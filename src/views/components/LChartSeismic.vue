@@ -1,0 +1,106 @@
+<template>
+  <div :id="chartId" class="fill"></div>
+</template>
+
+<script>
+  import {ColorHEX, ColorRGBA, lightningChart, PalettedFill, SolidFill} from '@arction/lcjs'
+  import {get2dColSize, get2dMaxData, get2dMinData, get2dRowSize, getLcColormap} from "../../libs/colormap";
+  import {createColorObject} from "../../libs/libLC";
+
+  export default {
+    name: "LChartSeismic",
+    props: ['title', 'points', 'xaxis' ,'yaxis'],
+    data()
+    {
+      return {
+        chart: null,
+        chartId: null,
+        ns: 0,
+        ntrc: 0,
+
+        defForeColor: "#000000",
+        defColor: {
+          background: ColorRGBA(255, 255, 255),
+          linecolor: ColorRGBA(65, 105, 225),
+          default: ColorRGBA(0, 0, 0),
+        },
+        grColor: null,
+      }
+    },
+    methods: {
+      createChart()
+      {
+        let ii = 0;
+        this.grColor = createColorObject(this.defColor);
+
+        // Create chartXY
+        this.chart = lightningChart().ChartXY({containerId: `${this.chartId}`})
+          .setTitleFillStyle(this.grColor.default)
+          .setBackgroundFillStyle(this.grColor.background)
+          .setChartBackgroundFillStyle(this.grColor.background);
+        this.chart.setTitle(this.title);
+
+        // Create LUT and FillStyle
+        this.minData = get2dMinData(this.points) + 20;
+        this.maxData = get2dMaxData(this.points) - 70;
+        this.palette = getLcColormap(ii, this.minData, this.maxData);
+
+        this.ntrc = get2dColSize(this.points);
+        this.ns = get2dRowSize(this.points);
+        let resolutionX = this.ns;
+        let resolutionY = this.ntrc;
+        let customX = this.chart.addAxisX(true)
+          .setTitleFillStyle(this.grColor.default)
+          .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
+          .disableAnimations()
+          .setInterval(0, this.ntrc)
+          .setTitle(this.xaxis["label"]);
+        let customY = this.chart.addAxisY(false)
+          .setTitleFillStyle(this.grColor.default)
+          .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
+          .disableAnimations()
+          .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns*this.yaxis["sampling"]))
+          .setTitle(this.yaxis["label"]);
+        this.chart.addHeatmapSeries({
+          rows: resolutionX,
+          columns: resolutionY,
+          start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns*this.yaxis["sampling"])},
+          end: {x: this.xaxis["data"][this.ntrc-1], y: this.yaxis["start"]},
+          pixelate: false,
+          xAxis: customX,
+          yAxis: customY
+        })
+          // Add data and invalidate the Series based on added data.
+          .invalidateValuesOnly(this.points)
+          .setFillStyle(new PalettedFill({lut: this.palette}));
+        this.chart.getDefaultAxisX().dispose();
+        this.chart.getDefaultAxisY().dispose();
+      }
+    },
+
+    mounted()
+    {
+      // Chart can only be created when the component has mounted the DOM because
+      // the chart needs the element with specified containerId to exist in the DOM
+      this.createChart()
+    },
+
+    beforeMount()
+    {
+      // Generate random ID to us as the containerId for the chart and the target div id
+      this.chartId = Math.trunc(Math.random() * 1000000)
+    },
+
+    beforeDestroy()
+    {
+      // "dispose" should be called when the component is unmounted to free all the resources used by the chart
+      this.chart.dispose()
+    }
+  }
+</script>
+
+<style scoped>
+  .fill {
+    height: 100%;
+  }
+</style>
