@@ -1,15 +1,18 @@
 <template>
-  <div :id="chartId" class="fill"></div>
+  <div class="image">
+    <div @click="myevent()" :id="chartId" class="image"></div>
+    <div class="overlay">{{TmpPoint}}</div>
+  </div>
 </template>
 
 <script>
-  import {ColorHEX, ColorRGBA, lightningChart, PalettedFill, SolidFill} from '@arction/lcjs'
+  import {ColorHEX, ColorRGBA, lightningChart, PalettedFill, SolidFill, translatePoint} from '@arction/lcjs'
   import {get2dColSize, get2dMaxData, get2dMinData, get2dRowSize, getLcColormap} from "../../libs/colormap";
   import {createColorObject} from "../../libs/libLC";
 
   export default {
     name: "LChartSeismic",
-    props: ['title', 'points', 'xaxis' ,'yaxis'],
+    props: ['title', 'points', 'xaxis', 'yaxis'],
     data()
     {
       return {
@@ -18,6 +21,8 @@
         ns: 0,
         ntrc: 0,
 
+        TmpPoint: '',
+        tmpEvent: null,
         defForeColor: "#000000",
         defColor: {
           background: ColorRGBA(255, 255, 255),
@@ -25,9 +30,21 @@
           default: ColorRGBA(0, 0, 0),
         },
         grColor: null,
+        pointInLcAxis: {}
       }
     },
     methods: {
+
+      isValidTrace(tmp_point)
+      {
+        if(tmp_point.x < 0 || tmp_point.x >= this.ntrc)
+          return(false);
+
+        if(tmp_point.y < this.yaxis["start"])
+          return (false)
+
+        return (true);
+      },
       createChart()
       {
         let ii = 0;
@@ -59,30 +76,70 @@
           .setTitleFillStyle(this.grColor.default)
           .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
-          .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns*this.yaxis["sampling"]))
+          .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns * this.yaxis["sampling"]))
           .setTitle(this.yaxis["label"]);
-        this.chart.addHeatmapSeries({
+        let a = this.chart.addHeatmapSeries({
           rows: resolutionX,
           columns: resolutionY,
-          start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns*this.yaxis["sampling"])},
-          end: {x: this.xaxis["data"][this.ntrc-1], y: this.yaxis["start"]},
+          start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns * this.yaxis["sampling"])},
+          end: {x: this.xaxis["data"][this.ntrc - 1], y: this.yaxis["start"]},
           pixelate: false,
           xAxis: customX,
           yAxis: customY
         })
+          .setMouseInteractions(true)
           // Add data and invalidate the Series based on added data.
           .invalidateValuesOnly(this.points)
           .setFillStyle(new PalettedFill({lut: this.palette}));
         this.chart.getDefaultAxisX().dispose();
         this.chart.getDefaultAxisY().dispose();
+
+        document.addEventListener('mousemove', (event) =>
+        {
+          this.tmpEvent = event;
+          let tmp_point = translatePoint(
+            this.chart.engine.clientLocation2Engine(this.tmpEvent.clientX, this.tmpEvent.clientY),
+            this.chart.engine.scale,
+            {
+              x: this.chart.getDefaultAxisX().scale,
+              y: this.chart.getDefaultAxisY().scale
+            }
+          )
+
+          if(this.isValidTrace(tmp_point))
+            this.TmpPoint = "Trace : " + Math.round(tmp_point.x+1) + " ,  " + this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
+              " ,  " + this.yaxis["label"] + " : " + Math.round(tmp_point.y);
+        })
+      },
+
+      myevent()
+      {
+        this.pointInLcAxis = translatePoint(
+          this.chart.engine.clientLocation2Engine(this.tmpEvent.clientX, this.tmpEvent.clientY),
+          this.chart.engine.scale,
+          {
+            x: this.chart.getDefaultAxisX().scale,
+            y: this.chart.getDefaultAxisY().scale
+          }
+        )
       }
     },
 
+    watch: {
+      pointInLcAxis(val)
+      {
+        if (val)
+        {
+          val["isValid"] = this.isValidTrace(val);
+          this.$emit('pointInLcAxis', val);
+        }
+      }
+    },
     mounted()
     {
       // Chart can only be created when the component has mounted the DOM because
       // the chart needs the element with specified containerId to exist in the DOM
-      this.createChart()
+      this.createChart();
     },
 
     beforeMount()
@@ -100,7 +157,13 @@
 </script>
 
 <style scoped>
-  .fill {
-    height: 100%;
+  .image {
+    height: 97%;
+    position: relative;
+    z-index: 1;
+  }
+  .overlay {
+    position: relative;
+    z-index: 2;
   }
 </style>

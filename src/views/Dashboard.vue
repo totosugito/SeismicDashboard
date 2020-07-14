@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container">
+    <DashboardTopInfo></DashboardTopInfo>
     <!--show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
@@ -20,12 +21,14 @@
   import {mapState, mapActions} from 'vuex'
   import {EventBus} from 'MyLibVue/src/libs/eventbus'
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+  import DashboardTopInfo from './components/DashboardTopInfo'
 
   export default {
     name: 'dashboard',
     components: {
       Callout,
-      VueSimpleDialog
+      VueSimpleDialog,
+      DashboardTopInfo
     },
     computed: mapState({
       varRouter: state => state.varRouter,

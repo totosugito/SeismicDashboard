@@ -53,7 +53,10 @@ export function getApronServerAPI()
     return ('https://rest.dazbor.com/'); //'http://jasdig.com:5156/apron/api';
   }
   else
+  {
     return ('http://192.168.99.51:5151/')
+    // return ('http://0.0.0.0:5151/')
+  }
 }
 
 export function create_auth_header()

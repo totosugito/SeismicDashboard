@@ -3,4 +3,5 @@ module.exports = {
   runtimeCompiler: true,
   assetsDir: 'static',
   publicPath: '',
+  outputDir: '../dist'
 };

@@ -13,10 +13,6 @@
           <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>
           <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>
         </b-button-group>
-        <b-input-group size="md" :prepend="YAxis.label">
-          <b-form-input v-model="timePos" class="text-right" style="width: 70px"></b-form-input>
-        </b-input-group>
-        <b-button class="ml-1" @click="createChartInfo()" variant="dark">Apply</b-button>
       </b-button-toolbar>
     </div>
 
@@ -24,7 +20,7 @@
       <template v-if="bShowChartSeismic===true">
         <b-col>
           <template v-if="showLoader===false">
-            <LChartSeismic class="lc_seismic_chart" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis"/>
+            <LChartSeismic class="lc_seismic_chart" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
           </template>
         </b-col>
       </template>
@@ -88,10 +84,16 @@
 
     beforeMount: function ()
     {
-      // this.getDemoData();
-      this.getListData();
+      this.getDemoData();
+      // this.getListData();
     },
     methods: {
+      updateLcPoint(e)
+      {
+        this.timePos = Math.round(e.y);
+        if(e.isValid)
+          this.createChartInfo();
+      },
       showHideChartSeismic()
       {
         this.bShowChartSeismic = !this.bShowChartSeismic;
@@ -129,7 +131,6 @@
       },
       createChartInfo()
       {
-        this.lineChartTitle = this.dataTitle + ', Time : ' + this.timePos;
         this.lineSeries = [];
         let tmp = [];
 
@@ -158,6 +159,7 @@
           data: tmp
         });
 
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + this.timePos;
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
