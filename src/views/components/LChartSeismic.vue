@@ -37,8 +37,11 @@
 
       isValidTrace(tmp_point)
       {
-        if(tmp_point.x < 0 || tmp_point.x >= this.ntrc)
-          return(false);
+        // if(tmp_point.x < 0 || tmp_point.x >= this.ntrc)
+        //   return(false);
+
+        if(tmp_point.x < this.xaxis["data"][0] || tmp_point >= this.xaxis["data"][this.ntrc - 1])
+          return (false)
 
         if(tmp_point.y < this.yaxis["start"])
           return (false)
@@ -107,8 +110,12 @@
           )
 
           if(this.isValidTrace(tmp_point))
-            this.TmpPoint = "Trace : " + Math.round(tmp_point.x+1) + " ,  " + this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
+          {
+            this.TmpPoint = this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
               " ,  " + this.yaxis["label"] + " : " + Math.round(tmp_point.y);
+            // this.TmpPoint = "Trace : " + Math.round(tmp_point.x + 1) + " ,  " + this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
+            //   " ,  " + this.yaxis["label"] + " : " + Math.round(tmp_point.y);
+          }
         })
       },
 

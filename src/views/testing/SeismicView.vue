@@ -13,6 +13,13 @@
           <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>
           <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>
         </b-button-group>
+        <b-dropdown size="sm" variant="dark" :text="getDropdownNeighbor()">
+          <b-dropdown-item-button @click="setNeighbor(0)">0</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(1)">1</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(2)">2</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(3)">3</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(4)">4</b-dropdown-item-button>
+        </b-dropdown>
       </b-button-toolbar>
     </div>
 
@@ -59,6 +66,7 @@
         myTitle: {},
         bShowChartSeismic: true,
         bShowChartLine: true,
+        nNeighbor: 0,
         timePos: 0,
         points: [],
         lcpoints: [],
@@ -84,8 +92,8 @@
 
     beforeMount: function ()
     {
-      this.getDemoData();
-      // this.getListData();
+      // this.getDemoData();
+      this.getListData();
     },
     methods: {
       updateLcPoint(e)
@@ -93,6 +101,15 @@
         this.timePos = Math.round(e.y);
         if(e.isValid)
           this.createChartInfo();
+      },
+      setNeighbor(ii)
+      {
+        this.nNeighbor = ii;
+        this.createChartInfo();
+      },
+      getDropdownNeighbor()
+      {
+        return("Neighbor ( " + this.nNeighbor + " ) ");
       },
       showHideChartSeismic()
       {
@@ -127,16 +144,16 @@
       getListData()
       {
         this.showLoader = true;
-        this.$store.dispatch('http_get', ["/api/segy/cdp-view/5ef4767e91d10d9b0c2a038e/205353", {}, this.event_http]).then();
+        this.$store.dispatch('http_get', ["/api/segy/trace-view/1/1000", {}, this.event_http]).then();
       },
       createChartInfo()
       {
         this.lineSeries = [];
-        let tmp = [];
 
         let nsp = this.points.length;
         let tidx = Math.floor(this.timePos / this.YAxis["sampling"]);
         let dx = Math.floor(this.YAxis["start"] / this.YAxis["sampling"]);
+        //console.log(tidx + " " + this.YAxis["sampling"] + " " + nsp + " " + dx)
 
         let pp = nsp-tidx-1 + dx;
         if(pp<0)
@@ -149,17 +166,30 @@
           pp = nsp - 1;
           this.timePos = this.YAxis["start"];
         }
-        for (let i = 0; i < this.points[0].length; i++)
-        {
-          tmp.push(this.points[pp][i]);
-        }
-        this.lineSeries.push({
-          type: 'line',
-          name: 'Raw Data',
-          data: tmp
-        });
 
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + this.timePos;
+        let t1 = pp - this.nNeighbor;
+        let t2 = pp + this.nNeighbor;
+        if(t1<0) t1 = 0;
+        if(t2>nsp) t2 = nsp-1;
+
+        for(let k=t1; k<=t2; k++)
+        {
+          let tmp = [];
+          for (let i = 0; i < this.points[0].length; i++)
+          {
+            tmp.push(this.points[k][i]);
+          }
+          let line_title = (nsp-k-1) * this.YAxis["sampling"];
+          //console.log((nsp-k) + " " + this.YAxis["sampling"] + " " + nsp)
+          this.lineSeries.push({
+            type: 'line',
+            name: line_title,
+            data: tmp
+          });
+        }
+
+
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + (nsp-pp-1)*this.YAxis["sampling"];
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
