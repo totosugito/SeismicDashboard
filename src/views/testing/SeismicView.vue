@@ -9,36 +9,34 @@
 
     <div>
       <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
-        <b-button-group size="md">
-          <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>
-          <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>
-        </b-button-group>
+<!--        <b-button-group size="md">-->
+<!--          <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>-->
+<!--          <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>-->
+<!--        </b-button-group>-->
         <b-dropdown size="sm" variant="dark" :text="getDropdownNeighbor()">
           <b-dropdown-item-button @click="setNeighbor(0)">0</b-dropdown-item-button>
           <b-dropdown-item-button @click="setNeighbor(1)">1</b-dropdown-item-button>
           <b-dropdown-item-button @click="setNeighbor(2)">2</b-dropdown-item-button>
           <b-dropdown-item-button @click="setNeighbor(3)">3</b-dropdown-item-button>
           <b-dropdown-item-button @click="setNeighbor(4)">4</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(5)">5</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(6)">6</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(7)">7</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(8)">8</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(9)">9</b-dropdown-item-button>
+          <b-dropdown-item-button @click="setNeighbor(10)">10</b-dropdown-item-button>
         </b-dropdown>
       </b-button-toolbar>
     </div>
 
-    <b-row>
-      <template v-if="bShowChartSeismic===true">
-        <b-col>
-          <template v-if="showLoader===false">
-            <LChartSeismic class="lc_seismic_chart" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
-          </template>
-        </b-col>
-      </template>
-      <template v-if="bShowChartLine===true">
-        <b-col>
-          <template v-if="showLoader===false">
-            <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
-          </template>
-        </b-col>
-      </template>
-    </b-row>
+    <splitpanes class="default-theme" vertical style="height: 77vh" @resized="splitResizedEvent('resized', $event)">
+      <pane min-size="20" max-size="80">
+        <LChartSeismic class="lc_seismic_chart" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
+      </pane>
+      <pane>
+        <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
+      </pane>
+    </splitpanes>
   </div>
 </template>
 
@@ -49,7 +47,9 @@
   import LChartSeismic from '../components/LChartSeismic'
   import {getData} from "../../libs/data";
   import ApexChartLine from "../components/ApexChartLine";
-  import {createDefaultParam} from "../../libs/defApexChartLine";
+  import {createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
+  import { Splitpanes, Pane } from 'splitpanes'
+  import 'splitpanes/dist/splitpanes.css'
 
   export default {
     name: 'SeismicView',
@@ -58,32 +58,31 @@
       spinLoader: state => state.spinLoader,
     }),
 
+    components: {
+      ApexChartLine,
+      LChartLine,
+      LChartSeismic,
+      Splitpanes, Pane
+    },
+
     data: () =>
     {
       return {
         showLoader: true,
 
         myTitle: {},
-        bShowChartSeismic: true,
-        bShowChartLine: true,
         nNeighbor: 0,
         timePos: 0,
         points: [],
         lcpoints: [],
         dataTitle: "",
         lineChartTitle: '',
-        XLabel: "Offset",
         XAxis: {},
         YAxis: {},
         lineSeries: [],
         lineChartOptions: {},
         event_http: {success: "success", fail: "fail"},
       }
-    },
-    components: {
-      ApexChartLine,
-      LChartLine,
-      LChartSeismic
     },
     created()
     {
@@ -92,10 +91,14 @@
 
     beforeMount: function ()
     {
-      // this.getDemoData();
-      this.getListData();
+      this.getDemoData();
+      // this.getListData();
     },
     methods: {
+      splitResizedEvent(strinfo, event)
+      {
+        this.createChartInfo();
+      },
       updateLcPoint(e)
       {
         this.timePos = Math.round(e.y);
@@ -110,14 +113,6 @@
       getDropdownNeighbor()
       {
         return("Neighbor ( " + this.nNeighbor + " ) ");
-      },
-      showHideChartSeismic()
-      {
-        this.bShowChartSeismic = !this.bShowChartSeismic;
-      },
-      showHideChartLine()
-      {
-        this.bShowChartLine = !this.bShowChartLine;
       },
       getDemoData()
       {
@@ -153,7 +148,6 @@
         let nsp = this.points.length;
         let tidx = Math.floor(this.timePos / this.YAxis["sampling"]);
         let dx = Math.floor(this.YAxis["start"] / this.YAxis["sampling"]);
-        //console.log(tidx + " " + this.YAxis["sampling"] + " " + nsp + " " + dx)
 
         let pp = nsp-tidx-1 + dx;
         if(pp<0)
@@ -179,8 +173,7 @@
           {
             tmp.push(this.points[k][i]);
           }
-          let line_title = (nsp-k-1) * this.YAxis["sampling"];
-          //console.log((nsp-k) + " " + this.YAxis["sampling"] + " " + nsp)
+          let line_title = ((nsp-k-1) * this.YAxis["sampling"]+this.YAxis["start"]);
           this.lineSeries.push({
             type: 'line',
             name: line_title,
@@ -188,13 +181,14 @@
           });
         }
 
-
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + (nsp-pp-1)*this.YAxis["sampling"];
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + ((nsp-pp-1)*this.YAxis["sampling"] + this.YAxis["start"]);
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
         this.lineChartOptions["xaxis"]["title"]["text"] = this.XAxis["label"];
         this.lineChartOptions["yaxis"]["title"]["text"] = "Amplitude";
+        this.lineChartOptions["colors"] = createDefaultColor(t1, t2, pp);
+        this.lineChartOptions["markers"] = createDefaultMarker(t1, t2, pp, 4, 0)
       }
 
     },
@@ -236,7 +230,7 @@
 
 <style lang="scss" scoped>
   .lc_seismic_chart {
-    height: 78vh;
+    height: 77vh;
   }
 
   .btn_toolbar {

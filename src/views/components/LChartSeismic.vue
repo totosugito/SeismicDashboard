@@ -25,7 +25,7 @@
         tmpEvent: null,
         defForeColor: "#000000",
         defColor: {
-          background: ColorRGBA(255, 255, 255),
+          background: ColorRGBA(250, 250, 250),
           linecolor: ColorRGBA(65, 105, 225),
           default: ColorRGBA(0, 0, 0),
         },
@@ -50,6 +50,9 @@
       },
       createChart()
       {
+        if (this.chart !== null)
+          this.chart.dispose();
+
         let ii = 0;
         this.grColor = createColorObject(this.defColor);
 
@@ -81,7 +84,7 @@
           .disableAnimations()
           .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns * this.yaxis["sampling"]))
           .setTitle(this.yaxis["label"]);
-        let a = this.chart.addHeatmapSeries({
+        this.chart.addHeatmapSeries({
           rows: resolutionX,
           columns: resolutionY,
           start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns * this.yaxis["sampling"])},
@@ -111,10 +114,10 @@
 
           if(this.isValidTrace(tmp_point))
           {
+            let y1 = Math.round((tmp_point.y - this.yaxis["start"]) / this.yaxis["sampling"]);
+            let y2 = y1 * this.yaxis["sampling"] + this.yaxis["start"];
             this.TmpPoint = this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
-              " ,  " + this.yaxis["label"] + " : " + Math.round(tmp_point.y);
-            // this.TmpPoint = "Trace : " + Math.round(tmp_point.x + 1) + " ,  " + this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
-            //   " ,  " + this.yaxis["label"] + " : " + Math.round(tmp_point.y);
+              " ,  " + this.yaxis["label"] + " : " + y2;
           }
         })
       },

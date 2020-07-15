@@ -1,8 +1,9 @@
 <template>
   <div>
     <apexcharts
-      style="background: whitesmoke"
+      style="background: #FAFAFA"
       height="100%"
+      width="100%"
       :options="chartOptions"
       :series="series"
     ></apexcharts>
