@@ -76,7 +76,7 @@ export default {
 
   methods: {
     gotoDashboardPage () {
-      this.$router.push(this.varRouter.getRoute("home", 1))
+      this.$router.push(this.varRouter.getRoute("well", 1))
     },
     authenticate () {
       this.showLoader = true;

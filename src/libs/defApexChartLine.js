@@ -124,6 +124,7 @@ export function createDefaultParam()
       type: 'numeric',
       position: 'top',
       title: {
+        offsetY: -65,
         // text: this.xaxis["label"],
         style: {
           fontSize: "120%"
@@ -131,6 +132,7 @@ export function createDefaultParam()
       },
       // categories: this.xaxis["data"],
       labels: {
+        offsetY: 10,
         show: true,
         hideOverlappingLabels: true,
         showDuplicates: false,
@@ -209,8 +211,16 @@ export function createDefaultParam()
       x: {
         show: true,
       },
+      y: {
+        formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+          return value.toFixed(6)
+        },
+        // title: {
+        //   formatter: (seriesName) => seriesName,
+        // },
+      },
       marker: {
-        show: false,
+        show: true,
       },
     }
   };

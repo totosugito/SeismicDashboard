@@ -16,6 +16,9 @@ export default class VarRouter {
     "start": ["start", "/start", "Start"],
     "home": ["home", "/home", "Home"],
     "dashboard": ["", "/", "Dashboard"],
+    "well": ["", "/", "Well"],
+    "inline-crossline": ["inline-crossline", "well/inline-crossline", "Inline & Crossline"],
+    "seismicviewer": ["seismicviewer", "/inline-crossline/seismic-viewer", "Seismic Viewer"],
 
     "lokasi-menu": ["lokasi-menu", "/lokasi-menu", "Menu Lokasi"],
     "lokasi-edit": ["lokasi-edit", "/lokasi-edit", "Edit Lokasi"],

@@ -56,7 +56,7 @@
   import 'splitpanes/dist/splitpanes.css'
 
   export default {
-    name: 'SeismicView',
+    name: 'SeismicViewer',
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
@@ -95,8 +95,8 @@
 
     beforeMount: function ()
     {
-      this.getDemoData();
-      // this.getListData();
+      // this.getDemoData();
+      this.getListData();
     },
     methods: {
       splitResizedEvent(strinfo, event)
@@ -143,7 +143,10 @@
       getListData()
       {
         this.showLoader = true;
-        this.$store.dispatch('http_get', ["/api/segy/trace-view/1/1000", {}, this.event_http]).then();
+        let str_st = this.$route.query.st;
+        let str_en = this.$route.query.en;
+        let cur_url = "/api/segy/trace-view/" + str_st + "/" + str_en;
+        this.$store.dispatch('http_get', [cur_url, {}, this.event_http]).then();
       },
       createChartInfo()
       {
@@ -215,7 +218,7 @@
         this.YAxis = msg["y"];
         this.XAxis["data"] = msg["cdp_header"];
 
-        this.dataTitle = "CDP NO : " + msg["cdp_no"];
+        this.dataTitle = msg["title"] + msg["cdp_no"];
         this.createChartInfo();
         this.showLoader = false;
       });

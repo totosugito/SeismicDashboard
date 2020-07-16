@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 import store from './_store';
 import VarRouter from "./_var-routers";
+
 const varRouter = new VarRouter();
 Vue.use(Router);
 
@@ -45,8 +46,8 @@ export default new Router({
       component: Page404
     },
     {
-      path : varRouter.getRoute("login", 1),
-      name : varRouter.getRoute("login", 2),
+      path: varRouter.getRoute("login", 1),
+      name: varRouter.getRoute("login", 2),
       component: PageLogin
     },
     {
@@ -57,14 +58,17 @@ export default new Router({
 
     {
       path: '/',
-      redirect: varRouter.getRoute("dashboard", 1),
-      name    : varRouter.getRoute("dashboard", 2),
+      redirect: varRouter.getRoute("well", 1),
+      name: varRouter.getRoute("well", 2),
       component: DefaultContainer,
       beforeEnter(to, from, next)
       {
-        if (!store.getters.isAuthenticated) {
+        if (!store.getters.isAuthenticated)
+        {
           next(varRouter.getRoute("login", 1))
-        } else {
+        }
+        else
+        {
           next();
         }
       },
@@ -73,39 +77,76 @@ export default new Router({
         {
           path: '/',
           name: '',
-          component: () => import('../views/Dashboard') //Dashboard
+          // component: () => import('../views/Dashboard') //Dashboard
+          component: () => import('../views/pages/WellTable') //Dashboard
         },
         {
           path: '',
           meta: {label: ''},
           component: {
-            render(c) {
+            render(c)
+            {
               return c('router-view')
             }
           },
           children: [
             {
+              path: varRouter.getRoute("well", 1),
+              name: varRouter.getRoute("well", 2),
+              component: () => import('../views/pages/WellTable')
+            },
+            {
+              path: varRouter.getRoute("inline-crossline", 1),
+              name: varRouter.getRoute("inline-crossline", 2),
+              component: () => import('../views/pages/InlineTable'),
+            },
+            // {
+            //   path: varRouter.getRoute("seismicviewer", 1),
+            //   name: varRouter.getRoute("seismicviewer", 2),
+            //   component: () => import('../views/pages/SeismicViewer')
+            // },
+            {
               path: varRouter.getRoute("home", 1),
               name: varRouter.getRoute("home", 2),
               component: () => import('../views/testing/SeismicView')
             },
+
+
+            {
+              path: varRouter.getRoute("inline-crossline", 1),
+              meta: {label: varRouter.getRoute("inline-crossline", 2)},
+              component: {
+                render(c) {
+                  return c('router-view')
+                }
+              },
+              children: [
+                {
+                  path: varRouter.getRoute("seismicviewer", 1),
+                  name: varRouter.getRoute("seismicviewer", 2),
+                  component: () => import('../views/pages/SeismicViewer')
+                },
+              ]
+            },
           ]
         },
 
+
+
         // {
-        //   path: varRouter.getRoute("home", 1),
-        //   meta: {label: varRouter.getRoute("home", 2)},
+        //   path: varRouter.getRoute("inline-crossline", 1),
+        //   meta: {label: varRouter.getRoute("inline-crossline", 2)},
         //   component: {
         //     render(c) {
         //       return c('router-view')
         //     }
         //   },
         //   children: [
-        //     // {
-        //     //   path: varRouter.getRoute("lokasi-menu", 1),
-        //     //   name: varRouter.getRoute("lokasi-menu", 2),
-        //     //   component: () => import('../apron/location/LokasiMenu') //LokasiMenu
-        //     // },
+        //     {
+        //       path: varRouter.getRoute("seismicviewer", 1),
+        //       name: varRouter.getRoute("seismicviewer", 2),
+        //       component: () => import('../views/pages/SeismicViewer')
+        //     },
         //   ]
         // },
       ]

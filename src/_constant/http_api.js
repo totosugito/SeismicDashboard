@@ -85,6 +85,14 @@ export function auto_error_message_parse(error)
   return(str_msg);
 }
 
+export function url_http_post_with_header(url_api, header, userData)
+{
+  return axios.post(getApronServerAPI() + url_api, userData,
+    {
+      headers: header
+    });
+}
+
 export function url_http_get_with_header(url_api, header, userData)
 {
   return axios.get(getApronServerAPI() + url_api, userData,

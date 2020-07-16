@@ -66,6 +66,15 @@
         // Create LUT and FillStyle
         this.minData = get2dMinData(this.points) + 20;
         this.maxData = get2dMaxData(this.points) - 70;
+
+        let mm_data = 0;
+        if(Math.abs(this.minData) > Math.abs(this.maxData))
+          mm_data = Math.abs(this.minData) * 10.0 / 100.0;
+        else
+          mm_data = Math.abs(this.maxData) * 10.0 / 100.0;
+        this.minData = this.minData + mm_data;
+        this.maxData = this.maxData - mm_data;
+
         this.palette = getLcColormap(ii, this.minData, this.maxData);
 
         this.ntrc = get2dColSize(this.points);

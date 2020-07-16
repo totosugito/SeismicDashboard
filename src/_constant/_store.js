@@ -11,7 +11,7 @@ import {
   create_auth_header,
   getDefaultUserIcon,
   url_http_get_with_header,
-  url_http_post
+  url_http_post, url_http_post_with_header
 } from "./http_api";
 import {
   isValidUser,
@@ -45,7 +45,9 @@ const state = {
   myProject:{},
 
   user: {},
-  selectedLokasi : {},
+  selectedWell : {},
+  selectedInline : {},
+
   selectedUser : {},
   selected_user: {},
   selected_jukir : []
@@ -133,25 +135,29 @@ const actions = {
 
   http_post(context, http_param_)
   {
-    printJson("INPUT --> ", http_param_[0]);
-    let event_ = http_param_[1];
-    return (url_http_post(http_param_[0]))
+    printJson("IPOST --> ", appDebugMode(), http_param_);
+    let event_ = http_param_[2];
+    let header = create_auth_header();
+    return (url_http_post_with_header(http_param_[0], header, http_param_[1]))
       .then(response => {
         const response_ = JSON.parse(JSON.stringify(response));
         let data = response_.data;
 
         printJson("OUTPUT --> ", data);
-        if(isEmpty(data))
+        //cek return data dari server
+        if (response_.status !== 200)
         {
-          EventBus.$emit('no_data', {status:0, title:'Fail', message:'Unknown data format'});
+          EventBus.$emit(event_.fail, data);
           return;
         }
-        if(data.status===1) EventBus.$emit(event_.success, data);
-        else  EventBus.$emit(event_.fail, data);
+        EventBus.$emit(event_.success, data);
       })
-      .catch(error => {
-        EventBus.$emit(event_.fail, this.createReturnStatus(0, 'Fail', error));
-      })
+        .catch(error =>
+        {
+          console.log('Error : ', error);
+          let str_msg = auto_error_message_parse(error);
+          EventBus.$emit(event_.fail, {status: 0, title: 'Fail', message: str_msg});
+        })
   },
 
   http_get(context, http_param_)
@@ -192,8 +198,11 @@ const actions = {
   actionSaveSelectedUser(context, payload){
     context.commit("saveSelectedUser", payload);
   },
-  actionSaveSelectedLokasi(context, payload){
-    context.commit("saveSelectedLokasi", payload);
+  actionSaveSelectedWell(context, payload){
+    context.commit("actionSaveSelectedWell", payload);
+  },
+  actionSaveSelectedInline(context, payload){
+    context.commit("actionSaveSelectedInline", payload);
   },
 
   //--------------------------------
@@ -232,9 +241,13 @@ const mutations = {
     localStorage.setItem(key_selected_user, JSON.stringify(value));
     state.selectedUser = value;
   },
-  saveSelectedLokasi(state, value){
+  actionSaveSelectedWell(state, value){
     localStorage.setItem(key_location, JSON.stringify(value)); //save data
-    state.selectedLokasi = value;
+    state.selectedWell = value;
+  },
+  actionSaveSelectedInline(state, value){
+    localStorage.setItem(key_location, JSON.stringify(value)); //save data
+    state.selectedInline = value;
   },
 
   // setSelectedUser(state, value){
@@ -272,9 +285,13 @@ const getters = {
     state.selectedUser = JSON.parse(localStorage.getItem(key_selected_user));
     return(state.selectedUser);
   },
-  readSelectedLokasi(state){
-    state.selectedLokasi = JSON.parse(localStorage.getItem(key_location));
-    return(state.selectedLokasi);
+  readSelectedWell(state){
+    state.selectedWell = JSON.parse(localStorage.getItem(key_location));
+    return(state.selectedWell);
+  },
+  readSelectedInline(state){
+    state.selectedInline = JSON.parse(localStorage.getItem(key_location));
+    return(state.selectedInline);
   },
 };
 
