@@ -38,12 +38,12 @@
       </div>
       <TheFooter>
         <div>
-          <a href="http://waviv.com">Waviv</a>
+<!--          <a href="http://waviv.com">Waviv</a>-->
           <span class="ml-1">&copy; 2020</span>
         </div>
         <div class="ml-auto">
-          <span class="mr-1">Powered by</span>
-          <a href="http://waviv.com">Waviv</a>
+<!--          <span class="mr-1">Powered by</span>-->
+<!--          <a href="http://waviv.com">Waviv</a>-->
         </div>
       </TheFooter>
     </template>

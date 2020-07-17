@@ -32,7 +32,7 @@
     <splitpanes class="default-theme" vertical style="height: 77vh" @resized="splitResizedEvent('resized', $event)">
       <pane min-size="20" max-size="80">
         <template v-if="showLoader==false">
-          <LChartSeismic class="lc_seismic_chart" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
+          <LChartSeismic class="lc_seismic_chart" :perc="plotPerc" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
         </template>
       </pane>
       <pane>
@@ -74,6 +74,7 @@
       return {
         showLoader: true,
 
+        plotPerc: 20,
         myTitle: {},
         nNeighbor: 0,
         timePos: 0,
@@ -145,7 +146,11 @@
         this.showLoader = true;
         let str_st = this.$route.query.st;
         let str_en = this.$route.query.en;
-        let cur_url = "/api/segy/trace-view/" + str_st + "/" + str_en;
+        this.plotPerc = this.$route.query.perc;
+        if(this.plotPerc === undefined)
+          this.plotPerc = 20;
+
+        let cur_url = "api/segy/trace-view/" + str_st + "/" + str_en;
         this.$store.dispatch('http_get', [cur_url, {}, this.event_http]).then();
       },
       createChartInfo()

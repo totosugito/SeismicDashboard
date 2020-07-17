@@ -56,9 +56,10 @@
 
             <!-- action status -->
             <template slot="action" slot-scope="row">
-              <button type="link" class="btn-sm btn-primary" @click="openData(row.item)"
-                      style="margin: 3px">Open
-              </button>
+<!--              <button type="link" class="btn-sm btn-primary" @click="openData(row.item)"-->
+<!--                      style="margin: 3px">Open-->
+<!--              </button>-->
+              <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
             </template>
           </b-table>
 
@@ -158,12 +159,16 @@
         let tmp_selected_well = this.$store.getters.readSelectedWell;
         this.$store.dispatch('http_post', ["api/well/info", tmp_selected_well, this.event_http_list]).then();
       },
+      openDataUrl(item)
+      {
+        return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"] + "&perc=20");
+      },
       openData(item)
       {
         this.selected_data = item;
         this.$router.push({
           path: this.varRouter.getRoute("seismicviewer", 1),
-          query: {st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
+          query: {st: this.selected_data["idx_st"], en: this.selected_data["idx_en"], perc: 20}
         });
       },
       radiusDialogBtn1Click() {
@@ -190,7 +195,10 @@
         // //fill table contents
         this.table_datas = msg;
 
-        this.strtitle = "Inline/Crossline List [ Radius=" + this.selectedWell["radius"] + " , Count=" + this.table_datas.length + " ]";
+        // this.strtitle = "Well ID = " + this.selectedWell["well_id"] +"  ,  Inline/Crossline List [ Radius=" +
+        //   this.selectedWell["radius"] + " , Count=" + this.table_datas.length + " ]";
+        this.strtitle = "Well ID = " + this.selectedWell["well_id"] +"  ,  [ Radius=" +
+          this.selectedWell["radius"] + " , Count=" + this.table_datas.length + " ]";
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
