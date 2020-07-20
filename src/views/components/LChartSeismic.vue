@@ -9,15 +9,18 @@
   import {ColorHEX, ColorRGBA, lightningChart, PalettedFill, SolidFill, translatePoint} from '@arction/lcjs'
   import {get2dColSize, get2dMaxData, get2dMinData, get2dRowSize, getLcColormap} from "../../libs/colormap";
   import {createColorObject} from "../../libs/libLC";
+  import {getIndexFromArray, getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
 
   export default {
     name: "LChartSeismic",
-    props: ['title', 'points', 'xaxis', 'yaxis', 'perc'],
+    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent'],
     data()
     {
       return {
         chart: null,
         chartId: null,
+        dx:1,
+        dy:1,
         ns: 0,
         ntrc: 0,
 
@@ -41,10 +44,15 @@
         //   return(false);
 
         if(tmp_point.x < this.xaxis["data"][0] || tmp_point >= this.xaxis["data"][this.ntrc - 1])
+        {
+          // console.log("x " + tmp_point)
           return (false)
+        }
 
-        if(tmp_point.y < this.yaxis["start"])
+        if(tmp_point.y < this.yaxis["start"])// || tmp_point.y > (this.yaxis["start"] + (this.ns * this.yaxis["sampling"])))
+        {
           return (false)
+        }
 
         return (true);
       },
@@ -53,7 +61,6 @@
         if (this.chart !== null)
           this.chart.dispose();
 
-        let ii = 0;
         this.grColor = createColorObject(this.defColor);
 
         // Create chartXY
@@ -75,10 +82,13 @@
         this.minData = this.minData + mm_data;
         this.maxData = this.maxData - mm_data;
 
-        this.palette = getLcColormap(ii, this.minData, this.maxData);
+        this.palette = getLcColormap(this.colormap, this.minData, this.maxData);
 
         this.ntrc = get2dColSize(this.points);
         this.ns = get2dRowSize(this.points);
+        this.dy = this.yaxis["sampling"]*1.0;
+        this.dx = this.xaxis["data"][1] - this.xaxis["data"][0];
+
         let resolutionX = this.ns;
         let resolutionY = this.ntrc;
         let customX = this.chart.addAxisX(true)
@@ -91,12 +101,12 @@
           .setTitleFillStyle(this.grColor.default)
           .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
-          .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns * this.yaxis["sampling"]))
+          .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns * this.dy))
           .setTitle(this.yaxis["label"]);
         this.chart.addHeatmapSeries({
           rows: resolutionX,
           columns: resolutionY,
-          start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns * this.yaxis["sampling"])},
+          start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns * this.dy)},
           end: {x: this.xaxis["data"][this.ntrc - 1], y: this.yaxis["start"]},
           pixelate: false,
           xAxis: customX,
@@ -123,17 +133,19 @@
 
           if(this.isValidTrace(tmp_point))
           {
-            let y1 = Math.round((tmp_point.y - this.yaxis["start"]) / this.yaxis["sampling"]);
-            let y2 = y1 * this.yaxis["sampling"] + this.yaxis["start"];
-            this.TmpPoint = this.xaxis["label"] + " : " + Math.round(tmp_point.x) +
-              " ,  " + this.yaxis["label"] + " : " + y2;
+            //console.log("0 : " + tmp_point.y)
+            let x1 = getIndexFromArray(tmp_point.x, this.dx);
+            let y1 = getIndexFromArray3(tmp_point.y, this.dy, this.yaxis["start"]);
+            let y2 = setPositionFromIndex(y1, this.dy, this.yaxis["start"]);
+            this.TmpPoint = this.xaxis["label"] + " : " + Math.round(tmp_point.x) + " [" + x1 + "]" +
+              " ,  " + this.yaxis["label"] + " : " + y2 + " [" + y1 + "]";
           }
         })
       },
 
       myevent()
       {
-        this.pointInLcAxis = translatePoint(
+        let tmp_point = translatePoint(
           this.chart.engine.clientLocation2Engine(this.tmpEvent.clientX, this.tmpEvent.clientY),
           this.chart.engine.scale,
           {
@@ -141,19 +153,13 @@
             y: this.chart.getDefaultAxisY().scale
           }
         )
+
+        if(this.isValidTrace(tmp_point))
+          this.pointInLcAxis = tmp_point;
+        //console.log("1 : " + this.pointInLcAxis.y)
       }
     },
 
-    watch: {
-      pointInLcAxis(val)
-      {
-        if (val)
-        {
-          val["isValid"] = this.isValidTrace(val);
-          this.$emit('pointInLcAxis', val);
-        }
-      }
-    },
     mounted()
     {
       // Chart can only be created when the component has mounted the DOM because
@@ -171,7 +177,33 @@
     {
       // "dispose" should be called when the component is unmounted to free all the resources used by the chart
       this.chart.dispose()
-    }
+    },
+    watch :
+      {
+        pointInLcAxis(val)
+        {
+          if (val)
+          {
+            val["isValid"] = this.isValidTrace(val);
+            this.$emit('pointInLcAxis', val);
+          }
+        },
+        colormap: function (val)
+        {
+          this.colormap = val;
+          this.createChart();
+        },
+        perc: function (val)
+        {
+          this.perc = val;
+          this.createChart();
+        },
+        resizeevent: function (val)
+        {
+          this.resizeevent = val;
+          this.createChart();
+        },
+      }
   }
 </script>
 

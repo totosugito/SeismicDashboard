@@ -32,6 +32,7 @@
     "splitpanes": "^2.2.1",
     "vue": "^2.5.22",
     "vue-apexcharts": "^1.5.3",
+    "vue-bootstrap-slider": "^2.1.8",
     "vue-material-design-icons": "^3.1.0",
     "vue-perfect-scrollbar": "^0.1.0",
     "vue-router": "^3.0.2",
@@ -48,7 +49,8 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-polyfill": "^6.26.0",
     "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.2"
+    "stylus-loader": "^3.0.2",
+    "vue-clusterize": "^0.5.1"
   },
   "browserslist": [
     "> 1%",

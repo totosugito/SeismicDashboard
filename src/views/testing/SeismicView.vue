@@ -9,6 +9,33 @@
 
     <div>
       <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
+        <b-dropdown size="sm" class="mr-1">
+          <template slot="button-content" class="pr-2">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(curColormap)" size="sm"/>
+          </template>
+
+          <b-dropdown-item @click="curColormap=4" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)" /> Gray
+          </b-dropdown-item>
+          <b-dropdown-item @click="curColormap=3" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)" /> Petrel
+          </b-dropdown-item>
+          <b-dropdown-item @click="curColormap=2" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)" /> Seismic
+          </b-dropdown-item>
+          <b-dropdown-item @click="curColormap=0" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)" /> Sharp
+          </b-dropdown-item>
+          <b-dropdown-item @click="curColormap=1" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> Yrwbc
+          </b-dropdown-item>
+        </b-dropdown>
+
+        <b-input-group size="sm" :prepend="YAxis.label">
+          <b-form-input v-model="timePos" class="text-right" style="width: 70px"></b-form-input>
+        </b-input-group>
+        <b-button size="sm" class="ml-1 mr-3" @click="createChartInfo()" variant="dark">Apply</b-button>
+
 <!--        <b-button-group size="md">-->
 <!--          <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>-->
 <!--          <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>-->
@@ -32,7 +59,8 @@
     <splitpanes class="default-theme" vertical style="height: 77vh" @resized="splitResizedEvent('resized', $event)">
       <pane min-size="20" max-size="80">
         <template v-if="showLoader==false">
-          <LChartSeismic class="lc_seismic_chart" :title="dataTitle" :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
+          <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :perc="plotPerc" :title="dataTitle"
+                         :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
         </template>
       </pane>
       <pane>
@@ -54,6 +82,8 @@
   import {createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
   import { Splitpanes, Pane } from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
+  import {getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
+  import {getColormapAsset} from "../../libs/colormap";
 
   export default {
     name: 'SeismicView',
@@ -72,14 +102,20 @@
     data: () =>
     {
       return {
+        curColormap : 4,
+
         showLoader: true,
 
+        dx:1.0,
+        dy:1.0,
+        colormap: 0,
         myTitle: {},
         nNeighbor: 0,
         timePos: 0,
         points: [],
         lcpoints: [],
         dataTitle: "",
+        plotPerc: 20,
         lineChartTitle: '',
         XAxis: {},
         YAxis: {},
@@ -99,15 +135,28 @@
       // this.getListData();
     },
     methods: {
+      fgetColormapAsset(ii)
+      {
+        return(getColormapAsset(ii))
+      },
+      getColormapImage()
+      {
+        let image_loc = '../../_assets/images/' + this.currentLang + '.png';
+        console.log(image_loc)
+        return(image_loc);
+      },
       splitResizedEvent(strinfo, event)
       {
         this.createChartInfo();
       },
       updateLcPoint(e)
       {
-        this.timePos = Math.round(e.y);
         if(e.isValid)
+        {
+          let idx_pos = getIndexFromArray3(e.y, this.dy, this.YAxis["start"]);
+          this.timePos = setPositionFromIndex(idx_pos, this.dy, this.YAxis["start"]);
           this.createChartInfo();
+        }
       },
       setNeighbor(ii)
       {
@@ -150,10 +199,9 @@
         this.lineSeries = [];
 
         let nsp = this.points.length;
-        let tidx = Math.floor(this.timePos / this.YAxis["sampling"]);
-        let dx = Math.floor(this.YAxis["start"] / this.YAxis["sampling"]);
+        let tidy = getIndexFromArray3(this.timePos, this.dy, this.YAxis["start"]);
 
-        let pp = nsp-tidx-1 + dx;
+        let pp = nsp-tidy-1;
         if(pp<0)
         {
           pp = 0;
@@ -185,7 +233,7 @@
           });
         }
 
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + ((nsp-pp-1)*this.YAxis["sampling"] + this.YAxis["start"]);
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + ((nsp-pp-1)*this.dy + this.YAxis["start"]);
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
@@ -214,6 +262,8 @@
         this.XAxis = msg["x"];
         this.YAxis = msg["y"];
         this.XAxis["data"] = msg["cdp_header"];
+        this.dx = this.XAxis["data"][1]-this.XAxis["data"][0];
+        this.dy = this.YAxis["sampling"]*1.0;
 
         this.dataTitle = "CDP NO : " + msg["cdp_no"];
         this.createChartInfo();

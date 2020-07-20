@@ -161,14 +161,14 @@
       },
       openDataUrl(item)
       {
-        return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"] + "&perc=20");
+        return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"]);
       },
       openData(item)
       {
         this.selected_data = item;
         this.$router.push({
           path: this.varRouter.getRoute("seismicviewer", 1),
-          query: {st: this.selected_data["idx_st"], en: this.selected_data["idx_en"], perc: 20}
+          query: {st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
         });
       },
       radiusDialogBtn1Click() {

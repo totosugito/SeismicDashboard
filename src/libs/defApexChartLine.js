@@ -28,13 +28,17 @@ export function createDefaultColor(idx1, idx2, idxc)
     "#9370DB", "#8A2BE2", "#9400D3", "#FF7F50",
     "#FF8C00", "#FFA500"];
 
-  let center_color = "#0000CD";
+  let dark_color = ["#0000CD", "#FF0000", "#008000", "#FF00FF"];
   let tmp_color = [];
   let ii = 0;
+  let idark = 0;
   for (let i=idx1; i<=idx2; i++)
   {
-    if(i===idxc)
-      tmp_color.push(center_color);
+    if(i===idxc[idark])
+    {
+      tmp_color.push(dark_color[idark]);
+      idark = idark + 1;
+    }
     else
     {
       tmp_color.push(list_color[ii]);
@@ -47,13 +51,18 @@ export function createDefaultColor(idx1, idx2, idxc)
 export function createDefaultMarker(idx1, idx2, idxc, center_size, other_size)
 {
   let tmp_marker = [];
+  let idx_marker = 0;
   for (let i=idx1; i<=idx2; i++)
   {
-    if(i===idxc)
+    if(i===idxc[idx_marker])
+    {
       tmp_marker.push(center_size);
+      idx_marker = idx_marker+1;
+    }
     else
       tmp_marker.push(other_size);
   }
+
   return({size: tmp_marker});
 }
 
