@@ -14,5 +14,5 @@ export function getIndexFromArray3(x, dx, dstart)
 export function setPositionFromIndex(idx, dx, dstart)
 {
   let p = dstart + (idx*dx);
-  return(p);
+  return(p.toFixed(3));
 }

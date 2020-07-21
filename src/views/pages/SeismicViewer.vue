@@ -12,7 +12,7 @@
 
 
         <b-input-group size="sm" :prepend="YAxis.label">
-          <b-form-input v-model="timePos" class="text-right" style="width: 70px"></b-form-input>
+          <b-form-input v-model="timePos" class="text-right" style="width: 80px"></b-form-input>
         </b-input-group>
         <b-button size="sm" class="ml-1 mr-3" @click="applyTimePosClicked()" variant="dark">Apply</b-button>
 
@@ -37,9 +37,9 @@
           <b-dropdown-item-button @click="setChartMode('opt')">Opt</b-dropdown-item-button>
         </b-dropdown>
 
-        <b-dropdown size="sm" class="mr-1">
+        <b-dropdown size="sm" class="mr-0">
           <template slot="button-content" class="pr-2" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap)" size="sm"/><span class="pl-1">{{fgetColormapName(colormap)}}</span>
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span class="pl-1">{{fgetColormapName(colormap.id)}}</span>
           </template>
 
           <b-dropdown-item @click="setColormap(0)" size="sm">
@@ -59,6 +59,8 @@
           </b-dropdown-item>
         </b-dropdown>
 
+        <enhanced-check label="Reverse" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>
+
         <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
           <b-input-group-prepend class="mr-1">
             <span style="color: white">perc :</span>
@@ -73,7 +75,7 @@
         <template v-if="showLoader==false">
           <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :resizeevent="resizeevent"
                          :perc="plotPerc" :title="dataTitle"
-                         :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
+                         :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)" @cursorInfo="cursorInfo($event)"/>
         </template>
       </pane>
       <pane>
@@ -82,6 +84,14 @@
         </template>
       </pane>
     </splitpanes>
+    <div>
+      <span class="box_shadow pl-1 pr-1">ntrc : {{ntrc}}</span>
+      <span class="box_shadow pl-1 pr-1">nsp : {{ns}}</span>
+      <span class="box_shadow pl-1 pr-1">dt : {{dt}}</span>
+      <span class="box_shadow pl-1 pr-1">start : {{ystart}}</span>
+      <span class="box_shadow ml-3 pl-1 pr-1">{{cursorinfo.x}}</span>
+      <span class="box_shadow pl-1 pr-1">{{cursorinfo.y}}</span>
+    </div>
 
 <!--    <vue-form-dialog-->
 <!--      ref="dataDialog"-->
@@ -114,6 +124,8 @@
 
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
+  import {getIndexFromArray, setPositionFromIndex} from "../../libs/simpleLib";
+  import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   // import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   // import clusterize from "vue-clusterize"
 
@@ -130,6 +142,7 @@
       LChartSeismic,
       Splitpanes, Pane,
       bFormSlider,
+      EnhancedCheck,
       // VueFormDialog,
       // "clusterize": clusterize
     },
@@ -139,8 +152,16 @@
       return {
         showLoader: true,
 
+        fixedDec: 3,
+        ntrc: 0,
+        ns:0,
+        ystart: 0,
+        dt: 1.0,
         resizeevent: false,
-        colormap: 0,
+        reverseColormap : false,
+        colormap: {id: 3, reverse: false},
+        cursorinfo: {x:0, y:0},
+
         modeMinMax: "min",
         plotPerc: 20,
         tmpPlotPerc: 20,
@@ -188,9 +209,13 @@
         this.resizeevent = !this.resizeevent;
         this.createChartInfo();
       },
+      cursorInfo(e)
+      {
+        this.cursorinfo = e;
+      },
       updateLcPoint(e)
       {
-        this.timePos = Math.round(e.y);
+        this.timePos = (Math.round(e.y)).toFixed(this.fixedDec);
         if(e.isValid)
           this.createChartInfo();
       },
@@ -206,7 +231,7 @@
       },
       setColormap(ii)
       {
-        this.colormap = ii;
+        this.colormap = {id: ii, reverse: this.reverseColormap};
       },
       getDropdownNeighbor()
       {
@@ -265,19 +290,18 @@
         this.lineSeries = [];
 
         let nsp = this.points.length;
-        let tidx = Math.floor(this.timePos / this.YAxis["sampling"]);
-        let dx = Math.floor(this.YAxis["start"] / this.YAxis["sampling"]);
+        let tidx = getIndexFromArray(this.timePos, this.dt, this.ystart);
 
-        let pp = nsp-tidx-1 + dx;
+        let pp = nsp-tidx-1;
         if(pp<0)
         {
           pp = 0;
-          this.timePos = this.YAxis["start"] + (this.YAxis["sampling"]*nsp) - 1;
+          this.timePos = setPositionFromIndex(nsp-1, this.dt, this.ystart);
         }
         else if(pp>=nsp)
         {
           pp = nsp - 1;
-          this.timePos = this.YAxis["start"];
+          this.timePos = setPositionFromIndex(0, this.dt, this.ystart);
         }
 
         let t1 = pp - this.nNeighbor;
@@ -293,7 +317,7 @@
           {
             tmp.push(this.points[k][i]);
           }
-          let line_title = ((nsp-k-1) * this.YAxis["sampling"] + this.YAxis["start"]);
+          let line_title = setPositionFromIndex(nsp-k-1, this.dt, this.ystart);
           this.lineSeries.push({
             type: 'line',
             name: line_title,
@@ -314,7 +338,7 @@
           });
         }
 
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + ((nsp-pp-1)*this.YAxis["sampling"] + this.YAxis["start"]);
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + setPositionFromIndex(nsp-pp-1, this.dt, this.ystart);
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
@@ -324,7 +348,9 @@
         this.lineChartOptions["markers"] = createDefaultMarker(t1, t2+1, [pp, t2+1], 4, 0)
 
         if(this.bApplyTimePos === false)
-          this.timePos = (nsp-pp-1)*this.YAxis["sampling"] + this.YAxis["start"];
+        {
+          this.timePos = setPositionFromIndex(nsp - pp - 1, this.dt, this.ystart);
+        }
 
         this.bApplyTimePos = false;
       }
@@ -337,10 +363,12 @@
       {
         this.points = [];
         let tmp = msg["cdp_data"];
-        for (let i = tmp[0].length - 1; i >= 0; i--)
+        this.ns = tmp[0].length;
+        this.ntrc = tmp.length;
+        for (let i = this.ns - 1; i >= 0; i--)
         {
           let tmp0 = [];
-          for (let j = 0; j < tmp.length; j++)
+          for (let j = 0; j < this.ntrc; j++)
             tmp0.push(tmp[j][i]);
           this.points.push(tmp0);
         }
@@ -348,6 +376,8 @@
         this.XAxis = msg["x"];
         this.YAxis = msg["y"];
         this.XAxis["data"] = msg["cdp_header"];
+        this.dt = this.YAxis["sampling"];
+        this.ystart = this.YAxis["start"];
 
         this.dataTitle = msg["title"] + msg["cdp_no"];
         this.createChartInfo();
@@ -363,6 +393,15 @@
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
     },
+
+    watch :
+      {
+        reverseColormap: function (val)
+        {
+          this.reverseColormap = val;
+          this.setColormap(this.colormap["id"]);
+        },
+      }
   }
 </script>
 

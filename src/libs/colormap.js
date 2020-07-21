@@ -1,5 +1,6 @@
 import {ColorRGBA, LUT} from "@arction/lcjs";
 import {colormapGray, colormapOdtPetrel, colormapOdtSeismic, colormapSharp, colormapYrwbc} from "./var_colormaps";
+import _ from "lodash";
 
 export function createColormapData(color_list, vmin_, vmax_)
 {
@@ -65,49 +66,39 @@ export function get2dMaxData(data)
   return (mmax);
 }
 
-export function getLcColormap(ii, mmin_, mmax_)
+export function getLcColormap(colormap, mmin_, mmax_)
 {
   let palette = {};
-  switch (ii)
+  let cc = [];
+  switch (colormap.id)
   {
     case 0:
-      palette = new LUT({
-        steps: createColormapData(colormapSharp(), mmin_, mmax_),
-        interpolate: true
-      });
+      cc = colormapSharp();
       break;
     case 1:
-      palette = new LUT({
-        steps: createColormapData(colormapYrwbc(), mmin_, mmax_),
-        interpolate: true
-      });
+      cc = colormapYrwbc();
       break;
     case 2:
-      palette = new LUT({
-        steps: createColormapData(colormapOdtSeismic(), mmin_, mmax_),
-        interpolate: true
-      });
+      cc = colormapOdtSeismic();
       break;
     case 3:
-      palette = new LUT({
-        steps: createColormapData(colormapOdtPetrel(), mmin_, mmax_),
-        interpolate: true
-      });
+      cc = colormapOdtPetrel();
       break;
     case 4:
-      palette = new LUT({
-        steps: createColormapData(colormapGray(), mmin_, mmax_),
-        interpolate: true
-      });
+      cc = colormapGray();
       break;
     default:
-      palette = new LUT({
-        steps: createColormapData(colormapOdtPetrel(), mmin_, mmax_),
-        interpolate: true
-      });
+      cc = colormapOdtPetrel();
       break;
   }
-  return(palette);
+  if (colormap.reverse)
+    _.reverse(cc);
+
+  palette = new LUT({
+    steps: createColormapData(cc, mmin_, mmax_),
+    interpolate: true
+  });
+  return (palette);
 }
 
 export function getColormapName(ii)

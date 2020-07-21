@@ -30,6 +30,7 @@
             <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> Yrwbc
           </b-dropdown-item>
         </b-dropdown>
+        <enhanced-check label="Reverse" style="height: 25px;" v-model="reverseColormap"></enhanced-check>
 
         <b-input-group size="sm" :prepend="YAxis.label">
           <b-form-input v-model="timePos" class="text-right" style="width: 70px"></b-form-input>
@@ -74,6 +75,7 @@
 
 <script>
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
+  import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import {mapState} from "vuex";
   import LChartLine from '../components/LChartLine'
   import LChartSeismic from '../components/LChartSeismic'
@@ -84,6 +86,7 @@
   import 'splitpanes/dist/splitpanes.css'
   import {getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
   import {getColormapAsset} from "../../libs/colormap";
+  import _ from 'lodash';
 
   export default {
     name: 'SeismicView',
@@ -96,19 +99,21 @@
       ApexChartLine,
       LChartLine,
       LChartSeismic,
-      Splitpanes, Pane
+      Splitpanes, Pane,
+      EnhancedCheck
     },
 
     data: () =>
     {
       return {
         curColormap : 4,
+        reverseColormap : false,
 
         showLoader: true,
 
         dx:1.0,
         dy:1.0,
-        colormap: 0,
+        colormap: {id: 4, reverse: false},
         myTitle: {},
         nNeighbor: 0,
         timePos: 0,
@@ -135,15 +140,18 @@
       // this.getListData();
     },
     methods: {
+      updateColormap()
+      {
+        this.colormap = { id: this.curColormap, reverse: this.reverseColormap}
+      },
       fgetColormapAsset(ii)
       {
         return(getColormapAsset(ii))
       },
-      getColormapImage()
+      fgetColormapReverse()
       {
-        let image_loc = '../../_assets/images/' + this.currentLang + '.png';
-        console.log(image_loc)
-        return(image_loc);
+        this.colormap = {id: curColormap, reverse: this.reverseColormap};
+        console.log(JSON.stringify(this.colormap))
       },
       splitResizedEvent(strinfo, event)
       {
@@ -279,6 +287,20 @@
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
     },
+
+    watch :
+      {
+        reverseColormap: function (val)
+        {
+          this.reverseColormap = val;
+          this.updateColormap();
+        },
+        curColormap: function (val)
+        {
+          this.curColormap = val;
+          this.updateColormap();
+        },
+      }
   }
 </script>
 

@@ -1,7 +1,6 @@
 <template>
   <div class="image">
     <div @click="myevent()" :id="chartId" class="image"></div>
-    <div class="overlay">{{TmpPoint}}</div>
   </div>
 </template>
 
@@ -23,8 +22,10 @@
         dy:1,
         ns: 0,
         ntrc: 0,
+        ystart : 0,
 
-        TmpPoint: '',
+        // x_cursor_info : '',
+        // y_cursor_info : '',
         tmpEvent: null,
         defForeColor: "#000000",
         defColor: {
@@ -33,7 +34,8 @@
           default: ColorRGBA(0, 0, 0),
         },
         grColor: null,
-        pointInLcAxis: {}
+        pointInLcAxis: {},
+        cursorInfo: {x:0, y:0}
       }
     },
     methods: {
@@ -49,7 +51,7 @@
           return (false)
         }
 
-        if(tmp_point.y < this.yaxis["start"])// || tmp_point.y > (this.yaxis["start"] + (this.ns * this.yaxis["sampling"])))
+        if(tmp_point.y < this.ystart)// || tmp_point.y > (this.yaxis["start"] + (this.ns * this.yaxis["sampling"])))
         {
           return (false)
         }
@@ -59,7 +61,9 @@
       createChart()
       {
         if (this.chart !== null)
+        {
           this.chart.dispose();
+        }
 
         this.grColor = createColorObject(this.defColor);
 
@@ -88,6 +92,9 @@
         this.ns = get2dRowSize(this.points);
         this.dy = this.yaxis["sampling"]*1.0;
         this.dx = this.xaxis["data"][1] - this.xaxis["data"][0];
+        this.ystart = this.yaxis["start"];
+        let start_time = Math.round(setPositionFromIndex(0, this.dy, this.ystart));
+        let end_time = Math.round(setPositionFromIndex(this.ns-1, this.dy, this.ystart));
 
         let resolutionX = this.ns;
         let resolutionY = this.ntrc;
@@ -101,13 +108,13 @@
           .setTitleFillStyle(this.grColor.default)
           .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
-          .setInterval(this.yaxis["start"], this.yaxis["start"] + (this.ns * this.dy))
+          .setInterval(start_time, end_time)
           .setTitle(this.yaxis["label"]);
         this.chart.addHeatmapSeries({
           rows: resolutionX,
           columns: resolutionY,
-          start: {x: this.xaxis["data"][0], y: this.yaxis["start"] + (this.ns * this.dy)},
-          end: {x: this.xaxis["data"][this.ntrc - 1], y: this.yaxis["start"]},
+          start: {x: this.xaxis["data"][0], y: end_time},
+          end: {x: this.xaxis["data"][this.ntrc - 1], y: start_time},
           pixelate: false,
           xAxis: customX,
           yAxis: customY
@@ -130,19 +137,29 @@
               y: this.chart.getDefaultAxisY().scale
             }
           )
-
-          if(this.isValidTrace(tmp_point))
-          {
-            //console.log("0 : " + tmp_point.y)
-            let x1 = getIndexFromArray(tmp_point.x, this.dx);
-            let y1 = getIndexFromArray3(tmp_point.y, this.dy, this.yaxis["start"]);
-            let y2 = setPositionFromIndex(y1, this.dy, this.yaxis["start"]);
-            this.TmpPoint = this.xaxis["label"] + " : " + Math.round(tmp_point.x) + " [" + x1 + "]" +
-              " ,  " + this.yaxis["label"] + " : " + y2 + " [" + y1 + "]";
-          }
+          this.cursor_move_event(tmp_point);
         })
       },
 
+      cursor_move_event(tmp_point)
+      {
+        if(this.isValidTrace(tmp_point))
+        {
+          //console.log("0 : " + tmp_point.y)
+          let x1 = getIndexFromArray(tmp_point.x, this.dx);
+          let y1 = getIndexFromArray3(tmp_point.y, this.dy, this.ystart);
+          let y2 = setPositionFromIndex(y1, this.dy, this.ystart);
+
+          // this.x_cursor_info = this.xaxis["label"] + " : " + Math.round(tmp_point.x) + " [" + x1 + "]";
+          // let y_cursor_info = this.yaxis["label"] + " : " + y2.toFixed(3) + " [" + y1 + "]";
+          let x_cursor_info = "x : " + Math.round(tmp_point.x) + " [" + x1 + "]";
+          let y_cursor_info = "y : " + y2 + " [" + y1 + "]";
+          this.cursorInfo = {
+            x : x_cursor_info,
+            y : y_cursor_info,
+          }
+        }
+      },
       myevent()
       {
         let tmp_point = translatePoint(
@@ -156,7 +173,6 @@
 
         if(this.isValidTrace(tmp_point))
           this.pointInLcAxis = tmp_point;
-        //console.log("1 : " + this.pointInLcAxis.y)
       }
     },
 
@@ -180,6 +196,11 @@
     },
     watch :
       {
+        cursorInfo(val)
+        {
+          this.$emit('cursorInfo', val);
+        },
+
         pointInLcAxis(val)
         {
           if (val)
@@ -209,7 +230,7 @@
 
 <style scoped>
   .image {
-    height: 97%;
+    height: 100%;
     position: relative;
     z-index: 1;
   }
