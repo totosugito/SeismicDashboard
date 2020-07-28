@@ -25,7 +25,7 @@
               <b-col md="6" class="my-1">
                 <b-form-group  label-cols-lg="4" label-cols-md="3" label-cols-sm="6"  class="mb-0">
                   <b-input-group prepend="Filter : ">
-                    <b-form-input v-model="filter" placeholder="Cari data"/>
+                    <b-form-input v-model="filter" placeholder="Search"/>
                     <b-input-group-append>
                       <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                     </b-input-group-append>
@@ -161,6 +161,7 @@
       },
       openDataUrl(item)
       {
+        // return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"] + "&min=0&max=0");
         return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"]);
       },
       openData(item)

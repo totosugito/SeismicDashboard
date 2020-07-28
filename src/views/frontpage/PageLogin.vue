@@ -56,12 +56,12 @@ export default {
 
   created() {
     this.$store.dispatch('createVarRouter').then(); //no selected project
-    this.$store.dispatch('logout').then(); //no selected project
-    if(appDebugServer()===true)
-    {
-      this.textUserName = "demo";
-      this.textPassword = "demo";
-    }
+    // this.$store.dispatch('logout').then(); //no selected project
+    // if(appDebugServer()===true)
+    // {
+    //   this.textUserName = "demo";
+    //   this.textPassword = "demo";
+    // }
   },
 
   data () {

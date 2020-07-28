@@ -35,8 +35,8 @@ export default {
 
   methods: {
     logout () {
-      this.$store.dispatch('logout', {token: "", type : this.varRouter.getHttpType("user"), subtype: "logout", param: [this.user]})
-        .then(() => this.$router.push(this.varRouter.getRoute("login", 1)))
+      // this.$store.dispatch('logout', {token: "", type : this.varRouter.getHttpType("user"), subtype: "logout", param: [this.user]})
+      //   .then(() => this.$router.push(this.varRouter.getRoute("login", 1)))
     },
   },
 }

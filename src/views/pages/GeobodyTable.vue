@@ -10,7 +10,7 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <strong>Well List</strong>
+            <strong>Geobody</strong>
           </div>
 
           <!-- -------------------------------------------- -->
@@ -110,7 +110,7 @@
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {mapState} from "vuex";
   export default {
-    name: 'well-table',
+    name: 'geobody-table',
 
     components: {
       VueSimpleDialog,
@@ -128,7 +128,7 @@
     },
 
     beforeMount: function () {
-      this.getListData();
+      // this.getListData();
     },
 
     methods: {

@@ -12,7 +12,7 @@
 
   export default {
     name: "LChartSeismic",
-    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent'],
+    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax'],
     data()
     {
       return {
@@ -77,6 +77,11 @@
         // Create LUT and FillStyle
         this.minData = get2dMinData(this.points);
         this.maxData = get2dMaxData(this.points);
+
+        // let dmin_ = Math.abs(this.minData * this.cmin / 100.0);
+        // let dmax_ = Math.abs(this.maxData * this.cmax / 100.0);
+        // this.minData = this.minData + dmin_;
+        // this.maxData = this.maxData - dmax_;
 
         let mm_data = 0;
         if(Math.abs(this.minData) > Math.abs(this.maxData))

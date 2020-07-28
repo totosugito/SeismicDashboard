@@ -58,8 +58,8 @@ export default new Router({
 
     {
       path: '/',
-      redirect: varRouter.getRoute("well", 1),
-      name: varRouter.getRoute("well", 2),
+      redirect: varRouter.getRoute("dashboard", 1),
+      name: varRouter.getRoute("dashboard", 2),
       component: DefaultContainer,
       beforeEnter(to, from, next)
       {
@@ -91,26 +91,41 @@ export default new Router({
           },
           children: [
             {
-              path: varRouter.getRoute("well", 1),
-              name: varRouter.getRoute("well", 2),
-              component: () => import('../views/pages/WellTable')
+              path: varRouter.getRoute("geobody", 1),
+              name: varRouter.getRoute("geobody", 2),
+              component: () => import('../views/pages/GeobodyTable')
             },
-            {
-              path: varRouter.getRoute("inline-crossline", 1),
-              name: varRouter.getRoute("inline-crossline", 2),
-              component: () => import('../views/pages/InlineTable'),
-            },
-            // {
-            //   path: varRouter.getRoute("seismicviewer", 1),
-            //   name: varRouter.getRoute("seismicviewer", 2),
-            //   component: () => import('../views/pages/SeismicViewer')
-            // },
             {
               path: varRouter.getRoute("home", 1),
               name: varRouter.getRoute("home", 2),
               component: () => import('../views/testing/SeismicView')
             },
 
+
+            // ---------------------------------------------------
+            // ---------------------- WELL -----------------------
+            // ---------------------------------------------------
+            {
+              path: varRouter.getRoute("well", 1),
+              name: varRouter.getRoute("well", 2),
+              component: () => import('../views/pages/WellTable')
+            },
+            {
+              path: varRouter.getRoute("well", 1),
+              meta: {label: varRouter.getRoute("well", 2)},
+              component: {
+                render(c) {
+                  return c('router-view')
+                }
+              },
+              children: [
+                {
+                  path: varRouter.getRoute("inline-crossline", 1),
+                  name: varRouter.getRoute("inline-crossline", 2),
+                  component: () => import('../views/pages/InlineTable')
+                },
+              ]
+            },
 
             {
               path: varRouter.getRoute("inline-crossline", 1),

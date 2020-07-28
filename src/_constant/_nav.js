@@ -16,6 +16,28 @@ export default {
 
     {
       title: true,
+      name: 'Project',
+      class: '',
+      wrapper: {
+        element: '',
+        attributes: {}
+      }
+    },
+    {
+      name: 'Well',
+      url: '/well',
+      router: 'well',
+      icon: 'fa fa-fire '
+    },
+    {
+      name: 'Geobody',
+      url: '/geobody',
+      router: 'geobody',
+      icon: 'fa fa-cube'
+    },
+
+    {
+      title: true,
       name: 'Account',
       class: '',
       wrapper: {

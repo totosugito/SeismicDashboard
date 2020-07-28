@@ -74,8 +74,9 @@
       <pane min-size="20" max-size="80">
         <template v-if="showLoader==false">
           <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :resizeevent="resizeevent"
-                         :perc="plotPerc" :title="dataTitle"
-                         :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)" @cursorInfo="cursorInfo($event)"/>
+                         :perc="plotPerc" :title="dataTitle" :cmin="cmin" :cmax="cmax"
+                         :points="points" :xaxis="XAxis" :yaxis="YAxis"
+                         @pointInLcAxis="updateLcPoint($event)" @cursorInfo="cursorInfo($event)"/>
         </template>
       </pane>
       <pane>
@@ -162,6 +163,8 @@
         colormap: {id: 3, reverse: false},
         cursorinfo: {x:0, y:0},
 
+        cmin : 0,
+        cmax : 0,
         modeMinMax: "min",
         plotPerc: 20,
         tmpPlotPerc: 20,
@@ -273,9 +276,12 @@
         this.showLoader = true;
         let str_st = this.$route.query.st;
         let str_en = this.$route.query.en;
-        // this.plotPerc = this.$route.query.perc*1;
-        // if(this.plotPerc === undefined)
-        //   this.plotPerc = 20;
+        this.cmin = this.$route.query.min;
+        this.cmax = this.$route.query.max;
+        if(this.cmin === undefined)
+          this.cmin = 0;
+        if(this.cmax === undefined)
+          this.cmax = 0;
 
         let cur_url = "api/segy/trace-view/" + str_st + "/" + str_en;
         this.$store.dispatch('http_get', [cur_url, {}, this.event_http]).then();
