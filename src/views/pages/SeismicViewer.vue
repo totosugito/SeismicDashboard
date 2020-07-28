@@ -38,34 +38,41 @@
         </b-dropdown>
 
         <b-dropdown size="sm" class="mr-0">
-          <template slot="button-content" class="pr-2" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span class="pl-1">{{fgetColormapName(colormap.id)}}</span>
+          <template slot="button-content" class="pr-1" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span
+            class="pl-1">{{fgetColormapName(colormap.id)}}</span>
           </template>
 
           <b-dropdown-item @click="setColormap(0)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)" /> Sharp
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> Sharp
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(1)" size="sm">
             <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> Yrwbc
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(2)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)" /> Seismic
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> Seismic
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(3)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)" /> Petrel
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> Petrel
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(4)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)" /> Gray
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> Gray
           </b-dropdown-item>
         </b-dropdown>
-
-        <enhanced-check label="Reverse" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>
+<!--        <b-form-checkbox v-model="reverseColormap" class="mr-1">Rev</b-form-checkbox>-->
+        <enhanced-check label="Rev" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>
 
         <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
           <b-input-group-prepend class="mr-1">
-            <span style="color: white">perc :</span>
+            <span style="color: white">Min ({{cmin}})</span>
           </b-input-group-prepend>
-          <b-form-slider class="height=30px" v-model="tmpPlotPerc" @slide-stop="slideStop" :min="0" :max="100"></b-form-slider>
+          <b-form-slider style="height:20px;" v-model="tmp_cmin" @slide-stop="slideStopMin" :min="0" :max="99"></b-form-slider>
+        </b-input-group>
+        <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+          <b-input-group-prepend class="mr-1">
+            <span style="color: white">Max ({{cmax}})</span>
+          </b-input-group-prepend>
+          <b-form-slider style="height:20px;" v-model="tmp_cmax" @slide-stop="slideStopMax" :min="0" :max="99"></b-form-slider>
         </b-input-group>
       </b-button-toolbar>
     </div>
@@ -73,15 +80,16 @@
     <splitpanes class="default-theme" vertical style="height: 77vh" @resized="splitResizedEvent('resized', $event)">
       <pane min-size="20" max-size="80">
         <template v-if="showLoader==false">
-          <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :resizeevent="resizeevent"
-                         :perc="plotPerc" :title="dataTitle" :cmin="cmin" :cmax="cmax"
-                         :points="points" :xaxis="XAxis" :yaxis="YAxis"
-                         @pointInLcAxis="updateLcPoint($event)" @cursorInfo="cursorInfo($event)"/>
+          <LChartSeismicWithLine class="lc_seismic_chart" :colormap="colormap" :resizeevent="resizeevent"
+                                 :title="dataTitle" :cmin="cmin" :cmax="cmax"
+                                 :points="points" :xaxis="XAxis" :yaxis="YAxis"
+                                 @pointInLcAxis="updateLcPoint($event)" @cursorInfo="cursorInfo($event)"
+                                 :chart_info_data="seriesSeismicInfo"/>
         </template>
       </pane>
       <pane>
         <template v-if="showLoader==false">
-        <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
+          <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
         </template>
       </pane>
     </splitpanes>
@@ -94,19 +102,19 @@
       <span class="box_shadow pl-1 pr-1">{{cursorinfo.y}}</span>
     </div>
 
-<!--    <vue-form-dialog-->
-<!--      ref="dataDialog"-->
-<!--      type="default"-->
-<!--      header="Parameters" body="Body"-->
-<!--      btn1_text="Close" btn2_text="Process"-->
-<!--      btn1_style="danger" btn2_style="primary">-->
-<!--&lt;!&ndash;      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">&ndash;&gt;-->
+    <!--    <vue-form-dialog-->
+    <!--      ref="dataDialog"-->
+    <!--      type="default"-->
+    <!--      header="Parameters" body="Body"-->
+    <!--      btn1_text="Close" btn2_text="Process"-->
+    <!--      btn1_style="danger" btn2_style="primary">-->
+    <!--&lt;!&ndash;      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">&ndash;&gt;-->
 
-<!--      &lt;!&ndash; body slot &ndash;&gt;-->
-<!--&lt;!&ndash;      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">&ndash;&gt;-->
-<!--&lt;!&ndash;              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>&ndash;&gt;-->
-<!--&lt;!&ndash;            </span>&ndash;&gt;-->
-<!--    </vue-form-dialog>-->
+    <!--      &lt;!&ndash; body slot &ndash;&gt;-->
+    <!--&lt;!&ndash;      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">&ndash;&gt;-->
+    <!--&lt;!&ndash;              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>&ndash;&gt;-->
+    <!--&lt;!&ndash;            </span>&ndash;&gt;-->
+    <!--    </vue-form-dialog>-->
   </div>
 </template>
 
@@ -114,13 +122,13 @@
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
   import {mapState} from "vuex";
   import LChartLine from '../components/LChartLine'
-  import LChartSeismic from '../components/LChartSeismic'
+  import LChartSeismicWithLine from '../components/LChartSeismicWithLine'
   import {getData} from "../../libs/data";
   import ApexChartLine from "../components/ApexChartLine";
   import {createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
-  import { Splitpanes, Pane } from 'splitpanes'
+  import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
-  import {matrix_col_optimum} from "../../libs/test_max_min_val_each_column";
+  import {matrix_col_optimum, matrix_col_optimum_v1} from "../../libs/test_max_min_val_each_column";
   import {getColormapAsset, getColormapName} from "../../libs/colormap";
 
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
@@ -140,7 +148,7 @@
     components: {
       ApexChartLine,
       LChartLine,
-      LChartSeismic,
+      LChartSeismicWithLine,
       Splitpanes, Pane,
       bFormSlider,
       EnhancedCheck,
@@ -155,19 +163,20 @@
 
         fixedDec: 3,
         ntrc: 0,
-        ns:0,
+        ns: 0,
         ystart: 0,
         dt: 1.0,
         resizeevent: false,
-        reverseColormap : false,
+        reverseColormap: false,
         colormap: {id: 3, reverse: false},
-        cursorinfo: {x:0, y:0},
+        cursorinfo: {x: 0, y: 0},
+        seriesSeismicInfo: [],
 
-        cmin : 0,
-        cmax : 0,
+        cmin: 20,
+        cmax: 20,
         modeMinMax: "min",
-        plotPerc: 20,
-        tmpPlotPerc: 20,
+        tmp_cmin: 20,
+        tmp_cmax: 20,
         myTitle: {},
         nNeighbor: 0,
         timePos: 0,
@@ -196,15 +205,20 @@
     methods: {
       fgetColormapName(ii)
       {
-        return(getColormapName(ii))
+        return (getColormapName(ii))
       },
       fgetColormapAsset(ii)
       {
-        return(getColormapAsset(ii))
+        return (getColormapAsset(ii))
       },
 
-      slideStop () {
-        this.plotPerc = this.tmpPlotPerc;
+      slideStopMin()
+      {
+        this.cmin = this.tmp_cmin;
+      },
+      slideStopMax()
+      {
+        this.cmax = this.tmp_cmax;
       },
 
       splitResizedEvent(strinfo, event)
@@ -219,7 +233,7 @@
       updateLcPoint(e)
       {
         this.timePos = (Math.round(e.y)).toFixed(this.fixedDec);
-        if(e.isValid)
+        if (e.isValid)
           this.createChartInfo();
       },
       setChartMode(ii)
@@ -238,15 +252,16 @@
       },
       getDropdownNeighbor()
       {
-        return("Neighbor ( " + this.nNeighbor + " ) ");
+        return ("Neighbor ( " + this.nNeighbor + " ) ");
       },
       getDropdownMode()
       {
-        return("Mode ( " + this.modeMinMax + " ) ");
+        // return ("Mode ( " + this.modeMinMax + " ) ");
+        return (this.modeMinMax);
       },
       getColormapColor()
       {
-        return("Colormap : " + getColormapName(this.colormap));
+        return ("Colormap : " + getColormapName(this.colormap));
       },
 
       getDemoData()
@@ -266,6 +281,8 @@
         for (let i = 0; i < this.points[0].length; i++)
           data.push(i);
         this.XAxis["data"] = data;
+        this.ns = this.points.length;
+        this.dt = this.YAxis["sampling"];
 
         this.dataTitle = "CDP NO : 1";
         this.createChartInfo();
@@ -276,12 +293,6 @@
         this.showLoader = true;
         let str_st = this.$route.query.st;
         let str_en = this.$route.query.en;
-        this.cmin = this.$route.query.min;
-        this.cmax = this.$route.query.max;
-        if(this.cmin === undefined)
-          this.cmin = 0;
-        if(this.cmax === undefined)
-          this.cmax = 0;
 
         let cur_url = "api/segy/trace-view/" + str_st + "/" + str_en;
         this.$store.dispatch('http_get', [cur_url, {}, this.event_http]).then();
@@ -294,36 +305,34 @@
       createChartInfo()
       {
         this.lineSeries = [];
-
-        let nsp = this.points.length;
         let tidx = getIndexFromArray(this.timePos, this.dt, this.ystart);
 
-        let pp = nsp-tidx-1;
-        if(pp<0)
+        let pp = this.ns - tidx - 1;
+        if (pp < 0)
         {
           pp = 0;
-          this.timePos = setPositionFromIndex(nsp-1, this.dt, this.ystart);
+          this.timePos = setPositionFromIndex(this.ns - 1, this.dt, this.ystart);
         }
-        else if(pp>=nsp)
+        else if (pp >= this.ns)
         {
-          pp = nsp - 1;
+          pp = this.ns - 1;
           this.timePos = setPositionFromIndex(0, this.dt, this.ystart);
         }
 
         let t1 = pp - this.nNeighbor;
         let t2 = pp + this.nNeighbor;
-        if(t1<0) t1 = 0;
-        if(t2>nsp) t2 = nsp-1;
+        if (t1 < 0) t1 = 0;
+        if (t2 > this.ns) t2 = this.ns - 1;
 
         let ArrModeMinMax = [];
-        for(let k=t2; k>=t1; k--)
+        for (let k = t2; k >= t1; k--)
         {
           let tmp = [];
           for (let i = 0; i < this.points[0].length; i++)
           {
             tmp.push(this.points[k][i]);
           }
-          let line_title = setPositionFromIndex(nsp-k-1, this.dt, this.ystart);
+          let line_title = setPositionFromIndex(this.ns - k - 1, this.dt, this.ystart);
           this.lineSeries.push({
             type: 'line',
             name: line_title,
@@ -333,29 +342,35 @@
         }
 
         // plot min max data
-        if(this.modeMinMax !== 'off')
+        if (this.modeMinMax !== 'off')
         {
           let nx = this.points[0].length;
-          let v_data_minmax = matrix_col_optimum(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax);
+          //let v_data_minmax = matrix_col_optimum(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax);
+          let opt_data = matrix_col_optimum_v1(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax, t1, this.XAxis["data"], this.dt, this.ns);
           this.lineSeries.push({
             type: 'line',
             name: "Mode : " + this.modeMinMax,
-            data: v_data_minmax
+            data: opt_data["opt"]
           });
+          this.seriesSeismicInfo = opt_data["info"];
+        }
+        else
+        {
+          this.seriesSeismicInfo = null;
         }
 
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + setPositionFromIndex(nsp-pp-1, this.dt, this.ystart);
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + setPositionFromIndex(this.ns - pp - 1, this.dt, this.ystart);
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
         this.lineChartOptions["xaxis"]["title"]["text"] = this.XAxis["label"];
         this.lineChartOptions["yaxis"]["title"]["text"] = "Amplitude";
-        this.lineChartOptions["colors"] = createDefaultColor(t1, t2+1, [pp, t2+1]);
-        this.lineChartOptions["markers"] = createDefaultMarker(t1, t2+1, [pp, t2+1], 4, 0)
+        this.lineChartOptions["colors"] = createDefaultColor(t1, t2 + 1, [pp, t2 + 1]);
+        this.lineChartOptions["markers"] = createDefaultMarker(t1, t2 + 1, [pp, t2 + 1], 4, 0)
 
-        if(this.bApplyTimePos === false)
+        if (this.bApplyTimePos === false)
         {
-          this.timePos = setPositionFromIndex(nsp - pp - 1, this.dt, this.ystart);
+          this.timePos = setPositionFromIndex(this.ns - pp - 1, this.dt, this.ystart);
         }
 
         this.bApplyTimePos = false;
@@ -400,7 +415,7 @@
       EventBus.$off(this.event_http.fail);
     },
 
-    watch :
+    watch:
       {
         reverseColormap: function (val)
         {

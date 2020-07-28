@@ -15,16 +15,16 @@
           </template>
 
           <b-dropdown-item @click="curColormap=4" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)" /> Gray
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> Gray
           </b-dropdown-item>
           <b-dropdown-item @click="curColormap=3" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)" /> Petrel
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> Petrel
           </b-dropdown-item>
           <b-dropdown-item @click="curColormap=2" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)" /> Seismic
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> Seismic
           </b-dropdown-item>
           <b-dropdown-item @click="curColormap=0" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)" /> Sharp
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> Sharp
           </b-dropdown-item>
           <b-dropdown-item @click="curColormap=1" size="sm">
             <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> Yrwbc
@@ -37,10 +37,10 @@
         </b-input-group>
         <b-button size="sm" class="ml-1 mr-3" @click="createChartInfo()" variant="dark">Apply</b-button>
 
-<!--        <b-button-group size="md">-->
-<!--          <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>-->
-<!--          <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>-->
-<!--        </b-button-group>-->
+        <!--        <b-button-group size="md">-->
+        <!--          <b-button class="mr-1" variant="dark" @click="showHideChartSeismic()"><i class="btn_toolbar fa fa-image"></i></b-button>-->
+        <!--          <b-button class="mr-1" variant="dark" @click="showHideChartLine()"><i class="btn_toolbar fa fa-line-chart"></i></b-button>-->
+        <!--        </b-button-group>-->
         <b-dropdown size="sm" variant="dark" :text="getDropdownNeighbor()">
           <b-dropdown-item-button @click="setNeighbor(0)">0</b-dropdown-item-button>
           <b-dropdown-item-button @click="setNeighbor(1)">1</b-dropdown-item-button>
@@ -60,13 +60,15 @@
     <splitpanes class="default-theme" vertical style="height: 77vh" @resized="splitResizedEvent('resized', $event)">
       <pane min-size="20" max-size="80">
         <template v-if="showLoader==false">
-          <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :perc="plotPerc" :title="dataTitle"
-                         :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"/>
+          <LChartSeismicWithLine class="lc_seismic_chart" :colormap="colormap" :perc="plotPerc" :title="dataTitle"
+                                 :points="points" :xaxis="XAxis" :yaxis="YAxis" @pointInLcAxis="updateLcPoint($event)"
+                                 :chart_info_data="seriesSeismicInfo"
+          />
         </template>
       </pane>
       <pane>
         <template v-if="showLoader==false">
-        <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
+          <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
         </template>
       </pane>
     </splitpanes>
@@ -78,15 +80,16 @@
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import {mapState} from "vuex";
   import LChartLine from '../components/LChartLine'
-  import LChartSeismic from '../components/LChartSeismic'
+  import LChartSeismicWithLine from '../components/LChartSeismicWithLine'
   import {getData} from "../../libs/data";
   import ApexChartLine from "../components/ApexChartLine";
   import {createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
-  import { Splitpanes, Pane } from 'splitpanes'
+  import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import {getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
   import {getColormapAsset} from "../../libs/colormap";
   import _ from 'lodash';
+  import {matrix_col_optimum, matrix_col_optimum_v1} from "../../libs/test_max_min_val_each_column";
 
   export default {
     name: 'SeismicView',
@@ -98,7 +101,7 @@
     components: {
       ApexChartLine,
       LChartLine,
-      LChartSeismic,
+      LChartSeismicWithLine,
       Splitpanes, Pane,
       EnhancedCheck
     },
@@ -106,13 +109,15 @@
     data: () =>
     {
       return {
-        curColormap : 4,
-        reverseColormap : false,
+        curColormap: 4,
+        reverseColormap: false,
 
+        modeMinMax: "min",
         showLoader: true,
-
-        dx:1.0,
-        dy:1.0,
+        seriesSeismicInfo: [],
+        dx: 1.0,
+        dy: 1.0,
+        ns: 0,
         colormap: {id: 4, reverse: false},
         myTitle: {},
         nNeighbor: 0,
@@ -142,11 +147,11 @@
     methods: {
       updateColormap()
       {
-        this.colormap = { id: this.curColormap, reverse: this.reverseColormap}
+        this.colormap = {id: this.curColormap, reverse: this.reverseColormap}
       },
       fgetColormapAsset(ii)
       {
-        return(getColormapAsset(ii))
+        return (getColormapAsset(ii))
       },
       fgetColormapReverse()
       {
@@ -159,7 +164,7 @@
       },
       updateLcPoint(e)
       {
-        if(e.isValid)
+        if (e.isValid)
         {
           let idx_pos = getIndexFromArray3(e.y, this.dy, this.YAxis["start"]);
           this.timePos = setPositionFromIndex(idx_pos, this.dy, this.YAxis["start"]);
@@ -173,7 +178,7 @@
       },
       getDropdownNeighbor()
       {
-        return("Neighbor ( " + this.nNeighbor + " ) ");
+        return ("Neighbor ( " + this.nNeighbor + " ) ");
       },
       getDemoData()
       {
@@ -185,13 +190,14 @@
         this.YAxis = {
           "label": "Depth (m)",
           "sampling": 2,
-          "start": 50
+          "start": 0
         };
         this.points = getData();
         let data = [];
         for (let i = 0; i < this.points[0].length; i++)
           data.push(i);
         this.XAxis["data"] = data;
+        this.dy = this.YAxis["sampling"];
 
         this.dataTitle = "CDP NO : 1";
         this.createChartInfo();
@@ -206,42 +212,54 @@
       {
         this.lineSeries = [];
 
-        let nsp = this.points.length;
+        this.ns = this.points.length;
         let tidy = getIndexFromArray3(this.timePos, this.dy, this.YAxis["start"]);
 
-        let pp = nsp-tidy-1;
-        if(pp<0)
+        let pp = this.ns - tidy - 1;
+        if (pp < 0)
         {
           pp = 0;
-          this.timePos = this.YAxis["start"] + (this.YAxis["sampling"]*nsp) - 1;
+          this.timePos = this.YAxis["start"] + (this.YAxis["sampling"] * this.ns) - 1;
         }
-        else if(pp>=nsp)
+        else if (pp >= this.ns)
         {
-          pp = nsp - 1;
+          pp = this.ns - 1;
           this.timePos = this.YAxis["start"];
         }
 
         let t1 = pp - this.nNeighbor;
         let t2 = pp + this.nNeighbor;
-        if(t1<0) t1 = 0;
-        if(t2>nsp) t2 = nsp-1;
+        if (t1 < 0) t1 = 0;
+        if (t2 > this.ns) t2 = this.ns - 1;
 
-        for(let k=t1; k<=t2; k++)
+        let ArrModeMinMax = [];
+        for (let k = t1; k <= t2; k++)
         {
           let tmp = [];
           for (let i = 0; i < this.points[0].length; i++)
           {
             tmp.push(this.points[k][i]);
           }
-          let line_title = ((nsp-k-1) * this.YAxis["sampling"]+this.YAxis["start"]);
+          let line_title = ((this.ns - k - 1) * this.YAxis["sampling"] + this.YAxis["start"]);
           this.lineSeries.push({
             type: 'line',
             name: line_title,
             data: tmp
           });
+          ArrModeMinMax.push(tmp);
         }
+        let nx = this.points[0].length;
+        // let v_data_minmax = matrix_col_optimum(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax);
+        let opt_data = matrix_col_optimum_v1(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax, t1, this.XAxis["data"], this.dy, this.ns);
+        this.lineSeries.push({
+          type: 'line',
+          name: "Mode : " + this.modeMinMax,
+          data: opt_data["opt"]
+        });
+        this.seriesSeismicInfo = opt_data["info"];
+        // console.log(JSON.stringify(this.seriesSeismicInfo));
 
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + ((nsp-pp-1)*this.dy + this.YAxis["start"]);
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + ((this.ns - pp - 1) * this.dy + this.YAxis["start"]);
         this.lineChartOptions = createDefaultParam();
         this.lineChartOptions["title"]["text"] = this.lineChartTitle;
         this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
@@ -270,8 +288,8 @@
         this.XAxis = msg["x"];
         this.YAxis = msg["y"];
         this.XAxis["data"] = msg["cdp_header"];
-        this.dx = this.XAxis["data"][1]-this.XAxis["data"][0];
-        this.dy = this.YAxis["sampling"]*1.0;
+        this.dx = this.XAxis["data"][1] - this.XAxis["data"][0];
+        this.dy = this.YAxis["sampling"] * 1.0;
 
         this.dataTitle = "CDP NO : " + msg["cdp_no"];
         this.createChartInfo();
@@ -288,7 +306,7 @@
       EventBus.$off(this.event_http.fail);
     },
 
-    watch :
+    watch:
       {
         reverseColormap: function (val)
         {

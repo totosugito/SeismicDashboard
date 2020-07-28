@@ -1,3 +1,15 @@
+export function getDefaultDarkColor()
+{
+  let dark_color = ["#0000CD", "#FF0000", "#008000", "#FF00FF"];
+  return(dark_color);
+}
+export function getDefaultDarkColorAtIdx(ii)
+{
+  let dark_color = ["#0000CD", "#FF0000", "#008000", "#FF00FF"];
+  return(dark_color[ii]);
+}
+
+
 export function createDefaultColor(idx1, idx2, idxc)
 {
   let list_color = [
@@ -28,7 +40,7 @@ export function createDefaultColor(idx1, idx2, idxc)
     "#9370DB", "#8A2BE2", "#9400D3", "#FF7F50",
     "#FF8C00", "#FFA500"];
 
-  let dark_color = ["#0000CD", "#FF0000", "#008000", "#FF00FF"];
+  let dark_color = getDefaultDarkColor();
   let tmp_color = [];
   let ii = 0;
   let idark = 0;
