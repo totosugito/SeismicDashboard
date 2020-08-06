@@ -96,6 +96,11 @@ export default new Router({
               component: () => import('../views/pages/GeobodyTable')
             },
             {
+              path: varRouter.getRoute("segy-list", 1),
+              name: varRouter.getRoute("segy-list", 2),
+              component: () => import('../views/pages/SegyTable')
+            },
+            {
               path: varRouter.getRoute("home", 1),
               name: varRouter.getRoute("home", 2),
               component: () => import('../views/testing/SeismicView')

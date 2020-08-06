@@ -92,6 +92,19 @@
               <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>
             </span>
     </vue-form-dialog>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -157,19 +170,18 @@
       getListData() {
         this.showLoader = true;
         let tmp_selected_well = this.$store.getters.readSelectedWell;
-        this.$store.dispatch('http_post', ["api/well/info", tmp_selected_well, this.event_http_list]).then();
+        this.$store.dispatch('http_post', ["/api/well/info", tmp_selected_well, this.event_http_list]).then();
       },
       openDataUrl(item)
       {
-        // return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"] + "&min=0&max=0");
-        return("#/inline-crossline/seismic-viewer?st=" + item["idx_st"] + "&en=" + item["idx_en"]);
+        return("#/inline-crossline/seismic-viewer?mode=0&st=" + item["idx_st"] + "&en=" + item["idx_en"]);
       },
       openData(item)
       {
         this.selected_data = item;
         this.$router.push({
           path: this.varRouter.getRoute("seismicviewer", 1),
-          query: {st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
+          query: {mode:0, st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
         });
       },
       radiusDialogBtn1Click() {
@@ -184,6 +196,16 @@
         });
 
         this.$refs.radiusDialog.hideModal();
+      },
+
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
       },
     },
 

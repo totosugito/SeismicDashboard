@@ -115,6 +115,19 @@
     <!--&lt;!&ndash;              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>&ndash;&gt;-->
     <!--&lt;!&ndash;            </span>&ndash;&gt;-->
     <!--    </vue-form-dialog>-->
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -135,6 +148,8 @@
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
   import {getIndexFromArray, setPositionFromIndex} from "../../libs/simpleLib";
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
+  import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+
   // import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   // import clusterize from "vue-clusterize"
 
@@ -146,6 +161,7 @@
     }),
 
     components: {
+      VueSimpleDialog,
       ApexChartLine,
       LChartLine,
       LChartSeismicWithLine,
@@ -159,6 +175,7 @@
     data: () =>
     {
       return {
+        retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: true,
 
         fixedDec: 3,
@@ -291,11 +308,23 @@
       getListData()
       {
         this.showLoader = true;
-        let str_st = this.$route.query.st;
-        let str_en = this.$route.query.en;
+        let imode = this.$route.query.mode * 1;
 
-        let cur_url = "api/segy/trace-view/" + str_st + "/" + str_en;
-        this.$store.dispatch('http_get', [cur_url, {}, this.event_http]).then();
+        if(imode === 0)
+        {
+          let str_st = this.$route.query.st;
+          let str_en = this.$route.query.en;
+          let cur_url = "/api/segy/trace-view/" + str_st + "/" + str_en;
+          this.$store.dispatch('http_get', [cur_url, {}, this.event_http]).then();
+        }
+        else
+        {
+          let str_fid = this.$route.query.fid;
+          let str_st = this.$route.query.iline;
+          let str_en = this.$route.query.xline;
+          let cur_url = "/api/segy/view-iline-xline";
+          this.$store.dispatch('http_post', [cur_url, {file_id:str_fid, iline: str_st, xline: str_en}, this.event_http]).then();
+        }
       },
       applyTimePosClicked()
       {
@@ -353,6 +382,7 @@
             data: opt_data["opt"]
           });
           this.seriesSeismicInfo = opt_data["info"];
+          console.log(JSON.stringify(this.seriesSeismicInfo))
         }
         else
         {
@@ -374,8 +404,17 @@
         }
 
         this.bApplyTimePos = false;
-      }
+      },
 
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
     },
 
     mounted()
@@ -406,8 +445,11 @@
       });
       EventBus.$on(this.event_http.fail, (msg) =>
       {
-        // printJson("INPUT --> ", msg);
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
       });
+
     },
     beforeDestroy()
     {

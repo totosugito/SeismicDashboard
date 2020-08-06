@@ -20,6 +20,7 @@ export default class VarRouter {
     "inline-crossline": ["inline-crossline", "/well/inline-crossline", "Inline & Crossline"],
     "seismicviewer": ["seismicviewer", "/inline-crossline/seismic-viewer", "Seismic Viewer"],
     "geobody": ["geobody", "/geobody", "Geobody"],
+    "segy-list": ["segy-list", "/segy-list", "SEGY List"],
 
     "lokasi-menu": ["lokasi-menu", "/lokasi-menu", "Menu Lokasi"],
     "lokasi-edit": ["lokasi-edit", "/lokasi-edit", "Edit Lokasi"],

@@ -170,7 +170,7 @@ const actions = {
       {
         const response_ = JSON.parse(JSON.stringify(response));
         let data = response_.data;
-        printJson("IGET --> ", appDebugMode(), response_);
+        printJson("OGET --> ", appDebugMode(), data);
 
         //cek return data dari server
         if (response_.status !== 200)
@@ -182,9 +182,9 @@ const actions = {
       })
       .catch(error =>
       {
-        console.log('Error : ', error);
+        console.log('', error);
         let str_msg = auto_error_message_parse(error);
-        EventBus.$emit(event_.fail, {status: 0, title: 'Fail', message: str_msg});
+        EventBus.$emit(event_.fail, {status: 0, title: 'Fail', message: error});
       })
   },
 

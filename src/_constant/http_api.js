@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 const DEBUG_SERVER = true;
 const SERVER_DEVEL = 2;
 // const DEBUG_MODE = false;
@@ -54,8 +54,7 @@ export function getApronServerAPI()
   }
   else
   {
-    return ('http://jasdig.com:5151/')
-    // return ('http://0.0.0.0:5151/')
+    return ('http://jasdig.com:5151')
   }
 }
 
@@ -73,7 +72,7 @@ export function auto_error_message_parse(error)
 {
   // console.log('Error no valid: ', error);
   let str_msg = "Error Network";
-  let n = 100;
+  let n = 200;
   if (error !== undefined)
   {
     error = JSON.stringify(error);

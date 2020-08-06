@@ -31,6 +31,11 @@
           </b-dropdown-item>
         </b-dropdown>
         <enhanced-check label="Reverse" style="height: 25px;" v-model="reverseColormap"></enhanced-check>
+        <label class="switch switch-pill switch-label switch-outline-primary">
+          <input type="checkbox" class="switch-input" checked>
+          <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+        </label>
+
 
         <b-input-group size="sm" :prepend="YAxis.label">
           <b-form-input v-model="timePos" class="text-right" style="width: 70px"></b-form-input>

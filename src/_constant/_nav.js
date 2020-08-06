@@ -35,6 +35,12 @@ export default {
       router: 'geobody',
       icon: 'fa fa-cube'
     },
+    {
+      name: 'SEGY',
+      url: '/segy-list',
+      router: 'segy-list',
+      icon: 'fa fa-hdd-o'
+    },
 
     {
       title: true,

@@ -10,7 +10,7 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <strong>Well List</strong>
+            <strong>SEGY List</strong>
           </div>
 
           <!-- -------------------------------------------- -->
@@ -50,24 +50,14 @@
             :fields="table_headers"
             :items="table_datas">
 
-            <!-- X -->
-            <template slot="X" slot-scope="data">
-              <strong>Min : </strong> {{data.item.x_min}}<br><strong>Max : </strong> {{data.item.x_max}}
-            </template>
-            <!-- Y -->
-            <template slot="Y" slot-scope="data">
-              <strong>Min : </strong> {{data.item.y_min}}<br><strong>Max : </strong> {{data.item.y_max}}
-            </template>
-            <!-- Z -->
-            <template slot="Z" slot-scope="data">
-              <strong>Min : </strong> {{data.item.z_min}}<br><strong>Max : </strong> {{data.item.z_max}}
-            </template>
+            <!-- id -->
+<!--            <template slot="_id" slot-scope="data">-->
+<!--              {{data.item._id["$oid"]}}-->
+<!--            </template>-->
 
             <!-- action status -->
             <template slot="action" slot-scope="row">
-              <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"
-                      style="margin: 3px">Open
-              </button>
+              <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
             </template>
           </b-table>
 
@@ -88,12 +78,12 @@
     </b-row>
 
     <vue-form-dialog
-      ref="radiusDialog"
+      ref="paramFileDialog"
       type="default"
       header="Parameters" body="Body"
       btn1_text="Close" btn2_text="Process"
       btn1_style="danger" btn2_style="primary"
-      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">
+      @btn1Click="paramFileDialogBtn1Click()" @btn2Click="paramFileDialogBtn2Click()">
 
       <!-- body slot -->
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
@@ -124,7 +114,7 @@
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {mapState} from "vuex";
   export default {
-    name: 'well-table',
+    name: 'segy-table',
 
     components: {
       VueSimpleDialog,
@@ -178,26 +168,34 @@
       //-----------------------------------------------------
       getListData() {
         this.showLoader = true;
-        this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
-        this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list]).then();
+        this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http_list]).then();
+      },
+      openDataUrl(item)
+      {
+        return("#");
+        // return("#/inline-crossline/seismic-viewer?mode=1&fid=" + "" + "&st=" + item["idx_st"] + "&en=" + item["idx_en"]);
       },
       openData(item)
       {
-        this.selected_data = item;
-        this.$refs.radiusDialog.showModal();
+        this.selected_data = {};
+        this.selected_data["mode"] = 1;
+        this.selected_data["fid"] = item["_id"]["$oid"];
+        this.$refs.paramFileDialog.showModal();
       },
-      radiusDialogBtn1Click() {
-        this.$refs.radiusDialog.hideModal();
+      paramFileDialogBtn1Click() {
+        this.$refs.paramFileDialog.hideModal();
       },
-      radiusDialogBtn2Click() {
+      paramFileDialogBtn2Click() {
         if (!this.bvalidate) return;
-        this.selected_data["radius"] = this.model["radius"];
-        this.$store.dispatch('actionSaveSelectedWell', this.selected_data); //set selected project
+        this.selected_data["iline"] = this.model["iline"];
+        this.selected_data["xline"] = this.model["xline"];
         this.$router.push({
-          path: this.varRouter.getRoute("inline-crossline", 1),
+          path: this.varRouter.getRoute("seismicviewer", 1),
+          query: this.selected_data
+          // query: {mode:1, fid:"5f2565a9b846f22a7af4a199", iline: 8047, xline: 2449}
         });
 
-        this.$refs.radiusDialog.hideModal();
+        this.$refs.paramFileDialog.hideModal();
       },
 
       //MESSAGE HTTP I/O
@@ -218,7 +216,7 @@
         this.table_headers.push({label: "Action", key:"action", default: "", tdClass: 'align-middle'});
 
         // //fill table contents
-        this.table_datas = msg.data;
+        this.table_datas = msg;
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
@@ -259,16 +257,27 @@
         filter: null,
 
         model: {
-          radius: 0
+          file_id: '',
+          iline: 0,
+          xline: 0,
         },
         schema: {
           fields: [
             {
               type: 'input',
               inputType: 'text',
-              label: 'Radius',
-              model: 'radius',
-              placeholder: 'Set Radius',
+              label: 'Inline',
+              model: 'iline',
+              placeholder: 'Set Inline',
+              featured: true,
+              required: true
+            },
+            {
+              type: 'input',
+              inputType: 'text',
+              label: 'XLine',
+              model: 'xline',
+              placeholder: 'Set XLine',
               featured: true,
               required: true
             },
@@ -282,30 +291,20 @@
         selected_data: {},
         table_headers: [
           {
+            key: 'file_name',
+            label: 'Filename',
+            sortable: true,
+          },
+          {
             key: 'area',
             label: 'Area',
             sortable: true
           },
           {
-            key: 'well_id',
-            label: 'Well ID',
+            key: 'endian',
+            label: 'ENDIAN',
             sortable: true
           },
-          {
-            key: 'X',
-            label: 'X Coord',
-            sortable: false,
-          },
-          {
-            key: 'Y',
-            label: 'Y Coord',
-            sortable: false,
-          },
-          {
-            key: 'Z',
-            label: 'Z Coord',
-            sortable: false,
-          }
         ],
         table_datas: [],
 
