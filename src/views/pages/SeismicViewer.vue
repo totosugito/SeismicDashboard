@@ -382,7 +382,7 @@
             data: opt_data["opt"]
           });
           this.seriesSeismicInfo = opt_data["info"];
-          console.log(JSON.stringify(this.seriesSeismicInfo))
+          //console.log(JSON.stringify(this.seriesSeismicInfo))
         }
         else
         {

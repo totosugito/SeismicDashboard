@@ -105,7 +105,36 @@ export default new Router({
               name: varRouter.getRoute("home", 2),
               component: () => import('../views/testing/SeismicView')
             },
-
+            {
+              path: varRouter.getRoute("processwizard1", 1),
+              name: varRouter.getRoute("processwizard1", 2),
+              component: () => import('../views/testing/ProcessWizardStep1')
+            },
+            {
+              path: varRouter.getRoute("processwizard2", 1),
+              name: varRouter.getRoute("processwizard2", 2),
+              component: () => import('../views/testing/ProcessWizardStep2')
+            },
+            {
+              path: varRouter.getRoute("processwizard3", 1),
+              name: varRouter.getRoute("processwizard3", 2),
+              component: () => import('../views/testing/ProcessWizardStep3')
+            },
+            {
+              path: varRouter.getRoute("processwizard4", 1),
+              name: varRouter.getRoute("processwizard4", 2),
+              component: () => import('../views/testing/ProcessWizardStep4')
+            },
+            {
+              path: varRouter.getRoute("processwizard5", 1),
+              name: varRouter.getRoute("processwizard5", 2),
+              component: () => import('../views/testing/ProcessWizardStep5')
+            },
+            {
+              path: varRouter.getRoute("processwizard6", 1),
+              name: varRouter.getRoute("processwizard6", 2),
+              component: () => import('../views/testing/ProcessWizardStep6')
+            },
 
             // ---------------------------------------------------
             // ---------------------- WELL -----------------------

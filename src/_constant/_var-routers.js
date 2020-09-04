@@ -21,6 +21,13 @@ export default class VarRouter {
     "seismicviewer": ["seismicviewer", "/inline-crossline/seismic-viewer", "Seismic Viewer"],
     "geobody": ["geobody", "/geobody", "Geobody"],
     "segy-list": ["segy-list", "/segy-list", "SEGY List"],
+    "processwizard": ["process-wizard", "/process-wizard", "Process Wizard"],
+    "processwizard1": ["process-wizard1", "/process-wizard1", "Process Wizard Step 1"],
+    "processwizard2": ["process-wizard2", "/process-wizard2", "Process Wizard Step 2"],
+    "processwizard3": ["process-wizard3", "/process-wizard3", "Process Wizard Step 3"],
+    "processwizard4": ["process-wizard4", "/process-wizard4", "Process Wizard Step 4"],
+    "processwizard5": ["process-wizard5", "/process-wizard5", "Process Wizard Step 5"],
+    "processwizard6": ["process-wizard6", "/process-wizard6", "Process Wizard Step 6"],
 
     "lokasi-menu": ["lokasi-menu", "/lokasi-menu", "Menu Lokasi"],
     "lokasi-edit": ["lokasi-edit", "/lokasi-edit", "Edit Lokasi"],

@@ -52,15 +52,15 @@
 
             <!-- X -->
             <template slot="X" slot-scope="data">
-              <strong>Min : </strong> {{data.item.x_min}}<br><strong>Max : </strong> {{data.item.x_max}}
+              <strong>Min : </strong> {{data.item.x_min.toFixed(8)}}<br><strong>Max : </strong> {{data.item.x_max.toFixed(8)}}
             </template>
             <!-- Y -->
             <template slot="Y" slot-scope="data">
-              <strong>Min : </strong> {{data.item.y_min}}<br><strong>Max : </strong> {{data.item.y_max}}
+              <strong>Min : </strong> {{data.item.y_min.toFixed(8)}}<br><strong>Max : </strong> {{data.item.y_max.toFixed(8)}}
             </template>
             <!-- Z -->
             <template slot="Z" slot-scope="data">
-              <strong>Min : </strong> {{data.item.z_min}}<br><strong>Max : </strong> {{data.item.z_max}}
+              <strong>Min : </strong> {{data.item.z_min.toFixed(8)}}<br><strong>Max : </strong> {{data.item.z_max.toFixed(8)}}
             </template>
 
             <!-- action status -->

@@ -41,6 +41,12 @@ export default {
       router: 'segy-list',
       icon: 'fa fa-hdd-o'
     },
+    {
+      name: 'Process Wizard',
+      url: '/process-wizard1',
+      router: 'process-wizard',
+      icon: 'fa fa-list-ol'
+    },
 
     {
       title: true,

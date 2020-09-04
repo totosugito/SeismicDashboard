@@ -169,18 +169,20 @@
       //-----------------------------------------------------
       getListData() {
         this.showLoader = true;
-        let tmp_selected_well = this.$store.getters.readSelectedWell;
-        this.$store.dispatch('http_post', ["/api/well/info", tmp_selected_well, this.event_http_list]).then();
+        this.cur_well = this.$store.getters.readSelectedWell;
+        this.$store.dispatch('http_post', ["/api/well/info", this.cur_well, this.event_http_list]).then();
       },
       openDataUrl(item)
       {
         return("#/inline-crossline/seismic-viewer?mode=0&st=" + item["idx_st"] + "&en=" + item["idx_en"]);
+        // return("#/inline-crossline/seismic-viewer?mode=1&fid=" + this.cur_well["_id"]["$oid"] + "&iline=" + item["iline"] + "&xline=" + item["xline"]);
       },
       openData(item)
       {
         this.selected_data = item;
         this.$router.push({
           path: this.varRouter.getRoute("seismicviewer", 1),
+          // query: {mode:1, fid:this.cur_well["_id"]["$oid"], iline: this.selected_data["iline"], xline: this.selected_data["xline"]}
           query: {mode:0, st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
         });
       },
@@ -217,9 +219,7 @@
 
         // //fill table contents
         this.table_datas = msg;
-
-        // this.strtitle = "Well ID = " + this.selectedWell["well_id"] +"  ,  Inline/Crossline List [ Radius=" +
-        //   this.selectedWell["radius"] + " , Count=" + this.table_datas.length + " ]";
+        //console.log(JSON.stringify(msg))
         this.strtitle = "Well ID = " + this.selectedWell["well_id"] +"  ,  [ Radius=" +
           this.selectedWell["radius"] + " , Count=" + this.table_datas.length + " ]";
         this.showLoader = false;
@@ -263,6 +263,7 @@
         totalRows: 0,
         filter: null,
 
+        cur_well: {_id: {$oid: ""}},
         model: {
           radius: 0
         },
