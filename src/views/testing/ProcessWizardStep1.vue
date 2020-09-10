@@ -1,6 +1,6 @@
 <template>
   <div class="panel-body">
-    <view-process-wizard-button :icon="tabicon" :title="tabtitle" :index="0" :textsize="190" class="mb-3"/>
+    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="cur_tab" :textsize="190" class="mb-3"/>
 
     <h4>AVA Navigation</h4>
     <vue-form-generator :schema="schema_ava" :model="model_ava" :options="formOptions"></vue-form-generator>
@@ -17,6 +17,7 @@
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
+  import {createTabProcessIcon, createTabProcessText} from '../../libs/libSeismicUi';
 
   export default {
     name: "ProcessWizardStep1",
@@ -37,9 +38,7 @@
     data()
     {
       return {
-        tabicon: ["fa fa-wpforms", "fa fa-map", "fa fa-window-restore", "fa fa-map-marker", "fa fa-line-chart", "fa fa-pie-chart"],
-        tabtitle: ["Input Parameter", "Map Window", "Section", "Map Propagation", "Data Trend", "Recomendation"],
-
+        cur_tab: 0,
         model_ava: {
           geobodyava: "",
           xava: 0,
@@ -120,6 +119,14 @@
     },
 
     methods: {
+      getTabIcon()
+      {
+        return(createTabProcessIcon())
+      },
+      getTabText()
+      {
+        return(createTabProcessText())
+      },
       wizardButtonClicked(str_router) {
         return(this.varRouter.getRoute(str_router, 1))
       }

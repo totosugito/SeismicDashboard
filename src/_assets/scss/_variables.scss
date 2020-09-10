@@ -1,1 +1,8 @@
 // Variable overrides
+$sidebar-bg: #106DB9;
+
+$sidebar-nav-link-icon-color: #FFFFFF;
+$sidebar-nav-link-hover-bg: lighten($sidebar-bg, 25%);
+
+$sidebar-nav-link-active-bg: lighten($sidebar-bg, 10%);
+$sidebar-nav-link-active-icon-color:  #FFFFFF;

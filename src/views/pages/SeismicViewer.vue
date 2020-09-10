@@ -44,19 +44,22 @@
           </template>
 
           <b-dropdown-item @click="setColormap(0)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> Sharp
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> {{fgetColormapName(0)}}
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(1)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> Yrwbc
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> {{fgetColormapName(1)}}
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(2)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> Seismic
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> {{fgetColormapName(2)}}
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(3)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> Petrel
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> {{fgetColormapName(3)}}
           </b-dropdown-item>
           <b-dropdown-item @click="setColormap(4)" size="sm">
-            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> Gray
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> {{fgetColormapName(4)}}
+          </b-dropdown-item>
+          <b-dropdown-item @click="setColormap(5)" size="sm">
+            <img class="colormapImageDropdown" :src="fgetColormapAsset(5)"/> {{fgetColormapName(5)}}
           </b-dropdown-item>
         </b-dropdown>
 <!--        <b-form-checkbox v-model="reverseColormap" class="mr-1">Rev</b-form-checkbox>-->

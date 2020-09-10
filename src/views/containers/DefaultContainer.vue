@@ -21,7 +21,7 @@
           <DefaultHeaderDropdownAccnt/>
         </b-navbar-nav>
       </AppHeader>
-      <div class="app-body">
+      <div class="app-body" >
         <AppSidebar fixed>
           <SidebarHeader/>
           <SidebarForm/>
@@ -140,3 +140,8 @@
     }
   }
 </script>
+<style scoped>
+  .sidebar {
+    background: #0d47a1;
+  }
+</style>
