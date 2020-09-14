@@ -83,7 +83,8 @@ export default class VarRouter {
     "invoice" : "invoice",
     "street" : "street",
     "subuser" : "subuser",
-    "parkSumm" : "parkSumm"
+    "parkSumm" : "parkSumm",
+    "area-list": "/api/area/list"
   };
 
   schematype = {

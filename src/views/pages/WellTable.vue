@@ -123,6 +123,7 @@
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {mapState} from "vuex";
+  import {createTableWellHeader} from "../../libs/libVars";
   export default {
     name: 'well-table',
 
@@ -280,33 +281,7 @@
         },
 
         selected_data: {},
-        table_headers: [
-          {
-            key: 'area',
-            label: 'Area',
-            sortable: true
-          },
-          {
-            key: 'well_id',
-            label: 'Well ID',
-            sortable: true
-          },
-          {
-            key: 'X',
-            label: 'X Coord',
-            sortable: false,
-          },
-          {
-            key: 'Y',
-            label: 'Y Coord',
-            sortable: false,
-          },
-          {
-            key: 'Z',
-            label: 'Z Coord',
-            sortable: false,
-          }
-        ],
+        table_headers: createTableWellHeader(),
         table_datas: [],
 
         event_http_list :{success:"successList", fail:"failList"},
