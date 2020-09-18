@@ -196,24 +196,58 @@
         for (let i=0; i<msg.length; i++)
         {
           let item = msg[i];
-          let mm = {
-            id: i,
-            area: msg[i].area,
-            latlng: L.latLng(item.lat, item.lon),
-            popup : this.createCustomMarkerPopup(item),
-            icon: new L.DivIcon({
-              html: this.createDemoCss("#990000")
-            })
-          };
-          this.markers.push(mm);
+          // let mm = {
+          //   id: i,
+          //   area: msg[i].area,
+          //   latlng: L.latLng(item.lat, item.lon),
+          //   popup : this.createCustomMarkerPopup(item),
+          //   icon: new L.DivIcon({
+          //     html: this.createDemoCss("#990000")
+          //   })
+          // };
+          // this.markers.push(mm);
         }
+
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
         this.showLoader = false;
         this.table_datas = [];
         this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
+        // this.$refs.dialogMessage.showModal();
+
+        let item0 = {
+          area:"c#",
+          lat: -0.725517813974293,
+          lon: 117.504455369823
+        };
+        let mm0 = {
+          id: 1,
+          area: item0.area,
+          latlng: L.latLng(item0.lat, item0.lon),
+          popup : this.createCustomMarkerPopup(item0),
+          icon: new L.DivIcon({
+            html: this.createDemoCss("#990000")
+          })
+        };
+        this.markers.push(mm0);
+
+        let item1 = {
+          area:"web",
+          lat: -0.7255178139742111,
+          lon: 117.50445537011554
+        };
+        let mm1 = {
+          id: 2,
+          area: item1.area,
+          latlng: L.latLng(item1.lat, item1.lon),
+          popup : this.createCustomMarkerPopup(item1),
+          icon: new L.DivIcon({
+            html: this.createDemoCss("#9900cc")
+          })
+        };
+        this.markers.push(mm1);
+        this.center = L.latLng(item1.lat, item1.lon);
       });
 
       EventBus.$on(this.event_http.success, (msg) => {
