@@ -8,6 +8,6 @@ export function createTabProcessIcon()
 
 export function createTabProcessText()
 {
-  let tabtitle = ["Input Parameter", "Map Window", "Section", "Map Propagation", "Data Trend", "Recomendation"];
+  let tabtitle = ["Navigation Map", "Pick Geobody", "Section", "Map Propagation", "Data Trend", "Recomendation"];
   return(tabtitle);
 }

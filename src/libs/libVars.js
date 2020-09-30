@@ -3,13 +3,13 @@ export function createTableWellHeader()
 {
   let table_headers = [
     {
-      key: 'area',
-      label: 'Area',
+      key: 'well_id',
+      label: 'Well ID',
       sortable: true
     },
     {
-      key: 'well_id',
-      label: 'Well ID',
+      key: 'area',
+      label: 'Area',
       sortable: true
     },
     {

@@ -30,6 +30,10 @@ export default {
     user: state => state.user
   }),
   created() {
+    if(this.user.loginID===undefined)
+      this.user.loginID = "Guest";
+    if(this.user.pasfoto===undefined)
+      this.user.pasfoto = "https://www.flaticon.com/svg/static/icons/svg/3135/3135715.svg";
     this.$store.dispatch('createVarRouter').then(); //no selected project
   },
 

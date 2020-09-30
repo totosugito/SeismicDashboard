@@ -143,7 +143,7 @@
     },
 
     beforeMount: function () {
-      this.getListData();
+      this.getListSegy();
     },
 
     methods: {
@@ -177,10 +177,14 @@
       //-----------------------------------------------------
       //DATA ACTION
       //-----------------------------------------------------
-      getListData() {
+      getListWell() {
         this.showLoader = true;
         this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
         this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list]).then();
+      },
+      getListSegy() {
+        this.showLoader = true;
+        this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http_list_sgy]).then();
       },
       openData(item)
       {
@@ -193,6 +197,9 @@
       radiusDialogBtn2Click() {
         if (!this.bvalidate) return;
         this.selected_data["radius"] = this.model["radius"];
+        this.selected_data["file_id"] = this.model["file_id"];
+        //console.log(JSON.stringify(this.selected_data))
+
         this.$store.dispatch('actionSaveSelectedWell', this.selected_data); //set selected project
         this.$router.push({
           path: this.varRouter.getRoute("inline-crossline", 1),
@@ -213,7 +220,23 @@
     },
 
     mounted() {
-      //-------------- LIST LOKASI -------------------
+      //-------------- LIST SEGY -------------------
+      EventBus.$on(this.event_http_list_sgy.success, (msg) => {
+        this.table_segy = [];
+        for(let i=0; i<msg.length; i++)
+          this.table_segy.push({id: msg[i]["_id"]["$oid"], name:msg[i]["file_name"]})
+        this.schema.fields[0].values = this.table_segy;
+        this.showLoader = false;
+        this.getListWell();
+      });
+      EventBus.$on(this.event_http_list_sgy.fail, (msg) => {
+        this.showLoader = false;
+        this.table_segy = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      //-------------- LIST Well -------------------
       EventBus.$on(this.event_http_list.success, (msg) => {
         //create table header
         this.table_headers.push({label: "Action", key:"action", default: "", tdClass: 'align-middle'});
@@ -241,6 +264,8 @@
     },
 
     beforeDestroy() {
+      EventBus.$off(this.event_http_list_sgy.success);
+      EventBus.$off(this.event_http_list_sgy.fail);
       EventBus.$off(this.event_http_list.success);
       EventBus.$off(this.event_http_list.fail);
       EventBus.$off(this.event_http.success);
@@ -259,11 +284,19 @@
         totalRows: 0,
         filter: null,
 
+        table_segy: [],
         model: {
-          radius: 0
+          file_id: 0,
+          radius: 0,
         },
         schema: {
           fields: [
+            {
+              type: 'select',
+              label: 'Select File',
+              model: 'file_id',
+              selectOptions: {hideNoneSelectedText: true}
+            },
             {
               type: 'input',
               inputType: 'text',
@@ -285,6 +318,7 @@
         table_datas: [],
 
         event_http_list :{success:"successList", fail:"failList"},
+        event_http_list_sgy :{success:"successListSgy", fail:"failListSgy"},
         event_http :{success:"success", fail:"fail"},
       }
     },
