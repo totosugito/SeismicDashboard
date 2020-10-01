@@ -20,6 +20,8 @@ export default class VarRouter {
     "inline-crossline": ["inline-crossline", "/well/inline-crossline", "Inline & Crossline"],
     "seismicviewer": ["seismicviewer", "/inline-crossline/seismic-viewer", "Seismic Viewer"],
     "geobody": ["geobody", "/geobody", "Geobody"],
+    "geobody-info": ["geobody-info", "/geobody/geobody-info", "Geobody Info"],
+
     "segy-list": ["segy-list", "/segy-list", "SEGY List"],
     "processwizard": ["process-wizard", "/process-wizard", "Process Wizard"],
     "processwizard1": ["process-wizard1", "/process-wizard1", "Process Wizard Step 1"],

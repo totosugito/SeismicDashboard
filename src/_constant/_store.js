@@ -46,6 +46,7 @@ const state = {
 
   user: {},
   selectedWell : {},
+  selectedGeobody: {},
   selectedInline : {},
 
   selectedUser : {},
@@ -201,6 +202,12 @@ const actions = {
   actionSaveSelectedWell(context, payload){
     context.commit("actionSaveSelectedWell", payload);
   },
+  actionSaveSelectedGeobody(context, payload){
+    context.commit("actionSaveSelectedGeobody", payload);
+  },
+  actionSaveSelectedArea(context, payload){
+    context.commit("actionSaveSelectedArea", payload);
+  },
   actionSaveSelectedInline(context, payload){
     context.commit("actionSaveSelectedInline", payload);
   },
@@ -222,6 +229,8 @@ const actions = {
 
 };
 
+const key_well = "well";
+const key_geobody = "geobody";
 const key_location = "location";
 const key_selected_user = "selected_user";
 
@@ -242,7 +251,11 @@ const mutations = {
     state.selectedUser = value;
   },
   actionSaveSelectedWell(state, value){
-    localStorage.setItem(key_location, JSON.stringify(value)); //save data
+    localStorage.setItem(key_well, JSON.stringify(value)); //save data
+    state.selectedWell = value;
+  },
+  actionSaveSelectedGeobody(state, value){
+    localStorage.setItem(key_geobody, JSON.stringify(value)); //save data
     state.selectedWell = value;
   },
   actionSaveSelectedInline(state, value){
@@ -286,8 +299,12 @@ const getters = {
     return(state.selectedUser);
   },
   readSelectedWell(state){
-    state.selectedWell = JSON.parse(localStorage.getItem(key_location));
+    state.selectedWell = JSON.parse(localStorage.getItem(key_well));
     return(state.selectedWell);
+  },
+  readSelectedGeobody(state){
+    state.selectedGeobody = JSON.parse(localStorage.getItem(key_geobody));
+    return(state.selectedGeobody);
   },
   readSelectedInline(state){
     state.selectedInline = JSON.parse(localStorage.getItem(key_location));

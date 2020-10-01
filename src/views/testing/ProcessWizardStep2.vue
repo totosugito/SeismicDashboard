@@ -1,5 +1,12 @@
 <template>
   <div>
+    <vue-element-loading
+      :spinner="spinLoader.spinner"
+      :color="spinLoader.color"
+      :background-color="spinLoader.background_color"
+      :size="spinLoader.size"
+      :active="showLoader"/>
+
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="1" :textsize="190" class="mb-3"/>
 
     <splitpanes class="default-theme" vertical style="height: 70vh" vertical>
@@ -42,9 +49,26 @@
           :items="table_datas">
 
           <template slot="action" slot-scope="row">
-            <button type="button" class="btn-sm btn-primary">Open
-            </button>
+<!--            <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"-->
+<!--                    style="margin: 3px">Open-->
+<!--            </button>-->
+<!--            <template slot="action" slot-scope="row">-->
+              <!--              <button type="link" class="btn-sm btn-primary" @click="openData(row.item)"-->
+              <!--                      style="margin: 3px">Open-->
+              <!--              </button>-->
+              <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
+<!--            </template>-->
           </template>
+
+          <!-- X -->
+          <template slot="xcoord" slot-scope="data">
+            <strong>Min : </strong> {{data.item.x_min.toFixed(6)}}<br><strong>Max : </strong> {{data.item.x_max.toFixed(6)}}
+          </template>
+          <!-- Y -->
+          <template slot="ycoord" slot-scope="data">
+            <strong>Min : </strong> {{data.item.y_min.toFixed(6)}}<br><strong>Max : </strong> {{data.item.y_max.toFixed(6)}}
+          </template>
+
         </b-table>
 
         <!-- table footer -->
@@ -61,13 +85,41 @@
       </pane>
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
-          <vue-leaflet-heatmap :markers="markers" :center="center"/>
+<!--          <vue-leaflet-heatmap :markers="markers" :center="center"/>-->
+          <vue-leaflet-map :markers="markers" :center="center"/>
         </div>
       </pane>
     </splitpanes>
 
-
     <view-bottom-wizard-button class="mt-2" index="1" :left_clicked="wizardButtonClicked('processwizard1')" :right_clicked="wizardButtonClicked('processwizard3')"/>
+
+    <vue-form-dialog
+      ref="radiusDialog"
+      type="default"
+      header="Parameters" body="Body"
+      btn1_text="Close" btn2_text="Process"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
+
   </div>
 </template>
 
@@ -80,17 +132,24 @@
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
-  import {createTableAreaListHeader} from "../../libs/libVars";
-  import VueLeafletHeatmap from "../components/vue-leaflet-heatmap";
+  import {createTableAreaListHeader, createTableGeobodyListHeader} from "../../libs/libVars";
+  // import VueLeafletHeatmap from "../components/vue-leaflet-heatmap";
+  import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+  import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
+  import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
 
   export default {
     name: "ProcessWizardStep2",
 
     components: {
-      VueLeafletHeatmap,
+      // VueLeafletHeatmap,
       ViewBottomWizardButton,
       ViewProcessWizardButton,
       Splitpanes, Pane,
+      VueSimpleDialog,
+      VueLeafletMap,
+      VueFormDialog,
+      "vue-form-generator": VueFormGenerator.component,
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -107,17 +166,10 @@
         showLoader: true,
         retStatus: {status: 0, title: "", message: "", data: []},
 
+        cur_well: {},
         cur_tab: 0,
         center: L.latLng(-6.90389, 107.61861),
-        markers: [
-          [-0.718818, 117.44827, 1],
-          [-0.728818, 117.45827, 0.75],
-          [-0.738818, 117.46827, 1],
-          [-0.748818, 117.47827, 1],
-          [-0.758818, 117.48827, 1],
-          [-0.768818, 117.49827, 0.5],
-          [-0.778818, 117.49827, 1]
-        ],
+        markers: [],
         perPageView: 10,
         perPage: 10,
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
@@ -125,8 +177,29 @@
         totalRows: 0,
         filter: null,
 
-        table_headers: createTableAreaListHeader(),
+        table_headers: createTableGeobodyListHeader(),
         table_datas: [],
+
+        model: {
+          radius: 0,
+        },
+        schema: {
+          fields: [
+            {
+              type: 'input',
+              inputType: 'text',
+              label: 'Radius',
+              model: 'radius',
+              placeholder: 'Set Radius',
+              featured: true,
+              required: true
+            },
+          ]
+        },
+        formOptions: {
+          validateAfterLoad: true,
+          validateAfterChanged: true,
+        },
 
         event_http_list: {success: "successList", fail: "failList"},
         event_http: {success: "success", fail: "fail"},
@@ -135,10 +208,24 @@
 
     beforeMount: function ()
     {
-      this.getListData();
+      this.getListGeobodyData();
     },
 
     methods: {
+      onValidated(isValid, errors) {
+        this.bvalidate = isValid;
+      },
+
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
+
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------
@@ -182,11 +269,13 @@
         return (this.varRouter.getRoute(str_router, 1))
       },
 
-      getListData()
+      getListGeobodyData()
       {
         this.showLoader = true;
-        this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_list]).then();
+        this.cur_well = this.$store.getters.readSelectedWell;
+        this.center = L.latLng(this.cur_well.lat, this.cur_well.lon);
+
+        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_well, this.event_http_list]).then();
       },
 
       createDemoCss(cc)
@@ -200,27 +289,48 @@
         sstr = sstr + 'Lon : <b>' + item.lon + '</b>';
         return (sstr);
       },
+
+      openData(item)
+      {
+        //this.varRouter.getRoute("seismicviewer", 1),
+        this.$router.push({
+          path: "3dview",
+          query: {file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+        });
+
+        // this.wizardButtonClicked('processwizard3');
+        // this.selected_data = item;
+        // this.$refs.radiusDialog.showModal();
+      },
+      openDataUrl(item)
+      {
+        return("#/3dview?file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+      },
+
+      radiusDialogBtn1Click() {
+        this.$refs.radiusDialog.hideModal();
+      },
+      radiusDialogBtn2Click() {
+        if (!this.bvalidate) return;
+        // this.selected_data["radius"] = this.model["radius"];
+        // this.selected_data["file_id"] = this.model["file_id"];
+        //console.log(JSON.stringify(this.selected_data))
+        // this.wizardButtonClicked('processwizard3');
+        // this.$store.dispatch('actionSaveSelectedWell', this.selected_data); //set selected project
+        this.$router.push({
+          path: this.varRouter.getRoute("processwizard3", 1),
+        });
+
+        this.$refs.radiusDialog.hideModal();
+      },
     },
     mounted()
     {
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) =>
       {
-        //create table header
-        // let col_action = { label: "Action", key:"action", default: "", tdClass: 'align-middle'};
-        // this.table_headers.push(col_action);
+        // console.log(JSON.stringify(msg))
         this.table_datas = msg; //fill table contents
-        this.center = L.latLng(msg[0].lat, msg[0].lon);
-
-        // this.markers = [
-        //   [-0.628818, 117.35827, 1],
-        //   [-0.728818, 117.45827, 0.75],
-        //   [-0.828818, 117.55827, 1],
-        //   [-0.828818, 117.65827, 1],
-        //   [-0.828818, 117.75827, 1],
-        //   [-0.928818, 117.85827, 0.5],
-        //   [-0.958818, 117.95827, 1]
-        // ];
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) =>

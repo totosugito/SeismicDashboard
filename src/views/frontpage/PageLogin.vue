@@ -22,6 +22,7 @@
                 <b-form-input type="password" class="form-control" placeholder="Password" autocomplete="current-password" v-model="textPassword"/>
               </b-input-group>
 
+              <div style="color: darkred">{{msg_error}}</div>
               <div class="d-flex justify-content-center mt-3 login_container">
 <!--                <button type="button" name="button" class="btn login_btn" @click="authenticate">Login</button>-->
                 <button type="button" name="button" class="btn login_btn" @click="gotoDashboardPage()">Login</button>
@@ -70,12 +71,24 @@ export default {
       retStatus: {status: 0, title: "", message: "", data: []},
       textUserName: '',
       textPassword: '',
+      msg_error: '',
       event_http :{success:"success", fail:"fail"},
     }
   },
 
   methods: {
     gotoDashboardPage () {
+      if (this.textUserName.trim() !== "phm")
+      {
+        this.msg_error = "Error user login";
+        return;
+      }
+      if (this.textPassword.trim() !== "phm")
+      {
+        this.msg_error = "Error user password";
+        return;
+      }
+
       this.$router.push(this.varRouter.getRoute("well", 1))
     },
     authenticate () {

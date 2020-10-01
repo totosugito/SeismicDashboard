@@ -1,8 +1,15 @@
 <template>
   <div class="panel-body">
+    <vue-element-loading
+      :spinner="spinLoader.spinner"
+      :color="spinLoader.color"
+      :background-color="spinLoader.background_color"
+      :size="spinLoader.size"
+      :active="showLoader"/>
+
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="cur_tab" :textsize="190" class="mb-3"/>
 
-    <splitpanes class="default-theme" vertical style="height: 70vh" vertical>
+    <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
       <pane class="p-2" min-size="20" max-size="80">
         <!-- -------------------------------------------- -->
         <!-- TABLE -->
@@ -42,7 +49,8 @@
           :items="table_datas">
 
           <template slot="action" slot-scope="row">
-            <button type="button" class="btn-sm btn-primary">Open
+            <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"
+                    style="margin: 3px">Open
             </button>
           </template>
         </b-table>
@@ -66,7 +74,34 @@
       </pane>
     </splitpanes>
 
-    <view-bottom-wizard-button class="mt-2" index="0" left_clicked="" :right_clicked="wizardButtonClicked('processwizard2')"/>
+    <vue-form-dialog
+      ref="radiusDialog"
+      type="default"
+      header="Parameters" body="Body"
+      btn1_text="Close" btn2_text="Process"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
+
+<!--    <view-bottom-wizard-button class="mt-2" index="0" left_clicked="" :right_clicked="wizardButtonClicked('processwizard2')"/>-->
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -80,6 +115,9 @@
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
   import {createTableAreaListHeader} from "../../libs/libVars";
+  import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
+  import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
+  import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
 
   export default {
     name: "ProcessWizardStep1",
@@ -89,6 +127,9 @@
       ViewProcessWizardButton,
       Splitpanes, Pane,
       VueLeafletMap,
+      VueFormDialog,
+      VueSimpleDialog,
+      "vue-form-generator": VueFormGenerator.component,
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -117,17 +158,62 @@
 
         table_headers: createTableAreaListHeader(),
         table_datas: [],
+        geobody_data: [],
+        selected_data: {},
+
+        model: {
+          file_id: "",
+          // radius: 0,
+        },
+        schema: {
+          fields: [
+            {
+              type: 'select',
+              label: 'Select File',
+              model: 'file_id',
+              selectOptions: {hideNoneSelectedText: true}
+            },
+            // {
+            //   type: 'input',
+            //   inputType: 'text',
+            //   label: 'Radius',
+            //   model: 'radius',
+            //   placeholder: 'Set Radius',
+            //   featured: true,
+            //   required: true
+            // },
+          ]
+        },
+        formOptions: {
+          validateAfterLoad: true,
+          validateAfterChanged: true,
+        },
 
         event_http_list :{success:"successList", fail:"failList"},
+        event_http_list_geo :{success:"successListGeo", fail:"failListGeo"},
         event_http :{success:"success", fail:"fail"},
       }
     },
 
     beforeMount: function () {
-      this.getListData();
+      this.getListGeobody();
     },
 
     methods: {
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
+
+      onValidated(isValid, errors) {
+        this.bvalidate = isValid;
+      },
+
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------
@@ -151,6 +237,30 @@
         this.currentPage = 1;
       },
       //-----------------------------------------------------
+      openData(item)
+      {
+        this.selected_data = item;
+        this.$refs.radiusDialog.showModal();
+      },
+      radiusDialogBtn1Click() {
+        this.$refs.radiusDialog.hideModal();
+      },
+      radiusDialogBtn2Click() {
+        if(!this.bvalidate) return;
+        if(this.model["file_id"]==="")
+          return;
+
+        // this.selected_data["radius"] = this.model["radius"];
+        this.selected_data["file_id"] = this.model["file_id"];
+        //console.log(JSON.stringify(this.selected_data))
+
+        this.$store.dispatch('actionSaveSelectedWell', this.selected_data); //set selected project
+        this.$router.push({
+          path: this.varRouter.getRoute("processwizard2", 1),
+        });
+
+        this.$refs.radiusDialog.hideModal();
+      },
 
       getTabIcon()
       {
@@ -164,7 +274,11 @@
         return(this.varRouter.getRoute(str_router, 1))
       },
 
-      getListData() {
+      getListGeobody() {
+        this.showLoader = true;
+        this.$store.dispatch('http_get', ["/api/geobody/file-list", {}, this.event_http_list_geo]).then();
+      },
+      getListArea() {
         this.showLoader = true;
         this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_list]).then();
@@ -186,9 +300,6 @@
     mounted() {
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) => {
-        //create table header
-        // let col_action = { label: "Action", key:"action", default: "", tdClass: 'align-middle'};
-        // this.table_headers.push(col_action);
         this.table_datas = msg; //fill table contents
         this.center = L.latLng(msg[0].lat, msg[0].lon);
 
@@ -196,16 +307,16 @@
         for (let i=0; i<msg.length; i++)
         {
           let item = msg[i];
-          // let mm = {
-          //   id: i,
-          //   area: msg[i].area,
-          //   latlng: L.latLng(item.lat, item.lon),
-          //   popup : this.createCustomMarkerPopup(item),
-          //   icon: new L.DivIcon({
-          //     html: this.createDemoCss("#990000")
-          //   })
-          // };
-          // this.markers.push(mm);
+          let mm = {
+            id: i,
+            area: msg[i].area,
+            latlng: L.latLng(item.lat, item.lon),
+            popup : this.createCustomMarkerPopup(item),
+            icon: new L.DivIcon({
+              html: this.createDemoCss("#990000")
+            })
+          };
+          this.markers.push(mm);
         }
 
         this.showLoader = false;
@@ -214,40 +325,22 @@
         this.showLoader = false;
         this.table_datas = [];
         this.retStatus = msg;
-        // this.$refs.dialogMessage.showModal();
+        this.$refs.dialogMessage.showModal();
+      });
 
-        let item0 = {
-          area:"c#",
-          lat: -0.725517813974293,
-          lon: 117.504455369823
-        };
-        let mm0 = {
-          id: 1,
-          area: item0.area,
-          latlng: L.latLng(item0.lat, item0.lon),
-          popup : this.createCustomMarkerPopup(item0),
-          icon: new L.DivIcon({
-            html: this.createDemoCss("#990000")
-          })
-        };
-        this.markers.push(mm0);
+      EventBus.$on(this.event_http_list_geo.success, (msg) => {
+        this.geobody_data = [];
+        for(let i=0; i<msg.length; i++)
+          this.geobody_data.push({id: msg[i]["_id"]["$oid"], name:msg[i]["file_name"]})
+        this.schema.fields[0].values = this.geobody_data;
+        this.getListArea(); //read area
+      });
 
-        let item1 = {
-          area:"web",
-          lat: -0.7255178139742111,
-          lon: 117.50445537011554
-        };
-        let mm1 = {
-          id: 2,
-          area: item1.area,
-          latlng: L.latLng(item1.lat, item1.lon),
-          popup : this.createCustomMarkerPopup(item1),
-          icon: new L.DivIcon({
-            html: this.createDemoCss("#9900cc")
-          })
-        };
-        this.markers.push(mm1);
-        this.center = L.latLng(item1.lat, item1.lon);
+      EventBus.$on(this.event_http_list_geo.fail, (msg) => {
+        this.showLoader = false;
+        this.geobody_data = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
       });
 
       EventBus.$on(this.event_http.success, (msg) => {
@@ -264,6 +357,8 @@
     beforeDestroy() {
       EventBus.$off(this.event_http_list.success);
       EventBus.$off(this.event_http_list.fail);
+      EventBus.$off(this.event_http_list_geo.success);
+      EventBus.$off(this.event_http_list_geo.fail);
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
       this.showLoader = false;

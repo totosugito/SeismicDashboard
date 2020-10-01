@@ -27,7 +27,26 @@ export default new Router({
       name: varRouter.getRoute("start", 2),
       component: () => import('../views/testing/SeismicView')
     },
-
+    {
+      path: "/test1",
+      name: "test1",
+      component: () => import('../views/testing/testHeatMap')
+    },
+    {
+      path: "/test2",
+      name: "test2",
+      component: () => import('../views/testing/testHeatMapMesh')
+    },
+    {
+      path: "/test3",
+      name: "test3",
+      component: () => import('../views/testing/test3dScatter')
+    },
+    {
+      path: "/3dview",
+      name: "3dview",
+      component: () => import('../views/testing/Test3DScatterView')
+    },
     // ---------------------------------------------------------------
     // FRONT PAGE
     // ---------------------------------------------------------------
@@ -91,11 +110,6 @@ export default new Router({
           },
           children: [
             {
-              path: varRouter.getRoute("geobody", 1),
-              name: varRouter.getRoute("geobody", 2),
-              component: () => import('../views/pages/GeobodyTable')
-            },
-            {
               path: varRouter.getRoute("segy-list", 1),
               name: varRouter.getRoute("segy-list", 2),
               component: () => import('../views/pages/SegyTable')
@@ -134,6 +148,31 @@ export default new Router({
               path: varRouter.getRoute("processwizard6", 1),
               name: varRouter.getRoute("processwizard6", 2),
               component: () => import('../views/testing/ProcessWizardStep6')
+            },
+
+            // ---------------------------------------------------
+            // ---------------------- geobody -----------------------
+            // ---------------------------------------------------
+            {
+              path: varRouter.getRoute("geobody", 1),
+              name: varRouter.getRoute("geobody", 2),
+              component: () => import('../views/pages/GeobodyTable')
+            },
+            {
+              path: varRouter.getRoute("geobody", 1),
+              meta: {label: varRouter.getRoute("geobody", 2)},
+              component: {
+                render(c) {
+                  return c('router-view')
+                }
+              },
+              children: [
+                {
+                  path: varRouter.getRoute("geobody-info", 1),
+                  name: varRouter.getRoute("geobody-info", 2),
+                  component: () => import('../views/pages/GeobodyTableContents')
+                },
+              ]
             },
 
             // ---------------------------------------------------

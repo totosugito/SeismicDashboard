@@ -51,17 +51,17 @@
             :items="table_datas">
 
             <!-- X -->
-            <template slot="X" slot-scope="data">
-              <strong>Min : </strong> {{data.item.x_min}}<br><strong>Max : </strong> {{data.item.x_max}}
-            </template>
-            <!-- Y -->
-            <template slot="Y" slot-scope="data">
-              <strong>Min : </strong> {{data.item.y_min}}<br><strong>Max : </strong> {{data.item.y_max}}
-            </template>
-            <!-- Z -->
-            <template slot="Z" slot-scope="data">
-              <strong>Min : </strong> {{data.item.z_min}}<br><strong>Max : </strong> {{data.item.z_max}}
-            </template>
+<!--            <template slot="X" slot-scope="data">-->
+<!--              <strong>Min : </strong> {{data.item.x_min}}<br><strong>Max : </strong> {{data.item.x_max}}-->
+<!--            </template>-->
+<!--            &lt;!&ndash; Y &ndash;&gt;-->
+<!--            <template slot="Y" slot-scope="data">-->
+<!--              <strong>Min : </strong> {{data.item.y_min}}<br><strong>Max : </strong> {{data.item.y_max}}-->
+<!--            </template>-->
+<!--            &lt;!&ndash; Z &ndash;&gt;-->
+<!--            <template slot="Z" slot-scope="data">-->
+<!--              <strong>Min : </strong> {{data.item.z_min}}<br><strong>Max : </strong> {{data.item.z_max}}-->
+<!--            </template>-->
 
             <!-- action status -->
             <template slot="action" slot-scope="row">
@@ -109,6 +109,7 @@
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {mapState} from "vuex";
+  import {createTableGeobodyFileListHeader} from "../../libs/libVars";
   export default {
     name: 'geobody-table',
 
@@ -120,7 +121,6 @@
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
-      // user: state => state.user,
     }),
 
     created() {
@@ -128,7 +128,7 @@
     },
 
     beforeMount: function () {
-      // this.getListData();
+      this.getListData();
     },
 
     methods: {
@@ -164,13 +164,18 @@
       //-----------------------------------------------------
       getListData() {
         this.showLoader = true;
-        this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
-        this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list]).then();
+        this.$store.dispatch('http_get', ["/api/geobody/file-list", {}, this.event_http_list]).then();
       },
       openData(item)
       {
-        this.selected_data = item;
-        this.$refs.radiusDialog.showModal();
+        this.selected_data = {};
+        this.selected_data["file_id"] = item["_id"]["$oid"];
+        this.selected_data["file_name"] = item["file_name"];
+        //console.log(JSON.stringify(this.selected_data))
+        this.$store.dispatch('actionSaveSelectedGeobody', this.selected_data); //set selected project
+        this.$router.push({
+          path: this.varRouter.getRoute("geobody-info", 1),
+        });
       },
       radiusDialogBtn1Click() {
         this.$refs.radiusDialog.hideModal();
@@ -190,11 +195,8 @@
     mounted() {
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) => {
-        //create table header
-        this.table_headers.push({label: "Action", key:"action", default: "", tdClass: 'align-middle'});
-
-        // //fill table contents
-        this.table_datas = msg.data;
+        // console.log(JSON.stringify(msg))
+        this.table_datas = msg;
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
@@ -256,33 +258,7 @@
         },
 
         selected_data: {},
-        table_headers: [
-          {
-            key: 'area',
-            label: 'Area',
-            sortable: true
-          },
-          {
-            key: 'well_id',
-            label: 'Well ID',
-            sortable: true
-          },
-          {
-            key: 'X',
-            label: 'X Coord',
-            sortable: false,
-          },
-          {
-            key: 'Y',
-            label: 'Y Coord',
-            sortable: false,
-          },
-          {
-            key: 'Z',
-            label: 'Z Coord',
-            sortable: false,
-          }
-        ],
+        table_headers: createTableGeobodyFileListHeader(),
         table_datas: [],
 
         event_http_list :{success:"successList", fail:"failList"},
