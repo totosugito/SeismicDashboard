@@ -78,18 +78,18 @@
         this.minData = get2dMinData(this.points);
         this.maxData = get2dMaxData(this.points);
 
-        // let dmin_ = Math.abs(this.minData * this.cmin / 100.0);
-        // let dmax_ = Math.abs(this.maxData * this.cmax / 100.0);
-        // this.minData = this.minData + dmin_;
-        // this.maxData = this.maxData - dmax_;
+        let dmin_ = Math.abs(this.minData * this.cmin / 100.0);
+        let dmax_ = Math.abs(this.maxData * this.cmax / 100.0);
+        this.minData = this.minData + dmin_;
+        this.maxData = this.maxData - dmax_;
 
-        let mm_data = 0;
-        if(Math.abs(this.minData) > Math.abs(this.maxData))
-          mm_data = Math.abs(this.minData) * this.perc / 100.0;
-        else
-          mm_data = Math.abs(this.maxData) * this.perc / 100.0;
-        this.minData = this.minData + mm_data;
-        this.maxData = this.maxData - mm_data;
+        // let mm_data = 0;
+        // if(Math.abs(this.minData) > Math.abs(this.maxData))
+        //   mm_data = Math.abs(this.minData) * this.perc / 100.0;
+        // else
+        //   mm_data = Math.abs(this.maxData) * this.perc / 100.0;
+        // this.minData = this.minData + mm_data;
+        // this.maxData = this.maxData - mm_data;
 
         this.palette = getLcColormap(this.colormap, this.minData, this.maxData);
 
@@ -219,9 +219,14 @@
           this.colormap = val;
           this.createChart();
         },
-        perc: function (val)
+        cmin: function (val)
         {
-          this.perc = val;
+          this.cmin = val;
+          this.createChart();
+        },
+        cmax: function (val)
+        {
+          this.cmax = val;
           this.createChart();
         },
         resizeevent: function (val)

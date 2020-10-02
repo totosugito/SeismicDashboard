@@ -28,6 +28,11 @@ export default new Router({
       component: () => import('../views/testing/SeismicView')
     },
     {
+      path: "/multiview",
+      name: "multiview",
+      component: () => import('../views/testing/MultiSeismicViewer')
+    },
+    {
       path: "/test1",
       name: "test1",
       component: () => import('../views/testing/testHeatMap')
