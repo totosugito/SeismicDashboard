@@ -51,19 +51,19 @@
             :fields="table_headers"
             :items="table_datas">
 
-            <template slot="action" slot-scope="row">
+            <template v-slot:cell(action)="row">
               <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"
                       style="margin: 3px">Open
               </button>
             </template>
 
             <!-- X -->
-            <template slot="xcoord" slot-scope="data">
-              <strong>Min : </strong> {{data.item.x_min.toFixed(6)}}<br><strong>Max : </strong> {{data.item.x_max.toFixed(6)}}
+            <template v-slot:cell(xcoord)="row">
+              <strong>Min : </strong> {{row.item.x_min.toFixed(6)}}<br><strong>Max : </strong> {{row.item.x_max.toFixed(6)}}
             </template>
             <!-- Y -->
-            <template slot="ycoord" slot-scope="data">
-              <strong>Min : </strong> {{data.item.y_min.toFixed(6)}}<br><strong>Max : </strong> {{data.item.y_max.toFixed(6)}}
+            <template v-slot:cell(ycoord)="row">
+              <strong>Min : </strong> {{row.item.y_min.toFixed(6)}}<br><strong>Max : </strong> {{row.item.y_max.toFixed(6)}}
             </template>
 
           </b-table>

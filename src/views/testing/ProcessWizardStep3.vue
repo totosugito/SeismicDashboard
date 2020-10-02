@@ -52,20 +52,20 @@
           :items="table_datas">
 
           <!-- X -->
-          <template slot="X" slot-scope="data">
-            <strong>Min : </strong> {{data.item.x_min.toFixed(8)}}<br><strong>Max : </strong> {{data.item.x_max.toFixed(8)}}
+          <template v-slot:cell(X)="row">
+            <strong>Min : </strong> {{row.item.x_min.toFixed(8)}}<br><strong>Max : </strong> {{row.item.x_max.toFixed(8)}}
           </template>
           <!-- Y -->
-          <template slot="Y" slot-scope="data">
-            <strong>Min : </strong> {{data.item.y_min.toFixed(8)}}<br><strong>Max : </strong> {{data.item.y_max.toFixed(8)}}
+          <template v-slot:cell(Y)="row">
+            <strong>Min : </strong> {{row.item.y_min.toFixed(8)}}<br><strong>Max : </strong> {{row.item.y_max.toFixed(8)}}
           </template>
           <!-- Z -->
-          <template slot="Z" slot-scope="data">
-            <strong>Min : </strong> {{data.item.z_min.toFixed(8)}}<br><strong>Max : </strong> {{data.item.z_max.toFixed(8)}}
+          <template v-slot:cell(Z)="row">
+            <strong>Min : </strong> {{row.item.z_min.toFixed(8)}}<br><strong>Max : </strong> {{row.item.z_max.toFixed(8)}}
           </template>
 
           <!-- action status -->
-          <template slot="action" slot-scope="row">
+          <template v-slot:cell(action)="row">
             <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"
                     style="margin: 3px">Open
             </button>

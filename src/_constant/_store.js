@@ -144,7 +144,7 @@ const actions = {
         const response_ = JSON.parse(JSON.stringify(response));
         let data = response_.data;
 
-        printJson("OUTPUT --> ", data);
+        // printJson("OUTPUT --> ", data);
         //cek return data dari server
         if (response_.status !== 200)
         {
@@ -171,7 +171,7 @@ const actions = {
       {
         const response_ = JSON.parse(JSON.stringify(response));
         let data = response_.data;
-        printJson("OGET --> ", appDebugMode(), data);
+        // printJson("OGET --> ", appDebugMode(), data);
 
         //cek return data dari server
         if (response_.status !== 200)

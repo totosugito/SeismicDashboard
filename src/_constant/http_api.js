@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 const DEBUG_SERVER = true;
 const SERVER_DEVEL = 2;
 // const DEBUG_MODE = false;

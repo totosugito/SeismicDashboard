@@ -26,7 +26,12 @@ export function createTableWellHeader()
       key: 'Z',
       label: 'Z Coord',
       sortable: false,
-    }
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
   ];
   return (table_headers);
 }

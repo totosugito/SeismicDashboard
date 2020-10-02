@@ -64,7 +64,7 @@
 <!--            </template>-->
 
             <!-- action status -->
-            <template slot="action" slot-scope="row">
+            <template v-slot:cell(action)="row">
               <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"
                       style="margin: 3px">Open
               </button>

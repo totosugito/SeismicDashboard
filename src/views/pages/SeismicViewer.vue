@@ -385,7 +385,7 @@
             data: opt_data["opt"]
           });
           this.seriesSeismicInfo = opt_data["info"];
-          //console.log(JSON.stringify(this.seriesSeismicInfo))
+          // console.log(JSON.stringify(this.seriesSeismicInfo))
         }
         else
         {
@@ -441,6 +441,7 @@
         this.XAxis["data"] = msg["cdp_header"];
         this.dt = this.YAxis["sampling"];
         this.ystart = this.YAxis["start"];
+        // console.log(JSON.stringify(msg["cdp_header"]))
 
         this.dataTitle = msg["title"] + msg["cdp_no"];
         this.createChartInfo();

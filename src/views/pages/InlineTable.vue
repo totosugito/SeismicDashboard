@@ -50,15 +50,12 @@
             :fields="table_headers"
             :items="table_datas">
 
-            <template v-slot:cell(index)="data">
+            <template v-slot:cell(No)="data">
               {{ data.index + 1 }}
             </template>
 
             <!-- action status -->
-            <template slot="action" slot-scope="row">
-<!--              <button type="link" class="btn-sm btn-primary" @click="openData(row.item)"-->
-<!--                      style="margin: 3px">Open-->
-<!--              </button>-->
+            <template v-slot:cell(action)="row">
               <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
             </template>
           </b-table>
@@ -174,16 +171,16 @@
       },
       openDataUrl(item)
       {
-        return("#/inline-crossline/seismic-viewer?mode=0&st=" + item["idx_st"] + "&en=" + item["idx_en"]);
-        // return("#/inline-crossline/seismic-viewer?mode=1&fid=" + this.cur_well["_id"]["$oid"] + "&iline=" + item["iline"] + "&xline=" + item["xline"]);
+        // return("#/inline-crossline/seismic-viewer?mode=0&st=" + item["idx_st"] + "&en=" + item["idx_en"]);
+        return("#/inline-crossline/seismic-viewer?mode=1&fid=" + this.cur_well["file_id"] + "&iline=" + item["iline"] + "&xline=" + item["xline"]);
       },
       openData(item)
       {
         this.selected_data = item;
         this.$router.push({
           path: this.varRouter.getRoute("seismicviewer", 1),
-          // query: {mode:1, fid:this.cur_well["_id"]["$oid"], iline: this.selected_data["iline"], xline: this.selected_data["xline"]}
-          query: {mode:0, st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
+          query: {mode:1, fid:this.cur_well["file_id"], iline: this.selected_data["iline"], xline: this.selected_data["xline"]}
+          // query: {mode:0, st: this.selected_data["idx_st"], en: this.selected_data["idx_en"]}
         });
       },
       radiusDialogBtn1Click() {
@@ -288,7 +285,7 @@
         selected_data: {},
         table_headers: [
           // A virtual column that doesn't exist in items
-          // 'index',
+          'No',
           {
             key: 'iline',
             label: 'Inline',

@@ -22,9 +22,12 @@ export function getPinMarker()
   return("https://storage.googleapis.com/public-datas/pin_location.png");
 }
 
-export function getMapServer()
+export function getMapServer(imode)
 {
-  return ('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+  if(imode===0)
+    return ('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+  else
+    return('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
 }
 
 export function getMarkerColor(item, statusSetting)

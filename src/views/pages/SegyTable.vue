@@ -56,7 +56,7 @@
 <!--            </template>-->
 
             <!-- action status -->
-            <template slot="action" slot-scope="row">
+            <template v-slot:cell(action)="row">
               <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
             </template>
           </b-table>
