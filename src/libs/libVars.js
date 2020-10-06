@@ -105,7 +105,7 @@ export function createTableGeobodyListHeader()
     },
     {
       key: 'nop',
-      label: 'Number of Points',
+      label: 'NPoints',
       sortable: true
     },
     {
@@ -149,6 +149,87 @@ export function createTableGeobodyFileListHeader()
       key: 'note',
       label: 'Note',
       sortable: false,
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+
+export function createTableWellHeaderBySelectedGeobody()
+{
+  let table_headers = [
+    {
+      key: 'well_id',
+      label: 'Well ID',
+      sortable: true
+    },
+    {
+      key: 'eucd',
+      label: 'EUCD',
+      sortable: true
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+
+export function createTableGatherHeader()
+{
+  let table_headers = [
+    {
+      key: 'iline',
+      label: 'Inline',
+      sortable: true
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      sortable: true
+    },
+    {
+      key: 'freq',
+      label: 'Freq',
+      sortable: true
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+
+export function createTableSectionHeader()
+{
+  let table_headers = [
+    {
+      key: 'iline',
+      label: 'Inline',
+      sortable: true
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      sortable: true
+    },
+    {
+      key: 'freq',
+      label: 'Freq',
+      sortable: true
+    },
+    {
+      key: 'segy_file_id',
+      label: 'SEGY ID',
+      sortable: true
     },
     {
       key: 'action',

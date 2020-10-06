@@ -254,7 +254,7 @@
         this.selected_data["file_id"] = this.model["file_id"];
         //console.log(JSON.stringify(this.selected_data))
 
-        this.$store.dispatch('actionSaveSelectedWell', this.selected_data); //set selected project
+        this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
           path: this.varRouter.getRoute("processwizard2", 1),
         });
@@ -280,7 +280,7 @@
       },
       getListArea() {
         this.showLoader = true;
-        this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
+        this.$store.dispatch('actionSaveSelectedArea', {}); //set selected project
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_list]).then();
       },
 

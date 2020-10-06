@@ -11,27 +11,27 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <strong>Well List</strong>
+            <strong>SEGY Gather List</strong>
           </div>
 
           <div>
             <b-row>
-              <b-col md="3">
-                <b-form-group label-cols="5" label-size="md" label="Number of Well">
-                  <b-form-input size="md" v-model="num_well"></b-form-input>
+              <b-col md="5">
+                <b-form-group label-cols="5" label-size="md" label="SEGY File">
+                  <b-form-select v-model="cur_segy" :options="list_segy"></b-form-select>
                 </b-form-group>
               </b-col>
             </b-row>
             <b-row>
-              <b-col md="3">
-                <b-form-group label-cols="5" label-size="md" label="Z Target">
-                  <b-form-input size="md" v-model="z_target"></b-form-input>
+              <b-col md="5">
+                <b-form-group label-cols="5" label-size="md" label="Radius">
+                  <b-form-input size="md" v-model="radius"></b-form-input>
                 </b-form-group>
               </b-col>
             </b-row>
             <b-row class="text-right">
-              <b-col md="3">
-                <b-btn class="btn btn-md" variant="success" @click="getListWell()">Update</b-btn>
+              <b-col md="5">
+                <b-btn class="btn btn-md" variant="success" @click="getListGather()">Show Gather</b-btn>
               </b-col>
             </b-row>
           </div>
@@ -107,11 +107,11 @@
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
+  import {createTableGatherHeader, createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
   import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
 
   export default {
-    name: "ProcessWizardStep3",
+    name: "ProcessWizardStep3_1",
 
     components: {
       ViewProcessWizardButton,
@@ -139,10 +139,11 @@
         totalRows: 0,
         filter: null,
 
-        table_headers: createTableWellHeaderBySelectedGeobody(),
+        table_headers: createTableGatherHeader(),
         table_datas: [],
-        z_target: -1,
-        num_well: 5,
+        radius: 0,
+        cur_segy: {},
+        list_segy: [],
 
         event_http_list: {success: "successList", fail: "failList"},
         event_http: {success: "success", fail: "fail"},
@@ -151,7 +152,7 @@
 
     beforeMount: function ()
     {
-      this.getListWell();
+      this.getListSegy();
     },
 
     methods: {
@@ -168,7 +169,12 @@
         // return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
 
-      getListWell()
+      getListSegy()
+      {
+        this.showLoader = true;
+        this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http]).then();
+      },
+      getListGather()
       {
         this.showLoader = true;
         let geobody_file_id = this.$route.query.geobody_file_id;
@@ -176,10 +182,16 @@
         let param = {
           geobody_file_id: geobody_file_id,
           geobody_id: geobody_id,
-          num_well: this.num_well,
-          z_target: this.z_target
+          segy_file_id: this.cur_segy,
+          radius: this.radius
         };
-        this.$store.dispatch('http_post', ["/api/geobody/calc-eucd-well", param, this.event_http_list]).then();
+        // param = {
+        //   "geobody_file_id": "5f70dacf6180bd82dd6637a3",
+        //   "geobody_id": "220538",
+        //   "segy_file_id": "5f72c6e01dc8fb197cdc5e19",
+        //   "radius": 0
+        // };
+        this.$store.dispatch('http_post', ["/api/geobody/find-gather", param, this.event_http_list]).then();
       },
 
       getTabIcon()
@@ -235,7 +247,7 @@
       //-------------- LIST Well -------------------
       EventBus.$on(this.event_http_list.success, (msg) =>
       {
-        // console.log(msg.length)
+        // console.log(JSON.stringify(msg))
         //fill table contents
         this.table_datas = msg;
         this.showLoader = false;
@@ -250,11 +262,18 @@
 
       EventBus.$on(this.event_http.success, (msg) =>
       {
-
+        this.list_segy = [];
+        for(let i=0; i<msg.length; i++)
+          this.list_segy.push({
+            value: msg[i]["_id"]["$oid"],
+            text: msg[i]["file_name"]
+          });
+        this.showLoader = false;
       });
 
       EventBus.$on(this.event_http.fail, (msg) =>
       {
+        this.list_segy = [];
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();

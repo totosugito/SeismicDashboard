@@ -9,7 +9,7 @@
 
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="1" :textsize="190" class="mb-3"/>
 
-    <splitpanes class="default-theme" vertical style="height: 70vh" vertical>
+    <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
       <pane class="p-2" min-size="20" max-size="80">
         <!-- -------------------------------------------- -->
         <!-- TABLE -->
@@ -49,7 +49,9 @@
           :items="table_datas">
 
           <template v-slot:cell(action)="row">
-              <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
+              <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>
+              <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>
+            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)">Section</b-link>
           </template>
 
           <!-- X -->
@@ -158,7 +160,7 @@
         showLoader: true,
         retStatus: {status: 0, title: "", message: "", data: []},
 
-        cur_well: {},
+        cur_area: {},
         cur_tab: 0,
         center: L.latLng(-6.90389, 107.61861),
         markers: [],
@@ -264,10 +266,10 @@
       getListGeobodyData()
       {
         this.showLoader = true;
-        this.cur_well = this.$store.getters.readSelectedWell;
-        this.center = L.latLng(this.cur_well.lat, this.cur_well.lon);
+        this.cur_area = this.$store.getters.readSelectedArea;
+        this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
 
-        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_well, this.event_http_list]).then();
+        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list]).then();
       },
 
       createDemoCss(cc)
@@ -282,21 +284,39 @@
         return (sstr);
       },
 
-      openData(item)
+      openData3(item)
       {
-        //this.varRouter.getRoute("seismicviewer", 1),
         this.$router.push({
-          path: "3dview",
-          query: {file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+          path: "process-wizard3",
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
         });
-
-        // this.wizardButtonClicked('processwizard3');
-        // this.selected_data = item;
-        // this.$refs.radiusDialog.showModal();
       },
-      openDataUrl(item)
+      openDataUrl3(item)
       {
-        return("#/3dview?file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+        return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+      },
+
+      openData3_1(item)
+      {
+        this.$router.push({
+          path: "process-wizard3-1",
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+        });
+      },
+      openDataUrl3_1(item)
+      {
+        return("#/process-wizard3-1?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+      },
+      openData3_2(item)
+      {
+        this.$router.push({
+          path: "process-wizard3-2",
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+        });
+      },
+      openDataUrl3_2(item)
+      {
+        return("#/process-wizard3-2?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
 
       radiusDialogBtn1Click() {

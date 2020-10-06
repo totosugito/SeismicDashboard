@@ -52,6 +52,11 @@ export default new Router({
       name: "3dview",
       component: () => import('../views/testing/Test3DScatterView')
     },
+    // {
+    //   path: "/plotly",
+    //   name: "plotly",
+    //   component: () => import('../views/testing/TestPlotly')
+    // },
     // ---------------------------------------------------------------
     // FRONT PAGE
     // ---------------------------------------------------------------
@@ -138,6 +143,16 @@ export default new Router({
               path: varRouter.getRoute("processwizard3", 1),
               name: varRouter.getRoute("processwizard3", 2),
               component: () => import('../views/testing/ProcessWizardStep3')
+            },
+            {
+              path: varRouter.getRoute("processwizard3-1", 1),
+              name: varRouter.getRoute("processwizard3-1", 2),
+              component: () => import('../views/testing/ProcessWizardStep3_1')
+            },
+            {
+              path: varRouter.getRoute("processwizard3-2", 1),
+              name: varRouter.getRoute("processwizard3-2", 2),
+              component: () => import('../views/testing/ProcessWizardStep3_2')
             },
             {
               path: varRouter.getRoute("processwizard4", 1),
