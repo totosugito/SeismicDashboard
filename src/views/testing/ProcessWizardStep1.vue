@@ -9,8 +9,14 @@
 
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="cur_tab" :textsize="190" class="mb-3"/>
 
+<!--    <b-row  class="p-0 m-0">-->
+<!--      <b-col md="12" class="p-0 m-0">-->
+<!--        <b-card style="margin: 0px; padding: 0px">-->
+<!--          <div slot="header">-->
+<!--            <strong>Well List</strong>-->
+<!--          </div>-->
     <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
-      <pane class="p-2" min-size="20" max-size="80">
+      <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
         <!-- -------------------------------------------- -->
         <!-- TABLE -->
         <!-- -------------------------------------------- -->
@@ -74,6 +80,9 @@
       </pane>
     </splitpanes>
 
+<!--        </b-card>-->
+<!--      </b-col>-->
+<!--    </b-row>-->
     <vue-form-dialog
       ref="radiusDialog"
       type="default"
@@ -250,9 +259,17 @@
         if(this.model["file_id"]==="")
           return;
 
-        // this.selected_data["radius"] = this.model["radius"];
+        for(let i=0; i<this.geobody_data.length; i++)
+        {
+          if(this.geobody_data[i]["id"] === this.model["file_id"])
+          {
+            this.selected_data["geobody_name"] = this.geobody_data[i]["name"];
+            break;
+          }
+        }
         this.selected_data["file_id"] = this.model["file_id"];
-        //console.log(JSON.stringify(this.selected_data))
+        // console.log(JSON.stringify(this.selected_data))
+        // console.log(JSON.stringify(this.geobody_data))
 
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({

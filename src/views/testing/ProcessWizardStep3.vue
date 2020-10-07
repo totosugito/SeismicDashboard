@@ -11,7 +11,7 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <strong>Well List</strong>
+            <div><span class="mr-2" style="color: #0d47a1"><strong>Well List <i class="fa fa-hand-o-right"></i></strong></span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></div>
           </div>
 
           <div>
@@ -97,6 +97,18 @@
       </b-col>
     </b-row>
       <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')" :right_clicked="wizardButtonClicked('processwizard4')"/>
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -109,6 +121,7 @@
   import {mapState} from "vuex";
   import {createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
   import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
+  import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
 
   export default {
     name: "ProcessWizardStep3",
@@ -116,7 +129,8 @@
     components: {
       ViewProcessWizardButton,
       ViewBottomWizardButton,
-      LChartSeismic
+      LChartSeismic,
+      VueSimpleDialog
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -143,6 +157,7 @@
         table_datas: [],
         z_target: -1,
         num_well: 5,
+        cur_area: {},
 
         event_http_list: {success: "successList", fail: "failList"},
         event_http: {success: "success", fail: "fail"},
@@ -155,6 +170,15 @@
     },
 
     methods: {
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
       openData(item)
       {
         // this.$router.push({
@@ -170,6 +194,7 @@
 
       getListWell()
       {
+        this.cur_area = this.$store.getters.readSelectedArea;
         this.showLoader = true;
         let geobody_file_id = this.$route.query.geobody_file_id;
         let geobody_id = this.$route.query.geobody_id;

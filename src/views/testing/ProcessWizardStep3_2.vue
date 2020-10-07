@@ -11,7 +11,7 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <strong>Section List</strong>
+            <div><span class="mr-2" style="color: #0d47a1"><strong>Section List <i class="fa fa-hand-o-right"></i></strong></span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></div>
           </div>
 
           <div>
@@ -97,6 +97,19 @@
       </b-col>
     </b-row>
       <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')" :right_clicked="wizardButtonClicked('processwizard4')"/>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -109,6 +122,7 @@
   import {mapState} from "vuex";
   import {createTableGatherHeader, createTableSectionHeader, createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
   import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
+  import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
 
   export default {
     name: "ProcessWizardStep3_2",
@@ -116,7 +130,8 @@
     components: {
       ViewProcessWizardButton,
       ViewBottomWizardButton,
-      LChartSeismic
+      LChartSeismic,
+      VueSimpleDialog
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -144,6 +159,7 @@
         radius: 0,
         cur_segy: {},
         list_segy: [],
+        cur_area: {},
 
         event_http_list: {success: "successList", fail: "failList"},
         event_http: {success: "success", fail: "fail"},
@@ -156,6 +172,15 @@
     },
 
     methods: {
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
       openData(item)
       {
         // this.$router.push({
@@ -171,6 +196,7 @@
 
       getListSegy()
       {
+        this.cur_area = this.$store.getters.readSelectedArea;
         this.showLoader = true;
         this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http]).then();
       },

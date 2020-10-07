@@ -9,8 +9,10 @@
 
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="1" :textsize="190" class="mb-3"/>
 
-    <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
-      <pane class="p-2" min-size="20" max-size="80">
+    <splitpanes class="default-theme" vertical style="height: 70vh" vertical>
+      <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
+        <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>
+
         <!-- -------------------------------------------- -->
         <!-- TABLE -->
         <!-- -------------------------------------------- -->
@@ -157,7 +159,7 @@
     data()
     {
       return {
-        showLoader: true,
+        showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
 
         cur_area: {},
@@ -265,10 +267,10 @@
 
       getListGeobodyData()
       {
-        this.showLoader = true;
         this.cur_area = this.$store.getters.readSelectedArea;
         this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
 
+        this.showLoader = true;
         this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list]).then();
       },
 

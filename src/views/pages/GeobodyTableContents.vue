@@ -82,6 +82,19 @@
         </b-card>
       </b-col>
     </b-row>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 

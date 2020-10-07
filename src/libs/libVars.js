@@ -5,7 +5,7 @@ export function createTableWellHeader()
     {
       key: 'well_id',
       label: 'Well ID',
-      sortable: true
+      sortable: true,
     },
     {
       key: 'area',
@@ -185,6 +185,12 @@ export function createTableGatherHeader()
 {
   let table_headers = [
     {
+      key: 'check',
+      label: '#',
+      sortable: true,
+      thStyle: { width: '40px'}
+    },
+    {
       key: 'iline',
       label: 'Inline',
       sortable: true
@@ -196,14 +202,14 @@ export function createTableGatherHeader()
     },
     {
       key: 'freq',
-      label: 'Freq',
+      label: 'Number of Traces',
       sortable: true
     },
-    {
-      key: 'action',
-      label: 'Action',
-      sortable: false,
-    },
+    // {
+    //   key: 'action',
+    //   label: 'Action',
+    //   sortable: false,
+    // },
   ];
   return (table_headers);
 }

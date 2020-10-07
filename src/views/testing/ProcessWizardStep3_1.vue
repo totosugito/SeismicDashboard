@@ -1,5 +1,67 @@
 <template>
   <div>
+    <Overlay :opened="opened" :visible="visible" @closed="overlayClosed()">
+      <div>
+        <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
+          <b-btn class="mr-2" variant="primary" @click="refreshMultiSeismicChart()"><i class="fa fa-refresh"></i> Refresh</b-btn>
+          <b-dropdown size="sm" class="mr-0">
+            <template slot="button-content" class="pr-1" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span
+              class="pl-1">{{fgetColormapName(colormap.id)}}</span>
+            </template>
+
+            <b-dropdown-item @click="setColormap(0)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> {{fgetColormapName(0)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(1)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> {{fgetColormapName(1)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(2)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> {{fgetColormapName(2)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(3)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> {{fgetColormapName(3)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(4)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> {{fgetColormapName(4)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(5)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(5)"/> {{fgetColormapName(5)}}
+            </b-dropdown-item>
+          </b-dropdown>
+          <!--        <b-form-checkbox v-model="reverseColormap" class="mr-1">Rev</b-form-checkbox>-->
+<!--          <enhanced-check label="Rev" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>-->
+
+          <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+            <b-input-group-prepend class="mr-1">
+              <span style="color: white">Min ({{cmin}})</span>
+            </b-input-group-prepend>
+            <b-form-slider style="height:20px;" v-model="tmp_cmin" @slide-stop="slideStopMin" :min="0" :max="99"></b-form-slider>
+          </b-input-group>
+          <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+            <b-input-group-prepend class="mr-1">
+              <span style="color: white">Max ({{cmax}})</span>
+            </b-input-group-prepend>
+            <b-form-slider style="height:20px;" v-model="tmp_cmax" @slide-stop="slideStopMax" :min="0" :max="99"></b-form-slider>
+          </b-input-group>
+        </b-button-toolbar>
+      </div>
+
+      <template v-if="bdraw===true">
+      <b-container fluid>
+        <b-row>
+          <template v-for="i in parseInt(npic)">
+            <b-col>
+              <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :points="getSeismicDataPoints(i-1)"
+                             :xaxis="getSeismicDataX(i-1)" :yaxis="getSeismicDataY(i-1)" :cmin="cmin" :cmax="cmax"
+                             :title="getSeismicTitle(i-1)"></LChartSeismic>
+            </b-col>
+          </template>
+        </b-row>
+      </b-container>
+      </template>
+    </Overlay>
+
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="2" :textsize="190" class="mb-3"/>
     <vue-element-loading
       :spinner="spinLoader.spinner"
@@ -7,11 +69,13 @@
       :background-color="spinLoader.background_color"
       :size="spinLoader.size"
       :active="showLoader"/>
+
+<!--    <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>-->
     <b-row>
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <strong>SEGY Gather List</strong>
+            <div><span class="mr-2" style="color: #0d47a1"><strong>SEGY GATHER <i class="fa fa-hand-o-right"></i></strong></span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></div>
           </div>
 
           <div>
@@ -42,6 +106,7 @@
           <div class="group-header">
             <b-row>
               <b-col md="6">
+                <b-btn variant="primary" @click="eventPlotSeismic()">Plot Seismic</b-btn>
               </b-col>
               <b-col md="6" class="my-1">
                 <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
@@ -71,9 +136,15 @@
             :fields="table_headers"
             :items="table_datas">
 
-            <template v-slot:cell(eucd)="row">
-              {{row.item.eucd.toFixed(5)}}
+            <template v-slot:cell(check)="row">
+              <b-form-group>
+                <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+              </b-form-group>
             </template>
+
+<!--            <template v-slot:cell(eucd)="row">-->
+<!--              {{row.item.eucd.toFixed(5)}}-->
+<!--            </template>-->
 
             <!-- action status -->
             <template v-slot:cell(action)="row">
@@ -97,6 +168,19 @@
       </b-col>
     </b-row>
       <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')" :right_clicked="wizardButtonClicked('processwizard4')"/>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -109,6 +193,12 @@
   import {mapState} from "vuex";
   import {createTableGatherHeader, createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
   import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
+  import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+  import Overlay from "../components/Overlay";
+  import {getColormapAsset, getColormapName} from "../../libs/colormap";
+  import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
+  import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
+  import 'bootstrap-slider/dist/css/bootstrap-slider.css'
 
   export default {
     name: "ProcessWizardStep3_1",
@@ -116,7 +206,11 @@
     components: {
       ViewProcessWizardButton,
       ViewBottomWizardButton,
-      LChartSeismic
+      LChartSeismic,
+      VueSimpleDialog,
+      Overlay,
+      EnhancedCheck,
+      bFormSlider,
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -130,6 +224,24 @@
     data()
     {
       return {
+        opened: false,
+        visible: false,
+
+        bdraw: false,
+        npic: 2,
+        points: [],
+        colormap: {id: 3, reverse: false},
+        reverseColormap: false,
+        cmin: 20,
+        cmax: 20,
+        tmp_cmin: 20,
+        tmp_cmax: 20,
+        XAxis: {},
+        YAxis: {},
+        dataTitle: "",
+
+
+        cur_area: {},
         showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
         perPageView: 15,
@@ -139,14 +251,36 @@
         totalRows: 0,
         filter: null,
 
+        listSelectedRow: [],
         table_headers: createTableGatherHeader(),
-        table_datas: [],
+        table_datas: [
+          // {"check":false,"iline":6215,"xline":2205,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6219,"xline":2205,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6219,"xline":2209,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6219,"xline":2213,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6219,"xline":2217,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6219,"xline":2221,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6219,"xline":2225,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2205,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2209,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2213,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2217,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2221,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2225,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2229,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2233,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6223,"xline":2237,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6227,"xline":2205,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6227,"xline":2209,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+          // {"check":false,"iline":6227,"xline":2213,"freq":31,"segy_file_id":"5f72c6e01dc8fb197cdc5e19"},
+        ],
         radius: 0,
         cur_segy: {},
         list_segy: [],
 
         event_http_list: {success: "successList", fail: "failList"},
         event_http: {success: "success", fail: "fail"},
+        event_http_sgy_data: {success: "successSgyData", fail: "failSgyData"},
       }
     },
 
@@ -156,6 +290,114 @@
     },
 
     methods: {
+      fgetColormapName(ii)
+      {
+        return (getColormapName(ii))
+      },
+      setColormap(ii)
+      {
+        this.colormap = {id: ii, reverse: this.reverseColormap};
+      },
+
+      fgetColormapAsset(ii)
+      {
+        return (getColormapAsset(ii))
+      },
+      slideStopMin()
+      {
+        this.cmin = this.tmp_cmin;
+      },
+      slideStopMax()
+      {
+        this.cmax = this.tmp_cmax;
+      },
+
+      getDemoData()
+      {
+        this.XAxis = {
+          "label": "Offset (m)",
+          "sampling": 1,
+          "start": 0
+        };
+        this.YAxis = {
+          "label": "Depth (m)",
+          "sampling": 2,
+          "start": 50
+        };
+        this.points = getData();
+        let data = [];
+        for (let i = 0; i < this.points[0].length; i++)
+          data.push(i);
+        this.XAxis["data"] = data;
+        this.ns = this.points.length;
+        this.dt = this.YAxis["sampling"];
+
+        this.dataTitle = "CDP NO : 1";
+        this.showLoader = false;
+      },
+
+      refreshMultiSeismicChart()
+      {
+        this.setColormap(3);
+      },
+      overlayClosed()
+      {
+        this.bdraw = false;
+        this.opened = false;
+        this.visible = false;
+      },
+      eventPlotSeismic()
+      {
+        this.showLoader = true;
+        this.overlayClosed();
+        let param = [
+          {
+            "segy_file_id": "5f72c6e01dc8fb197cdc5e19",
+            "iline": 6215,
+            "xline": 2205
+          },
+          {
+            "segy_file_id": "5f72c6e01dc8fb197cdc5e19",
+            "iline": 6219,
+            "xline": 2209
+          }
+        ];
+        param = this.listSelectedRow;
+        // this.getDemoData();
+        if(this.listSelectedRow.length===0)
+        {
+          this.retStatus = {status: 0, title: "Information", message: "Please Select files from table ...", data: []};
+          this.$refs.dialogMessage.showModal();
+          return
+        }
+        // console.log(JSON.stringify(this.listSelectedRow))
+        this.$store.dispatch('http_post', ["/api/segy/view-list-gather", param, this.event_http_sgy_data]).then();
+      },
+      updateSelectedRow(m)
+      {
+        if(m.check)
+        {
+          for(let i=0; i<this.listSelectedRow.length; i++)
+          {
+            if((m["iline"]===this.listSelectedRow[i]["iline"]) & (m["xline"]===this.listSelectedRow[i]["xline"]))
+            {
+              this.listSelectedRow.splice(i, 1);
+              break
+            }
+          }
+        }
+        else
+          this.listSelectedRow.push(m);
+      },
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        } else { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
       openData(item)
       {
         // this.$router.push({
@@ -171,6 +413,7 @@
 
       getListSegy()
       {
+        this.cur_area = this.$store.getters.readSelectedArea;
         this.showLoader = true;
         this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http]).then();
       },
@@ -192,6 +435,36 @@
         //   "radius": 0
         // };
         this.$store.dispatch('http_post', ["/api/geobody/find-gather", param, this.event_http_list]).then();
+      },
+      getSeismicDataPoints(ii)
+      {
+        let sgy_points = [];
+
+        let tmp = this.points[ii]["cdp_data"];
+        let ns = tmp[0].length;
+        let ntrc = tmp.length;
+        for (let i = ns - 1; i >= 0; i--)
+        {
+          let tmp0 = [];
+          for (let j = 0; j < ntrc; j++)
+            tmp0.push(tmp[j][i]);
+          sgy_points.push(tmp0);
+        }
+        return(sgy_points);
+      },
+      getSeismicDataX(ii)
+      {
+        let xx = this.points[ii]["x"];
+        xx["data"] = this.points[ii]["cdp_header"];
+        return(xx);
+      },
+      getSeismicDataY(ii)
+      {
+        return(this.points[ii]["y"]);
+      },
+      getSeismicTitle(ii)
+      {
+        return(this.points[ii]["title"] + this.points[ii]["cdp_no"]);
       },
 
       getTabIcon()
@@ -278,6 +551,25 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      // ----------------------- GET LIST OF SEGY DATA FOR PLOTTING----------------------
+      EventBus.$on(this.event_http_sgy_data.success, (msg) =>
+      {
+        this.points = msg;
+        this.npic = msg.length;
+        this.showLoader = false;
+        this.opened = true;
+        this.visible = true;
+        this.bdraw = true;
+      });
+
+      EventBus.$on(this.event_http_sgy_data.fail, (msg) =>
+      {
+        this.list_segy = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy()
@@ -286,13 +578,34 @@
       EventBus.$off(this.event_http_list.fail);
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
+      EventBus.$off(this.event_http_sgy_data.success);
+      EventBus.$off(this.event_http_sgy_data.fail);
       this.showLoader = false;
     },
+
+    watch:
+      {
+        bdraw: function (val)
+        {
+          // console.log(this.bdraw)
+          // this.bdraw = val;
+          // this.setColormap(2)
+          // console.log(this.bdraw)
+        },
+        reverseColormap: function (val)
+        {
+          this.reverseColormap = val;
+          this.setColormap(this.colormap["id"]);
+        },
+      }
   }
 </script>
 
 <style scoped>
   .style_chart_proc {
     height: 65vh;
+  }
+  .lc_seismic_chart {
+    height: 80vh;
   }
 </style>

@@ -100,6 +100,19 @@
               <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>
             </span>
     </vue-form-dialog>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.message}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -132,6 +145,20 @@
     },
 
     methods: {
+      //MESSAGE HTTP I/O
+      dialogMessageBtn1Click()
+      {
+        if (this.retStatus.status === -1)
+        { //error http
+          //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
+          this.$refs.dialogMessage.hideModal();
+        }
+        else
+        { //error token
+          this.$refs.dialogMessage.hideModal();
+        }
+      },
+
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------
