@@ -39,10 +39,8 @@
         </div>
 
         <b-table
-          sticky-header
-          responsive
           show-empty
-          stacked="md"
+          sticky-header="53vh"
           :small="true"
           :striped="true"
           :bordered="true"

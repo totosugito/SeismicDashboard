@@ -35,10 +35,8 @@
         </div>
 
         <b-table
-          sticky-header
-          responsive
           show-empty
-          stacked="md"
+          sticky-header="53vh"
           :small="true"
           :striped="true"
           :bordered="true"
@@ -53,7 +51,8 @@
           <template v-slot:cell(action)="row">
               <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>
               <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>
-            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)">Section</b-link>
+            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)" class="mr-2">Section</b-link>
+            <b-link :href="openDataUrl3_3(row.item)" @click="openData3_3(row.item)">Prob</b-link>
           </template>
 
           <!-- X -->
@@ -319,6 +318,17 @@
       openDataUrl3_2(item)
       {
         return("#/process-wizard3-2?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+      },
+      openData3_3(item)
+      {
+        this.$router.push({
+          path: "process-wizard3-3",
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+        });
+      },
+      openDataUrl3_3(item)
+      {
+        return("#/process-wizard3-3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
 
       radiusDialogBtn1Click() {

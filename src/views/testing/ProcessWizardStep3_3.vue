@@ -11,27 +11,27 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <div><span class="mr-2" style="color: #0d47a1"><strong>Well List <i class="fa fa-hand-o-right"></i></strong></span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></div>
+            <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i class="fa fa-hand-o-right"></i></strong></span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></div>
           </div>
 
           <div>
+<!--            <b-row>-->
+<!--              <b-col md="5">-->
+<!--                <b-form-group label-cols="5" label-size="md" label="SEGY File">-->
+<!--                  <b-form-select v-model="cur_segy" :options="list_segy"></b-form-select>-->
+<!--                </b-form-group>-->
+<!--              </b-col>-->
+<!--            </b-row>-->
             <b-row>
-              <b-col md="3">
-                <b-form-group label-cols="5" label-size="md" label="Number of Well">
-                  <b-form-input size="md" v-model="num_well"></b-form-input>
-                </b-form-group>
-              </b-col>
-            </b-row>
-            <b-row>
-              <b-col md="3">
-                <b-form-group label-cols="5" label-size="md" label="Z Target">
-                  <b-form-input size="md" v-model="z_target"></b-form-input>
+              <b-col md="5">
+                <b-form-group label-cols="5" label-size="md" label="Radius">
+                  <b-form-input size="md" v-model="radius"></b-form-input>
                 </b-form-group>
               </b-col>
             </b-row>
             <b-row class="text-right">
-              <b-col md="3">
-                <b-btn class="btn btn-md" variant="success" @click="getListWell()">Update</b-btn>
+              <b-col md="5">
+                <b-btn class="btn btn-md" variant="success" @click="getListSection()">Show Section</b-btn>
               </b-col>
             </b-row>
           </div>
@@ -71,8 +71,17 @@
             :fields="table_headers"
             :items="table_datas">
 
-            <template v-slot:cell(eucd)="row">
-              {{row.item.eucd.toFixed(5)}}
+            <template v-slot:cell(cdp_x)="row">
+              {{row.item.cdp_x.toFixed(3)}}
+            </template>
+            <template v-slot:cell(cdp_y)="row">
+              {{row.item.cdp_y.toFixed(3)}}
+            </template>
+            <template v-slot:cell(cdp_z)="row">
+              {{row.item.cdp_z.toFixed(3)}}
+            </template>
+            <template v-slot:cell(prob)="row">
+              {{row.item.prob.toFixed(6)}}
             </template>
 
             <!-- action status -->
@@ -97,6 +106,7 @@
       </b-col>
     </b-row>
       <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')" :right_clicked="wizardButtonClicked('processwizard4')"/>
+
     <!-- show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
@@ -119,12 +129,18 @@
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
+  import {
+    createTableGatherHeader,
+    createTableProbabilityHeader,
+    createTableSectionHeader,
+    createTableWellHeader,
+    createTableWellHeaderBySelectedGeobody
+  } from "../../libs/libVars";
   import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
 
   export default {
-    name: "ProcessWizardStep3",
+    name: "ProcessWizardStep3_3",
 
     components: {
       ViewProcessWizardButton,
@@ -153,10 +169,11 @@
         totalRows: 0,
         filter: null,
 
-        table_headers: createTableWellHeaderBySelectedGeobody(),
+        table_headers: createTableProbabilityHeader(),
         table_datas: [],
-        z_target: -1,
-        num_well: 5,
+        radius: 25,
+        cur_segy: {},
+        list_segy: [],
         cur_area: {},
 
         event_http_list: {success: "successList", fail: "failList"},
@@ -166,7 +183,7 @@
 
     beforeMount: function ()
     {
-      this.getListWell();
+      this.getListSegy();
     },
 
     methods: {
@@ -192,19 +209,29 @@
         // return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
 
-      getListWell()
+      getListSegy()
       {
         this.cur_area = this.$store.getters.readSelectedArea;
+        // this.showLoader = true;
+        // this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http]).then();
+      },
+      getListSection()
+      {
         this.showLoader = true;
         let geobody_file_id = this.$route.query.geobody_file_id;
         let geobody_id = this.$route.query.geobody_id;
         let param = {
           geobody_file_id: geobody_file_id,
           geobody_id: geobody_id,
-          num_well: this.num_well,
-          z_target: this.z_target
+          segy_file_id: this.cur_segy,
+          radius: this.radius
         };
-        this.$store.dispatch('http_post', ["/api/geobody/calc-eucd-well", param, this.event_http_list]).then();
+        // param = {
+        //   "geobody_file_id": "5f70dacf6180bd82dd6637a3",
+        //   "geobody_id": "220538",
+        //   "radius": 25
+        // };
+        this.$store.dispatch('http_post', ["/api/geobody/calc-prob", param, this.event_http_list]).then();
       },
 
       getTabIcon()
@@ -214,7 +241,7 @@
       getTabText()
       {
         let tab_text = createTabProcessText();
-        tab_text[2] = "Well List";
+        tab_text[2] = "Probability List";
         return (tab_text)
       },
 
@@ -262,7 +289,7 @@
       //-------------- LIST Well -------------------
       EventBus.$on(this.event_http_list.success, (msg) =>
       {
-        // console.log(msg.length)
+        // console.log(JSON.stringify(msg))
         //fill table contents
         this.table_datas = msg;
         this.showLoader = false;
@@ -277,11 +304,18 @@
 
       EventBus.$on(this.event_http.success, (msg) =>
       {
-
+        this.list_segy = [];
+        for(let i=0; i<msg.length; i++)
+          this.list_segy.push({
+            value: msg[i]["_id"]["$oid"],
+            text: msg[i]["file_name"]
+          });
+        this.showLoader = false;
       });
 
       EventBus.$on(this.event_http.fail, (msg) =>
       {
+        this.list_segy = [];
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();

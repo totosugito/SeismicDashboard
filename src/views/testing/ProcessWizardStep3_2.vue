@@ -59,7 +59,7 @@
           <!-- table contents -->
           <b-table
             show-empty
-            stacked="md"
+            sticky-header="53vh"
             :small="true"
             :striped="true"
             :bordered="true"
@@ -224,7 +224,9 @@
       },
       getTabText()
       {
-        return (createTabProcessText())
+        let tab_text = createTabProcessText();
+        tab_text[2] = "Section List";
+        return (tab_text)
       },
 
       //-----------------------------------------------------
