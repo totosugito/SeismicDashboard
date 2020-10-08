@@ -11,7 +11,8 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i class="fa fa-hand-o-right"></i></strong></span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></div>
+            <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i class="fa fa-hand-o-right"></i></strong>
+            </span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}} ({{cur_area.geobody_id}})</strong></div>
           </div>
 
           <div>
@@ -41,7 +42,8 @@
           <!-- table header -->
           <div class="group-header">
             <b-row>
-              <b-col md="6">
+              <b-col md="6" class="my-1">
+                <strong>Total : {{ndata}}</strong>
               </b-col>
               <b-col md="6" class="my-1">
                 <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
@@ -168,6 +170,7 @@
         currentPage: 1,
         totalRows: 0,
         filter: null,
+        ndata: 0,
 
         table_headers: createTableProbabilityHeader(),
         table_datas: [],
@@ -212,17 +215,17 @@
       getListSegy()
       {
         this.cur_area = this.$store.getters.readSelectedArea;
+        this.cur_area["geobody_file_id"] = this.$route.query.geobody_file_id;
+        this.cur_area["geobody_id"] = this.$route.query.geobody_id;
         // this.showLoader = true;
         // this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http]).then();
       },
       getListSection()
       {
         this.showLoader = true;
-        let geobody_file_id = this.$route.query.geobody_file_id;
-        let geobody_id = this.$route.query.geobody_id;
         let param = {
-          geobody_file_id: geobody_file_id,
-          geobody_id: geobody_id,
+          geobody_file_id: this.cur_area["geobody_file_id"],
+          geobody_id: this.cur_area["geobody_id"],
           segy_file_id: this.cur_segy,
           radius: this.radius
         };
@@ -292,6 +295,7 @@
         // console.log(JSON.stringify(msg))
         //fill table contents
         this.table_datas = msg;
+        this.ndata = this.table_datas.length;
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) =>

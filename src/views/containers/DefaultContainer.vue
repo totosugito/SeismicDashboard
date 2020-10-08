@@ -7,7 +7,8 @@
       <AppHeader fixed>
         <SidebarToggler class="d-lg-none" display="md" mobile/>
         <b-link class="navbar-brand" to=".">
-          <img class="navbar-brand-full" src="img/brand/logo.png" width="30" height="30" alt="APP Logo">
+<!--          <img class="navbar-brand-full" src="img/brand/logo.png" width="30" height="30" alt="APP Logo">-->
+          <div><span style="padding-left: 5px; font-style: normal; font-size: 120%">PHM</span><span style="font-size: 60%"> - Machine Learning</span></div>
           <span class="logo-taskbar">{{user.title}}</span>
           <!--<img class="navbar-brand-minimized" src="img/brand/logo.png" width="30" height="30" alt="CoreUI Logo">-->
         </b-link>
