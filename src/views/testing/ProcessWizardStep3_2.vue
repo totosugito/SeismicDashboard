@@ -313,7 +313,6 @@
       },
       eventPlotSeismic()
       {
-        this.showLoader = true;
         this.overlayClosed();
         let param = [
           {
@@ -328,13 +327,14 @@
           this.$refs.dialogMessage.showModal();
           return
         }
-        if(this.listSelectedRow.length>2)
+        if(this.listSelectedRow.length>3)
         {
-          this.retStatus = {status: 0, title: "Information", message: "Maximum selected data 2", data: []};
+          this.retStatus = {status: 0, title: "Information", message: "Maximum selected data 3", data: []};
           this.$refs.dialogMessage.showModal();
           return
         }
 
+        this.showLoader = true;
         // console.log(JSON.stringify(this.listSelectedRow))
         this.$store.dispatch('http_post', ["/api/segy/view-list-section", param, this.event_http_sgy_data]).then();
       },
@@ -414,6 +414,7 @@
       getListGather()
       {
         this.showLoader = true;
+        this.listSelectedRow = [];
         let param = {
           geobody_file_id: this.cur_area["geobody_file_id"],
           geobody_id: this.cur_area["geobody_id"],

@@ -290,6 +290,7 @@
 
     beforeMount: function ()
     {
+      this.listSelectedRow = [];
       this.getListSegy();
     },
 
@@ -426,6 +427,7 @@
       getListGather()
       {
         this.showLoader = true;
+        this.listSelectedRow = [];
         let param = {
           geobody_file_id: this.cur_area["geobody_file_id"],
           geobody_id: this.cur_area["geobody_id"],
