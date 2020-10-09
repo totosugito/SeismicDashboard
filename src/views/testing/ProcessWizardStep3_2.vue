@@ -1,5 +1,67 @@
 <template>
   <div>
+    <Overlay :opened="opened" :visible="visible" @closed="overlayClosed()">
+      <div>
+        <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
+          <b-btn class="mr-2" variant="primary" @click="refreshMultiSeismicChart()"><i class="fa fa-refresh"></i> Refresh</b-btn>
+          <b-dropdown size="sm" class="mr-0">
+            <template slot="button-content" class="pr-1" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span
+              class="pl-1">{{fgetColormapName(colormap.id)}}</span>
+            </template>
+
+            <b-dropdown-item @click="setColormap(0)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> {{fgetColormapName(0)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(1)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> {{fgetColormapName(1)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(2)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> {{fgetColormapName(2)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(3)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> {{fgetColormapName(3)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(4)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> {{fgetColormapName(4)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(5)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(5)"/> {{fgetColormapName(5)}}
+            </b-dropdown-item>
+          </b-dropdown>
+          <!--        <b-form-checkbox v-model="reverseColormap" class="mr-1">Rev</b-form-checkbox>-->
+          <!--          <enhanced-check label="Rev" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>-->
+
+          <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+            <b-input-group-prepend class="mr-1">
+              <span style="color: white">Min ({{cmin}})</span>
+            </b-input-group-prepend>
+            <b-form-slider style="height:20px;" v-model="tmp_cmin" @slide-stop="slideStopMin" :min="0" :max="99"></b-form-slider>
+          </b-input-group>
+          <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+            <b-input-group-prepend class="mr-1">
+              <span style="color: white">Max ({{cmax}})</span>
+            </b-input-group-prepend>
+            <b-form-slider style="height:20px;" v-model="tmp_cmax" @slide-stop="slideStopMax" :min="0" :max="99"></b-form-slider>
+          </b-input-group>
+        </b-button-toolbar>
+      </div>
+
+      <template v-if="bdraw===true">
+        <b-container fluid>
+          <b-row>
+            <template v-for="i in parseInt(npic)">
+              <b-col>
+                <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :points="getSeismicDataPoints(i-1)"
+                               :xaxis="getSeismicDataX(i-1)" :yaxis="getSeismicDataY(i-1)" :cmin="cmin" :cmax="cmax"
+                               :title="getSeismicTitle(i-1)"></LChartSeismic>
+              </b-col>
+            </template>
+          </b-row>
+        </b-container>
+      </template>
+    </Overlay>
+
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="2" :textsize="190" class="mb-3"/>
     <vue-element-loading
       :spinner="spinLoader.spinner"
@@ -32,7 +94,7 @@
             </b-row>
             <b-row class="text-right">
               <b-col md="5">
-                <b-btn class="btn btn-md" variant="success" @click="getListGather()">Show Gather</b-btn>
+                <b-btn class="btn btn-md" variant="success" @click="getListGather()">Show Section</b-btn>
               </b-col>
             </b-row>
           </div>
@@ -42,7 +104,10 @@
           <!-- table header -->
           <div class="group-header">
             <b-row>
-              <b-col md="6" class="my-1">
+              <b-col md="2">
+                <b-btn variant="primary" @click="eventPlotSeismic()">Plot Seismic</b-btn>
+              </b-col>
+              <b-col md="4" class="my-1">
                 <strong>Total : {{ndata}}</strong>
               </b-col>
               <b-col md="6" class="my-1">
@@ -73,9 +138,15 @@
             :fields="table_headers"
             :items="table_datas">
 
-            <template v-slot:cell(eucd)="row">
-              {{row.item.eucd.toFixed(5)}}
+            <template v-slot:cell(check)="row">
+              <b-form-group>
+                <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+              </b-form-group>
             </template>
+
+<!--            <template v-slot:cell(eucd)="row">-->
+<!--              {{row.item.eucd.toFixed(5)}}-->
+<!--            </template>-->
 
             <!-- action status -->
             <template v-slot:cell(action)="row">
@@ -117,14 +188,19 @@
 
 <script>
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
-  import {getData} from "../../libs/data";
+  // import {getData} from "../../libs/data";
   import LChartSeismic from "../components/LChartSeismic";
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTableGatherHeader, createTableSectionHeader, createTableWellHeader, createTableWellHeaderBySelectedGeobody} from "../../libs/libVars";
+  import {createTableSectionHeader} from "../../libs/libVars";
   import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+  import {getColormapAsset, getColormapName} from "../../libs/colormap";
+  import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
+  import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
+  import 'bootstrap-slider/dist/css/bootstrap-slider.css';
+  import Overlay from "../components/Overlay";
 
   export default {
     name: "ProcessWizardStep3_2",
@@ -133,7 +209,10 @@
       ViewProcessWizardButton,
       ViewBottomWizardButton,
       LChartSeismic,
-      VueSimpleDialog
+      VueSimpleDialog,
+      EnhancedCheck,
+      bFormSlider,
+      Overlay
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -147,6 +226,21 @@
     data()
     {
       return {
+        opened: false,
+        visible: false,
+        bdraw: false,
+        npic: 2,
+        points: [],
+        colormap: {id: 3, reverse: false},
+        reverseColormap: false,
+        cmin: 20,
+        cmax: 20,
+        tmp_cmin: 20,
+        tmp_cmax: 20,
+        XAxis: {},
+        YAxis: {},
+        dataTitle: "",
+
         showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
         perPageView: 15,
@@ -163,9 +257,11 @@
         cur_segy: {},
         list_segy: [],
         cur_area: {},
+        listSelectedRow: [],
 
         event_http_list: {success: "successList", fail: "failList"},
         event_http: {success: "success", fail: "fail"},
+        event_http_sgy_data: {success: "successSgyData", fail: "failSgyData"},
       }
     },
 
@@ -183,6 +279,116 @@
         } else { //error token
           this.$refs.dialogMessage.hideModal();
         }
+      },
+      fgetColormapName(ii)
+      {
+        return (getColormapName(ii))
+      },
+      setColormap(ii)
+      {
+        this.colormap = {id: ii, reverse: this.reverseColormap};
+      },
+
+      fgetColormapAsset(ii)
+      {
+        return (getColormapAsset(ii))
+      },
+      slideStopMin()
+      {
+        this.cmin = this.tmp_cmin;
+      },
+      slideStopMax()
+      {
+        this.cmax = this.tmp_cmax;
+      },
+      overlayClosed()
+      {
+        this.bdraw = false;
+        this.opened = false;
+        this.visible = false;
+      },
+      refreshMultiSeismicChart()
+      {
+        this.setColormap(3);
+      },
+      eventPlotSeismic()
+      {
+        this.showLoader = true;
+        this.overlayClosed();
+        let param = [
+          {
+            "segy_file_id": "5f770203f0522ed909b6d573",
+            "type": "iline",
+            "iline": 6774
+          }];
+        param = this.listSelectedRow;
+        if(this.listSelectedRow.length===0)
+        {
+          this.retStatus = {status: 0, title: "Information", message: "Please Select files from table ...", data: []};
+          this.$refs.dialogMessage.showModal();
+          return
+        }
+        if(this.listSelectedRow.length>2)
+        {
+          this.retStatus = {status: 0, title: "Information", message: "Maximum selected data 2", data: []};
+          this.$refs.dialogMessage.showModal();
+          return
+        }
+
+        // console.log(JSON.stringify(this.listSelectedRow))
+        this.$store.dispatch('http_post', ["/api/segy/view-list-section", param, this.event_http_sgy_data]).then();
+      },
+
+      getSeismicDataPoints(ii)
+      {
+        let sgy_points = [];
+
+        let tmp = this.points[ii]["cdp_data"];
+        let ns = tmp[0].length;
+        let ntrc = tmp.length;
+        for (let i = ns - 1; i >= 0; i--)
+        {
+          let tmp0 = [];
+          for (let j = 0; j < ntrc; j++)
+            tmp0.push(tmp[j][i]);
+          sgy_points.push(tmp0);
+        }
+        return(sgy_points);
+      },
+      getSeismicDataX(ii)
+      {
+        let xx = this.points[ii]["x"];
+        xx["data"] = this.points[ii]["cdp_header"];
+        // let xxx = [];
+        // for(let i=0; i<this.points[ii]["cdp_header"].length; i++)
+        //   xxx.push(i);
+        // xx["data"] = xxx;
+        return(xx);
+      },
+      getSeismicDataY(ii)
+      {
+        return(this.points[ii]["y"]);
+      },
+      getSeismicTitle(ii)
+      {
+        return(this.points[ii]["title"] + this.points[ii]["cdp_no"]);
+      },
+
+      updateSelectedRow(m)
+      {
+        if(m.check)
+        {
+          for(let i=0; i<this.listSelectedRow.length; i++)
+          {
+            if((m["iline"]===this.listSelectedRow[i]["iline"]) & (m["xline"]===this.listSelectedRow[i]["xline"]))
+            {
+              this.listSelectedRow.splice(i, 1);
+              break
+            }
+          }
+        }
+        else
+          this.listSelectedRow.push(m);
       },
       openData(item)
       {
@@ -288,6 +494,7 @@
             xline: "-",
             freq: iline[i]["freq"],
             segy_file_id: iline[i]["segy_file_id"],
+            type: "iline"
           })
         }
         for(let i=0; i<xline.length; i++)
@@ -297,6 +504,7 @@
             xline: xline[i]["xline"],
             freq: xline[i]["freq"],
             segy_file_id: xline[i]["segy_file_id"],
+            type: "xline"
           })
         }
 
@@ -329,6 +537,26 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      // ----------------------- GET LIST OF SEGY DATA FOR PLOTTING----------------------
+      EventBus.$on(this.event_http_sgy_data.success, (msg) =>
+      {
+        this.points = msg;
+        this.npic = msg.length;
+        this.showLoader = false;
+        this.opened = true;
+        this.visible = true;
+        this.bdraw = true;
+      });
+
+      EventBus.$on(this.event_http_sgy_data.fail, (msg) =>
+      {
+        // this.list_segy = [];
+        this.points = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy()
@@ -337,6 +565,8 @@
       EventBus.$off(this.event_http_list.fail);
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
+      EventBus.$off(this.event_http_sgy_data.success);
+      EventBus.$off(this.event_http_sgy_data.fail);
       this.showLoader = false;
     },
   }
@@ -345,5 +575,8 @@
 <style scoped>
   .style_chart_proc {
     height: 65vh;
+  }
+  .lc_seismic_chart {
+    height: 80vh;
   }
 </style>

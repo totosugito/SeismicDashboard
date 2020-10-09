@@ -218,6 +218,12 @@ export function createTableSectionHeader()
 {
   let table_headers = [
     {
+      key: 'check',
+      label: '#',
+      sortable: true,
+      thStyle: { width: '40px'}
+    },
+    {
       key: 'iline',
       label: 'Inline',
       sortable: true
@@ -237,11 +243,11 @@ export function createTableSectionHeader()
       label: 'SEGY ID',
       sortable: true
     },
-    {
-      key: 'action',
-      label: 'Action',
-      sortable: false,
-    },
+    // {
+    //   key: 'action',
+    //   label: 'Action',
+    //   sortable: false,
+    // },
   ];
   return (table_headers);
 }

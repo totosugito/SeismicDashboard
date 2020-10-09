@@ -190,7 +190,7 @@
 
 <script>
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
-  import {getData} from "../../libs/data";
+  // import {getData} from "../../libs/data";
   import LChartSeismic from "../components/LChartSeismic";
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
@@ -572,7 +572,8 @@
 
       EventBus.$on(this.event_http_sgy_data.fail, (msg) =>
       {
-        this.list_segy = [];
+        // this.list_segy = [];
+        this.points = [];
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();

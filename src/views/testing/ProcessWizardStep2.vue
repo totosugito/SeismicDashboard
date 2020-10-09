@@ -289,12 +289,12 @@
       {
         this.$router.push({
           path: "process-wizard3",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"], cls: item['cls']}
         });
       },
       openDataUrl3(item)
       {
-        return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+        return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
 
       openData3_1(item)
@@ -312,23 +312,23 @@
       {
         this.$router.push({
           path: "process-wizard3-2",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"] , cls: item['cls']}
         });
       },
       openDataUrl3_2(item)
       {
-        return("#/process-wizard3-2?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+        return("#/process-wizard3-2?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
       openData3_3(item)
       {
         this.$router.push({
           path: "process-wizard3-3",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"], cls: item['cls']}
         });
       },
       openDataUrl3_3(item)
       {
-        return("#/process-wizard3-3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+        return("#/process-wizard3-3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
 
       radiusDialogBtn1Click() {
