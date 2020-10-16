@@ -9,7 +9,7 @@
 
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="1" :textsize="190" class="mb-3"/>
 
-    <splitpanes class="default-theme" vertical style="height: 70vh" vertical>
+    <splitpanes class="default-theme" vertical style="height: 70vh" @resized="splitResizedEvent('resized', $event)">
       <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
         <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>
 
@@ -81,7 +81,15 @@
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
 <!--          <vue-leaflet-heatmap :markers="markers" :center="center"/>-->
-          <vue-leaflet-map :markers="markers" :center="center"/>
+<!--          <vue-leaflet-map :markers="markers" :center="center"/>-->
+          <template v-if="showLoader===false">
+            <template v-if="right_chart_mode===0">
+              <ApexChartLine class="lc_seismic_chart" :chartOptions="lineChartOptions" :series="series" :resizeevent="resizeevent"/>
+            </template>
+            <template v-else>
+              <LChartSeries :points="series" :axis_bound="axis_bound" :prop="chart_prop"></LChartSeries>
+            </template>
+          </template>
         </div>
       </pane>
     </splitpanes>
@@ -132,6 +140,10 @@
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
+  import {getBoundaryData} from "../../libs/simpleLib";
+  import {apexChartSimpleProperties} from "../../libs/defApexChartLine";
+  import ApexChartLine from "../components/ApexChartLine";
+  import LChartSeries from "../components/LChartSeries"
 
   export default {
     name: "ProcessWizardStep2",
@@ -145,6 +157,8 @@
       VueLeafletMap,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
+      ApexChartLine,
+      LChartSeries
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -172,9 +186,17 @@
         totalRows: 0,
         filter: null,
 
+        right_chart_mode: 0,
+        chart_prop: {title:"", xlabel:"", ylabel:""},
+        lineChartOptions: {},
+        series: [],
+        axis_bound: [],
+
         table_headers: createTableGeobodyListHeader(),
         table_datas: [],
+        table_well: [],
 
+        resizeevent: false,
         model: {
           radius: 0,
         },
@@ -197,16 +219,28 @@
         },
 
         event_http_list: {success: "successList", fail: "failList"},
+        event_http_list_well: {success: "successListWell", fail: "failListWell"},
         event_http: {success: "success", fail: "fail"},
       }
     },
 
     beforeMount: function ()
     {
-      this.getListGeobodyData();
+      this.series = [];
+      this.right_chart_mode = this.$route.query.mode*1;
+
+      if(this.right_chart_mode === 0)
+        this.getListWell();
+      else
+        this.getListGeobodyData();
     },
 
     methods: {
+      splitResizedEvent(strinfo, event)
+      {
+        this.resizeevent = !this.resizeevent;
+      },
+
       onValidated(isValid, errors) {
         this.bvalidate = isValid;
       },
@@ -271,6 +305,11 @@
 
         this.showLoader = true;
         this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list]).then();
+      },
+      getListWell() {
+        this.showLoader = true;
+        this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
+        this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list_well]).then();
       },
 
       createDemoCss(cc)
@@ -350,11 +389,99 @@
     },
     mounted()
     {
+      //-------------- LIST Well -------------------
+      EventBus.$on(this.event_http_list_well.success, (msg) => {
+        let tmp_point = [];
+        for(let i=0; i< msg.data.length; i++)
+        {
+          let item = msg.data[i];
+          let xx = (item["x_max"] - item["x_min"]) / 2.0;
+          let yy = (item["y_max"] - item["y_min"]) / 2.0;
+          tmp_point.push({x:item["x_min"] + xx,  y:item["y_min"] + yy});
+        }
+        let tmp_series_point = {
+          name: "Well",
+          type: "scatter",
+          point_size: 2,
+          color: "#FF3333",
+          data: tmp_point,
+        };
+        this.series.push(tmp_series_point);
+
+        this.getListGeobodyData();
+      });
+      EventBus.$on(this.event_http_list_well.fail, (msg) => {
+        this.table_well = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+        this.showLoader = false;
+      });
+
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) =>
       {
         // console.log(JSON.stringify(msg))
         this.table_datas = msg; //fill table contents
+
+        let all_x = [];
+        let all_y = [];
+        all_x.push(this.cur_area["p1x"]);
+        all_x.push(this.cur_area["p2x"]);
+        all_x.push(this.cur_area["p3x"]);
+        all_x.push(this.cur_area["p4x"]);
+        all_y.push(this.cur_area["p1y"]);
+        all_y.push(this.cur_area["p2y"]);
+        all_y.push(this.cur_area["p3y"]);
+        all_y.push(this.cur_area["p4y"]);
+        this.axis_bound = getBoundaryData(all_x, all_y,0.05);
+
+        let series_item = {
+          name: this.cur_area["area"],
+          type: "line",
+          point_size: 2,
+          color: "#0000CD",
+          data: [
+            {x: this.cur_area["p1x"], y: this.cur_area["p1y"]},
+            {x: this.cur_area["p2x"], y: this.cur_area["p2y"]},
+            {x: this.cur_area["p3x"], y: this.cur_area["p3y"]},
+            {x: this.cur_area["p4x"], y: this.cur_area["p4y"]},
+            {x: this.cur_area["p1x"], y: this.cur_area["p1y"]},
+          ]
+        };
+        this.series.push(series_item);
+
+
+        if(this.right_chart_mode === 0)
+        {
+          this.lineChartOptions = apexChartSimpleProperties();
+          // this.lineChartOptions["xaxis"]["min"] = this.axis_bound[0];
+          // this.lineChartOptions["xaxis"]["max"] = this.axis_bound[1];
+          // this.lineChartOptions["yaxis"]["min"] = this.axis_bound[2];
+          // this.lineChartOptions["yaxis"]["max"] = this.axis_bound[3];
+        }
+        else
+        {
+          let tmp_point = [];
+          // for(let i=0; i< 100/*msg.length*/; i++)
+          for (let i = 0; i < msg.length; i++)
+          {
+            let item = msg[i];
+            let xx = (item["x_max"] - item["x_min"]) / 2.0;
+            let yy = (item["y_max"] - item["y_min"]) / 2.0;
+            tmp_point.push({x: item["x_min"] + xx, y: item["y_min"] + yy});
+          }
+          let tmp_series_point = {
+            name: "Geobody",
+            type: "point",
+            point_size: 2,
+            color: "#FF3333",
+            data: tmp_point,
+          };
+          this.series.push(tmp_series_point);
+          this.chart_prop["title"] = this.cur_area.geobody_name;
+          this.chart_prop["xlabel"] = "X";
+          this.chart_prop["ylabel"] = "Y";
+        }
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) =>
@@ -382,6 +509,8 @@
     {
       EventBus.$off(this.event_http_list.success);
       EventBus.$off(this.event_http_list.fail);
+      EventBus.$off(this.event_http_list_well.success);
+      EventBus.$off(this.event_http_list_well.fail);
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
       this.showLoader = false;
@@ -392,5 +521,9 @@
 <style scoped>
   .table > tbody > tr > td {
     vertical-align: middle;
+  }
+  .lc_seismic_chart {
+    width: 100%;
+    height: 67vh;
   }
 </style>

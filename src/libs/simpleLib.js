@@ -38,3 +38,44 @@ export function getMarkerColor(item, statusSetting)
     return (statusSetting['marker_color'][n-1])
   return(statusSetting['marker_color'][idx]);
 }
+
+export function getBoundaryData(x, y, max_perc)
+{
+  // x coord
+  let xmin = Math.min.apply(null, x);
+  let xmax = Math.max.apply(null, x);
+  let dx = Math.abs(xmax-xmin);
+
+  // y coord
+  let ymin = Math.min.apply(null, y);
+  let ymax = Math.max.apply(null, y);
+  let dy = Math.abs(ymax-ymin);
+
+  let XL = 0.0;
+  let XR = 0.0;
+  let YB = 0.0;
+  let YU = 0.0;
+  if (dx>dy)
+  {
+    let ddx = dx * max_perc;
+    XL = xmin - ddx;
+    XR = xmax + ddx;
+
+    let ddy = ((dx + (ddx*2.0)) - dy) / 2;
+    YB = ymin - ddy;
+    YU = ymax + ddy;
+  }
+  else
+  {
+    let ddy = dy * max_perc;
+    YB = ymin - ddy;
+    YU = ymax + ddy;
+
+    let ddx = ((dy + (ddy*2.0)) - dx) / 2;
+    XL = xmin - ddx;
+    XR = xmax + ddx;
+  }
+  // console.log(XR-XL)
+  // console.log(YU - YB)
+  return([XL, XR, YB, YU]);
+}

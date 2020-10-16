@@ -247,3 +247,83 @@ export function createDefaultParam()
   };
   return(chartOptions);
 }
+
+export function apexChartSimpleProperties()
+{
+  let chartOptions = {
+    chart: {
+      id: "chart-data",
+      animations: {
+        speed: 50
+      },
+    },
+    colors: ['#FF8000', '#1E90FF', '#008000', '#800000', '#800080'],
+    stroke: {
+      show: true,
+      width: 2,
+    },
+    plotOptions: {
+      line: {
+        distributed: true
+      }
+    },
+    legend: {
+      show: true,
+      showForSingleSeries: true,
+      position: 'top',
+      horizontalAlign: 'left',
+      floating: false,
+      onItemClick: {
+        toggleDataSeries: true
+      },
+      onItemHover: {
+        highlightDataSeries: true
+      },
+    },
+    markers: {
+      size: 4
+    },
+    xaxis: {
+      type: 'numeric',
+      labels: {
+        show: true,
+        align: 'left',
+        formatter: (value) =>
+        {
+          return value.toFixed(2)
+        },
+        min: undefined,
+        max: undefined
+      },
+    },
+    yaxis: {
+      labels: {
+        show: true,
+        align: 'left',
+        formatter: (value) =>
+        {
+          return value.toFixed(2)
+        },
+        min: undefined,
+        max: undefined
+      },
+    },
+    grid: {
+      show: true,
+      borderColor: '#C0C0C0',
+      strokeDashArray: 0,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      },
+    },
+  };
+  return(chartOptions);
+}

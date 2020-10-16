@@ -73,7 +73,10 @@
       </pane>
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
-          <vue-leaflet-map :markers="markers" :center="center"/>
+<!--          <vue-leaflet-map :markers="markers" :center="center"/>-->
+          <template v-if="showLoader===false">
+            <ApexChartLine class="lc_seismic_chart" :chartOptions="lineChartOptions" :series="series"/>
+          </template>
         </div>
       </pane>
     </splitpanes>
@@ -125,11 +128,15 @@
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+  import ApexChartLine from "../components/ApexChartLine";
+  import {apexChartSimpleProperties, createDefaultParam} from "../../libs/defApexChartLine";
+  import {getBoundaryData} from "../../libs/simpleLib";
 
   export default {
     name: "ProcessWizardStep1",
 
     components: {
+      ApexChartLine,
       ViewBottomWizardButton,
       ViewProcessWizardButton,
       Splitpanes, Pane,
@@ -163,6 +170,8 @@
         totalRows: 0,
         filter: null,
 
+        lineChartOptions: {},
+        series: [],
         table_headers: createTableAreaListHeader(),
         table_datas: [],
         geobody_data: [],
@@ -170,7 +179,7 @@
 
         model: {
           file_id: "",
-          // radius: 0,
+          mode: 0,
         },
         schema: {
           fields: [
@@ -180,15 +189,14 @@
               model: 'file_id',
               selectOptions: {hideNoneSelectedText: true}
             },
-            // {
-            //   type: 'input',
-            //   inputType: 'text',
-            //   label: 'Radius',
-            //   model: 'radius',
-            //   placeholder: 'Set Radius',
-            //   featured: true,
-            //   required: true
-            // },
+            {
+              type: 'select',
+              inputType: 'Select Mode',
+              label: 'Plot Data',
+              model: 'mode',
+              values: [{id:0, name: "Well"}, {id:1, name: "Geobody"}],
+              selectOptions: {hideNoneSelectedText: true}
+            },
           ]
         },
         formOptions: {
@@ -203,7 +211,10 @@
     },
 
     beforeMount: function () {
+      // let bb = getBoundaryData([553903,564971.187300455,574337.187300455,563269], [9896783,9894631.96359927,9942816.96359927,9944968], 0.1)
+      // console.log((JSON.stringify(bb)));
       this.getListGeobody();
+      // this.plotDemoLineChart();
     },
 
     methods: {
@@ -272,6 +283,7 @@
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
           path: this.varRouter.getRoute("processwizard2", 1),
+          query: {mode: this.model["mode"]}
         });
 
         this.$refs.radiusDialog.hideModal();
@@ -318,7 +330,10 @@
         this.table_datas = msg; //fill table contents
         this.center = L.latLng(msg[0].lat, msg[0].lon);
 
+        this.series = [];
         this.markers = [];
+        let all_x = [];
+        let all_y = [];
         for (let i=0; i<msg.length; i++)
         {
           let item = msg[i];
@@ -332,8 +347,38 @@
             })
           };
           this.markers.push(mm);
-        }
 
+          let x1 = item["p1x"];
+          if(x1===undefined)
+            continue;
+
+          all_x.push(item["p1x"]);
+          all_x.push(item["p2x"]);
+          all_x.push(item["p3x"]);
+          all_x.push(item["p4x"]);
+          all_y.push(item["p1y"]);
+          all_y.push(item["p2y"]);
+          all_y.push(item["p3y"]);
+          all_y.push(item["p4y"]);
+
+          let series_item = {
+            name: item["area"],
+            data: [
+              [item["p1x"], item["p1y"]],
+              [item["p2x"], item["p2y"]],
+              [item["p3x"], item["p3y"]],
+              [item["p4x"], item["p4y"]],
+              [item["p1x"], item["p1y"]],
+            ]
+          };
+          this.series.push(series_item);
+        }
+        let axis_bound = getBoundaryData(all_x, all_y,0.05);
+        this.lineChartOptions = apexChartSimpleProperties();
+        this.lineChartOptions["xaxis"]["min"] = axis_bound[0];
+        this.lineChartOptions["xaxis"]["max"] = axis_bound[1];
+        this.lineChartOptions["yaxis"]["min"] = axis_bound[2];
+        this.lineChartOptions["yaxis"]["max"] = axis_bound[3];
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
@@ -384,5 +429,10 @@
 <style scoped>
   .table > tbody > tr > td {
     vertical-align: middle;
+  }
+
+  .lc_seismic_chart {
+    width: 100%;
+    height: 70vh;
   }
 </style>
