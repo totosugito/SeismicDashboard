@@ -472,7 +472,7 @@
           }
           let tmp_series_point = {
             name: "Geobody",
-            type: "point",
+            type: "scatter",
             point_size: 2,
             color: "#FF3333",
             data: tmp_point,
