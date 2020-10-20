@@ -68,6 +68,7 @@
               .setName(data["name"])
               .setPointSize(data["point_size"] + npoint_size_add)
               .setPointFillStyle(new SolidFill().setColor(ColorHEX(data["color"])))
+              .setResultTableFormatter()
               .add(data["data"]); // Add data points to the line series
           }
           else

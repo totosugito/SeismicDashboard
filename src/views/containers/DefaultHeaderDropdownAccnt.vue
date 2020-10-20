@@ -20,6 +20,7 @@
 <script>
 import { HeaderDropdown as AppHeaderDropdown } from 'MyLibVue/src/coreui'
 import {mapState} from "vuex";
+import {getDefaultUserIcon} from "../../_constant/http_api";
 export default {
   name: 'DefaultHeaderDropdownAccnt',
   components: {
@@ -33,7 +34,7 @@ export default {
     if(this.user.loginID===undefined)
       this.user.loginID = "Guest";
     if(this.user.pasfoto===undefined)
-      this.user.pasfoto = "https://www.flaticon.com/svg/static/icons/svg/3135/3135715.svg";
+      this.user.pasfoto = getDefaultUserIcon();
     this.$store.dispatch('createVarRouter').then(); //no selected project
   },
 

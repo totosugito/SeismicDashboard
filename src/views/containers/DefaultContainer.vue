@@ -40,10 +40,13 @@
       <TheFooter>
         <div>
 <!--          <a href="http://waviv.com">Waviv</a>-->
-          <span class="ml-1">&copy; 2020</span>
+          <img :src="getImageUrl('company/skk-migas-50px.png')" style="height:40px" class="mr-4"/>
+          <img :src="getImageUrl('company/pertamina-hulu-mahakam-50px.png')" style="height:35px"/>
+<!--          <span class="ml-1">&copy; 2020</span>-->
         </div>
         <div class="ml-auto">
 <!--          <span class="mr-1">Powered by</span>-->
+          <img :src="getImageUrl('company/halliburton-50px.png')" style="height:10px"/>
 <!--          <a href="http://waviv.com">Waviv</a>-->
         </div>
       </TheFooter>
@@ -60,6 +63,7 @@
   import DefaultHeaderDropdownAccnt from './DefaultHeaderDropdownAccnt'
   import {mapState} from "vuex";
   import {HIDDEN_MENU} from "../../_constant/app_keys";
+  import {getAssetServer} from "../../_constant/http_api";
 
   export default {
     name: 'DefaultContainer',
@@ -103,6 +107,10 @@
       this.isHideDrawer();
     },
     methods: {
+      getImageUrl(sstr)
+      {
+        return(getAssetServer() + sstr);
+      },
       isHideDrawer()
       {
         //this.item_menu = checkUserStartPage(this.user.level);
@@ -115,7 +123,7 @@
         let hui = this.user[HIDDEN_MENU()]; //get hidden menu
         let bget;
 
-        if(hui==undefined)
+        if(hui===undefined)
         {
           this.nav = tmp_menu;
           return;

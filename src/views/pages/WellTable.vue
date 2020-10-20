@@ -277,8 +277,8 @@
       return {
         showLoader : false,
         retStatus: {status: 0, title: "", message: "", data: []},
-        perPageView: 15,
-        perPage: 15,
+        perPageView: 10,
+        perPage: 10,
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
         currentPage: 1,
         totalRows: 0,

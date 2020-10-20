@@ -19,12 +19,12 @@ export function url_http_post(userData) {
 
 export function getDefaultUserIcon()
 {
-  return("https://storage.googleapis.com/public-datas/user_icon.png");
+  return(getAssetServer() + "general/user_default.svg");
 }
 
 export function getApronPinMarker()
 {
-  return("https://storage.googleapis.com/public-datas/pin_location.png");
+  return(getAssetServer() + "general/pin_location.png");
 }
 
 export function getMarkerColor(item, statusSetting)
@@ -58,6 +58,10 @@ export function getApronServerAPI()
   }
 }
 
+export function getAssetServer()
+{
+  return("http://117.54.250.85:91/image/");
+}
 export function create_auth_header()
 {
   let auth_headers = {

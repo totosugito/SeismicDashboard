@@ -277,13 +277,13 @@
           }
         }
         this.selected_data["file_id"] = this.model["file_id"];
+        this.selected_data["view_mode"] = this.model["mode"];
         // console.log(JSON.stringify(this.selected_data))
         // console.log(JSON.stringify(this.geobody_data))
 
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
           path: this.varRouter.getRoute("processwizard2", 1),
-          query: {mode: this.model["mode"]}
         });
 
         this.$refs.radiusDialog.hideModal();

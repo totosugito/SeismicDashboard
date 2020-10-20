@@ -308,6 +308,20 @@ export function apexChartSimpleProperties()
         max: undefined
       },
     },
+    // tooltip: {
+    //   enabled: true,
+    //   x: {
+    //     show: true,
+    //   },
+    //   y: {
+    //     formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+    //       return value.toFixed(2)
+    //     },
+    //   },
+    //   marker: {
+    //     show: true,
+    //   },
+    // },
     grid: {
       show: true,
       borderColor: '#C0C0C0',

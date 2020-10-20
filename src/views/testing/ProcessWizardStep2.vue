@@ -83,7 +83,7 @@
 <!--          <vue-leaflet-heatmap :markers="markers" :center="center"/>-->
 <!--          <vue-leaflet-map :markers="markers" :center="center"/>-->
           <template v-if="showLoader===false">
-            <template v-if="right_chart_mode===0">
+            <template v-if="cur_area['view_mode']===0">
               <ApexChartLine class="lc_seismic_chart" :chartOptions="lineChartOptions" :series="series" :resizeevent="resizeevent"/>
             </template>
             <template v-else>
@@ -142,6 +142,7 @@
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {getBoundaryData} from "../../libs/simpleLib";
   import {apexChartSimpleProperties} from "../../libs/defApexChartLine";
+  import ApexChartLineWithPointId from "../components/ApexChartLineWithPointId";
   import ApexChartLine from "../components/ApexChartLine";
   import LChartSeries from "../components/LChartSeries"
 
@@ -157,8 +158,9 @@
       VueLeafletMap,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
-      ApexChartLine,
-      LChartSeries
+      ApexChartLineWithPointId,
+      LChartSeries,
+      ApexChartLine
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -186,7 +188,6 @@
         totalRows: 0,
         filter: null,
 
-        right_chart_mode: 0,
         chart_prop: {title:"", xlabel:"", ylabel:""},
         lineChartOptions: {},
         series: [],
@@ -227,9 +228,9 @@
     beforeMount: function ()
     {
       this.series = [];
-      this.right_chart_mode = this.$route.query.mode*1;
+      this.cur_area = this.$store.getters.readSelectedArea;
 
-      if(this.right_chart_mode === 0)
+      if(this.cur_area["view_mode"] === 0)
         this.getListWell();
       else
         this.getListGeobodyData();
@@ -300,7 +301,6 @@
 
       getListGeobodyData()
       {
-        this.cur_area = this.$store.getters.readSelectedArea;
         this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
 
         this.showLoader = true;
@@ -451,7 +451,7 @@
         this.series.push(series_item);
 
 
-        if(this.right_chart_mode === 0)
+        if(this.cur_area["view_mode"] === 0)
         {
           this.lineChartOptions = apexChartSimpleProperties();
           // this.lineChartOptions["xaxis"]["min"] = this.axis_bound[0];
