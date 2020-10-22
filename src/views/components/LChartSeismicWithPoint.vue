@@ -5,24 +5,27 @@
 </template>
 
 <script>
-  import {ColorHEX, ColorRGBA, lightningChart, PalettedFill, SolidFill, translatePoint} from '@arction/lcjs'
+  import {ColorHEX, ColorPalettes, ColorRGBA, lightningChart, PalettedFill, SolidFill, SolidLine, translatePoint, PointShape} from '@arction/lcjs'
   import {get2dColSize, get2dMaxData, get2dMinData, get2dRowSize, getLcColormap} from "../../libs/colormap";
   import {createColorObject} from "../../libs/libLC";
   import {getIndexFromArray, getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
+  import {getDefaultDarkColorAtIdx} from "../../libs/defApexChartLine";
 
   export default {
-    name: "LChartSeismic",
-    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax'],
+    name: "LChartSeismicWithPoint",
+    props: ['chartKey', 'title', 'points', 'xaxis', 'yaxis', 'colormap', 'resizeevent', 'cmin', 'cmax', 'chart_info_data'],
     data()
     {
       return {
         chart: null,
         chartId: null,
-        dx:1,
-        dy:1,
+        chart_info: null,
+        dx: 1,
+        dy: 1,
         ns: 0,
         ntrc: 0,
-        ystart : 0,
+        ystart: 0,
+        yend: 0,
 
         // x_cursor_info : '',
         // y_cursor_info : '',
@@ -35,7 +38,10 @@
         },
         grColor: null,
         pointInLcAxis: {},
-        cursorInfo: {x:0, y:0}
+        cursorInfo: {x: 0, y: 0},
+
+        customXAxis: null,
+        customYAxis: null,
       }
     },
     methods: {
@@ -45,13 +51,13 @@
         // if(tmp_point.x < 0 || tmp_point.x >= this.ntrc)
         //   return(false);
 
-        if(tmp_point.x < this.xaxis["data"][0] || tmp_point >= this.xaxis["data"][this.ntrc - 1])
+        if (tmp_point.x < this.xaxis["data"][0] || tmp_point >= this.xaxis["data"][this.ntrc - 1])
         {
           // console.log("x " + tmp_point)
           return (false)
         }
 
-        if(tmp_point.y < this.ystart)// || tmp_point.y > (this.yaxis["start"] + (this.ns * this.yaxis["sampling"])))
+        if (tmp_point.y < this.ystart)// || tmp_point.y > (this.yaxis["start"] + (this.ns * this.yaxis["sampling"])))
         {
           return (false)
         }
@@ -83,39 +89,46 @@
         this.minData = this.minData + dmin_;
         this.maxData = this.maxData - dmax_;
 
-        // console.log(this.minData + " " + this.maxData)
+        // let mm_data = 0;
+        // if (Math.abs(this.minData) > Math.abs(this.maxData))
+        //   mm_data = Math.abs(this.minData) * this.perc / 100.0;
+        // else
+        //   mm_data = Math.abs(this.maxData) * this.perc / 100.0;
+        // this.minData = this.minData + mm_data;
+        // this.maxData = this.maxData - mm_data;
 
         this.palette = getLcColormap(this.colormap, this.minData, this.maxData);
+
         this.ntrc = get2dColSize(this.points);
         this.ns = get2dRowSize(this.points);
-        this.dy = this.yaxis["sampling"]*1.0;
+        this.dy = this.yaxis["sampling"] * 1.0;
         this.dx = this.xaxis["data"][1] - this.xaxis["data"][0];
-        this.ystart = this.yaxis["start"];
-        let start_time = Math.round(setPositionFromIndex(0, this.dy, this.ystart));
-        let end_time = Math.round(setPositionFromIndex(this.ns-1, this.dy, this.ystart));
+        // this.ystart = this.yaxis["start"];
+        this.ystart = Math.round(setPositionFromIndex(0, this.dy, this.ystart));
+        this.yend = Math.round(setPositionFromIndex(this.ns - 1, this.dy, this.ystart));
 
         let resolutionX = this.ns;
         let resolutionY = this.ntrc;
-        let customX = this.chart.addAxisX(true)
+        this.customXAxis = this.chart.addAxisX(true)
           .setTitleFillStyle(this.grColor.default)
           .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
           .setInterval(0, this.ntrc)
           .setTitle(this.xaxis["label"]);
-        let customY = this.chart.addAxisY(false)
+        this.customYAxis = this.chart.addAxisY(false)
           .setTitleFillStyle(this.grColor.default)
           .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
-          .setInterval(start_time, end_time)
+          .setInterval(this.ystart, this.yend)
           .setTitle(this.yaxis["label"]);
         this.chart.addHeatmapSeries({
           rows: resolutionX,
           columns: resolutionY,
-          start: {x: this.xaxis["data"][0], y: end_time},
-          end: {x: this.xaxis["data"][this.ntrc - 1], y: start_time},
+          start: {x: this.xaxis["data"][0], y: this.yend},
+          end: {x: this.xaxis["data"][this.ntrc - 1], y: this.ystart},
           pixelate: false,
-          xAxis: customX,
-          yAxis: customY
+          xAxis: this.customXAxis,
+          yAxis: this.customYAxis
         })
           .setMouseInteractions(true)
           // Add data and invalidate the Series based on added data.
@@ -132,16 +145,44 @@
             this.chart.engine.scale,
             {
               x: this.chart.getDefaultAxisX().scale,
-              y: this.chart.getDefaultAxisY().scale
+              y: this.chart.getDefaultAxisY().scale,
+              start: {x: 1, y: 0},
+              end: {x: 31, y: 1501},
             }
           )
           this.cursor_move_event(tmp_point);
-        })
+        });
+
+        this.createLineChart();
+      },
+
+      createLineChart()
+      {
+        console.log("createLineChart")
+        if (this.chart_info_data === null)
+          return;
+
+        if (this.chart_info !== null)
+          this.chart_info.dispose();
+
+        let fill_style = new SolidFill().setColor(ColorHEX(getDefaultDarkColorAtIdx(1)));
+        this.chart_info = this.chart.addPointSeries(
+          {
+            pointShape: PointShape.Circle,
+            xAxis: this.customXAxis,
+            yAxis: this.customYAxis,
+          }
+        )
+          .setPointFillStyle(fill_style)
+          .setPointSize(20);
+
+        // Add data points to the line series
+        this.chart_info.add(this.chart_info_data);
       },
 
       cursor_move_event(tmp_point)
       {
-        if(this.isValidTrace(tmp_point))
+        if (this.isValidTrace(tmp_point))
         {
           //console.log("0 : " + tmp_point.y)
           let x1 = getIndexFromArray(tmp_point.x, this.dx);
@@ -153,8 +194,8 @@
           let x_cursor_info = "x : " + Math.round(tmp_point.x) + " [" + x1 + "]";
           let y_cursor_info = "y : " + y2 + " [" + y1 + "]";
           this.cursorInfo = {
-            x : x_cursor_info,
-            y : y_cursor_info,
+            x: x_cursor_info,
+            y: y_cursor_info,
           }
         }
       },
@@ -169,8 +210,10 @@
           }
         )
 
-        if(this.isValidTrace(tmp_point))
+        if (this.isValidTrace(tmp_point))
+        {
           this.pointInLcAxis = tmp_point;
+        }
       }
     },
 
@@ -192,8 +235,12 @@
       // "dispose" should be called when the component is unmounted to free all the resources used by the chart
       this.chart.dispose()
     },
-    watch :
+    watch:
       {
+        chart_info_data()
+        {
+          this.createLineChart();
+        },
         cursorInfo(val)
         {
           this.$emit('cursorInfo', val);
@@ -204,6 +251,7 @@
           if (val)
           {
             val["isValid"] = this.isValidTrace(val);
+            val['id'] = this.chartKey*1;
             this.$emit('pointInLcAxis', val);
           }
         },
@@ -237,6 +285,7 @@
     position: relative;
     z-index: 1;
   }
+
   .overlay {
     position: relative;
     z-index: 2;

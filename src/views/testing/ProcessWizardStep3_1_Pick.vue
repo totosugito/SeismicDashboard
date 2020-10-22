@@ -30,7 +30,7 @@
             </b-dropdown-item>
           </b-dropdown>
           <!--        <b-form-checkbox v-model="reverseColormap" class="mr-1">Rev</b-form-checkbox>-->
-<!--          <enhanced-check label="Rev" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>-->
+          <!--          <enhanced-check label="Rev" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>-->
 
           <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
             <b-input-group-prepend class="mr-1">
@@ -48,17 +48,20 @@
       </div>
 
       <template v-if="bdraw===true">
-      <b-container fluid>
-        <b-row>
-          <template v-for="i in parseInt(npic)">
-            <b-col>
-              <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :points="getSeismicDataPoints(i-1)"
-                             :xaxis="getSeismicDataX(i-1)" :yaxis="getSeismicDataY(i-1)" :cmin="cmin" :cmax="cmax"
-                             :title="getSeismicTitle(i-1)" @pointInLcAxis="updateLcPoint($event)"/>
-            </b-col>
-          </template>
-        </b-row>
-      </b-container>
+        <b-container fluid>
+          <b-row>
+            <template v-for="i in parseInt(npic)">
+              <b-col>
+                <LChartSeismicWithPoint class="lc_seismic_chart"
+                                        :chart-key="i-1"
+                                        :colormap="colormap" :points="getSeismicDataPoints(i-1)"
+                                        :xaxis="getSeismicDataX(i-1)" :yaxis="getSeismicDataY(i-1)" :cmin="cmin" :cmax="cmax"
+                                        :title="getSeismicTitle(i-1)" @pointInLcAxis="updateLcPoint($event)"
+                                        :chart_info_data="seriesSeismicInfo"/>
+              </b-col>
+            </template>
+          </b-row>
+        </b-container>
       </template>
     </Overlay>
 
@@ -70,7 +73,7 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-<!--    <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>-->
+    <!--    <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>-->
     <b-row>
       <b-col md="12">
         <b-card>
@@ -146,9 +149,9 @@
               </b-form-group>
             </template>
 
-<!--            <template v-slot:cell(eucd)="row">-->
-<!--              {{row.item.eucd.toFixed(5)}}-->
-<!--            </template>-->
+            <!--            <template v-slot:cell(eucd)="row">-->
+            <!--              {{row.item.eucd.toFixed(5)}}-->
+            <!--            </template>-->
 
             <!-- action status -->
             <template v-slot:cell(action)="row">
@@ -171,7 +174,8 @@
         </b-card>
       </b-col>
     </b-row>
-      <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')" :right_clicked="wizardButtonClicked('processwizard4')"/>
+    <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')"
+                               :right_clicked="wizardButtonClicked('processwizard4')"/>
 
     <!-- show error dialog -->
     <vue-simple-dialog
@@ -203,11 +207,13 @@
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
+  import LChartSeismicWithPoint from "../components/LChartSeismicWithPoint";
 
   export default {
-    name: "ProcessWizardStep3_1",
+    name: "ProcessWizardStep3_1_Pick",
 
     components: {
+      LChartSeismicWithPoint,
       ViewProcessWizardButton,
       ViewBottomWizardButton,
       LChartSeismic,
@@ -240,7 +246,7 @@
         cmax: 20,
         tmp_cmin: 20,
         tmp_cmax: 20,
-        dataTitle: "",
+        seriesSeismicInfo: [],
 
         ndata: 0,
         cur_area: {},
@@ -269,17 +275,17 @@
     beforeMount: function ()
     {
       this.listSelectedRow = [];
-      this.getListSegy();
+      // this.getListSegy();
     },
 
     methods: {
       updateLcPoint(e)
       {
-        // this.timePos = (Math.round(e.y)).toFixed(this.fixedDec);
-        // if (e.isValid)
-        // {
-        //   console.log(JSON.stringify(e))
-        // }
+        this.timePos = (Math.round(e.y)).toFixed(this.fixedDec);
+        if (e.isValid)
+        {
+          console.log(JSON.stringify(e))
+        }
       },
       fgetColormapName(ii)
       {
@@ -303,6 +309,43 @@
         this.cmax = this.tmp_cmax;
       },
 
+      getDemoData()
+      {
+        let XAxis = {
+          "label": "Offset (m)",
+          "sampling": 1,
+          "start": 0,
+        };
+        let YAxis = {
+          "label": "Depth (m)",
+          "sampling": 2,
+          "start": 50
+        };
+        // this.points = [];
+        this.npic = 1;
+        this.colormap = 1;
+        this.points.push({
+          x: XAxis,
+          y: YAxis,
+          title: "tes",
+          cdp_no: "-1",
+          cdp_header: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+          cdp_data: getData()
+        });
+        this.seriesSeismicInfo = [{x:10, y:1000}];
+
+        // console.log(this.points.length)
+        // let data = [];
+        // for (let i = 0; i < this.points[0][0].length; i++)
+        //   data.push(i);
+        // this.XAxis["data"] = data;
+        // this.ns = this.points[0].length;
+        // this.dt = this.YAxis["sampling"];
+        //
+        // this.dataTitle = "CDP NO : 1";
+        // this.showLoader = false;
+      },
+
       refreshMultiSeismicChart()
       {
         this.setColormap(3);
@@ -315,26 +358,32 @@
       },
       eventPlotSeismic()
       {
+        this.showLoader = true;
         this.overlayClosed();
 
-        let param = this.listSelectedRow;
-        if(this.listSelectedRow.length===0)
-        {
-          this.retStatus = {status: 0, title: "Information", message: "Please Select files from table ...", data: []};
-          this.$refs.dialogMessage.showModal();
-          return;
-        }
+        this.getDemoData();
+        this.opened = true;
+        this.visible = true;
+        this.bdraw = true;
+        this.showLoader = false;
 
-        this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/segy/view-list-gather", param, this.event_http_sgy_data]).then();
+
+        // let param = this.listSelectedRow;
+        // if(this.listSelectedRow.length===0)
+        // {
+        //   this.retStatus = {status: 0, title: "Information", message: "Please Select files from table ...", data: []};
+        //   this.$refs.dialogMessage.showModal();
+        //   return
+        // }
+        // this.$store.dispatch('http_post', ["/api/segy/view-list-gather", param, this.event_http_sgy_data]).then();
       },
       updateSelectedRow(m)
       {
-        if(m.check)
+        if (m.check)
         {
-          for(let i=0; i<this.listSelectedRow.length; i++)
+          for (let i = 0; i < this.listSelectedRow.length; i++)
           {
-            if((m["iline"]===this.listSelectedRow[i]["iline"]) & (m["xline"]===this.listSelectedRow[i]["xline"]))
+            if ((m["iline"] === this.listSelectedRow[i]["iline"]) & (m["xline"] === this.listSelectedRow[i]["xline"]))
             {
               this.listSelectedRow.splice(i, 1);
               break
@@ -345,13 +394,29 @@
           this.listSelectedRow.push(m);
       },
       //MESSAGE HTTP I/O
-      dialogMessageBtn1Click() {
-        if (this.retStatus.status === -1) { //error http
+      dialogMessageBtn1Click()
+      {
+        if (this.retStatus.status === -1)
+        { //error http
           //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
           this.$refs.dialogMessage.hideModal();
-        } else { //error token
+        }
+        else
+        { //error token
           this.$refs.dialogMessage.hideModal();
         }
+      },
+      openData(item)
+      {
+        // this.$router.push({
+        //   path: "process-wizard3",
+        //   query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+        // });
+      },
+      openDataUrl(item)
+      {
+        return ("");
+        // return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
 
       getListSegy()
@@ -376,33 +441,35 @@
       },
       getSeismicDataPoints(ii)
       {
-        let sgy_points = [];
+        // let sgy_points = [];
+        //
+        // let tmp = this.points[ii]["cdp_data"];
+        // let ns = tmp[0].length;
+        // let ntrc = tmp.length;
+        // for (let i = ns - 1; i >= 0; i--)
+        // {
+        //   let tmp0 = [];
+        //   for (let j = 0; j < ntrc; j++)
+        //     tmp0.push(tmp[j][i]);
+        //   sgy_points.push(tmp0);
+        // }
+        // return(sgy_points);
 
-        let tmp = this.points[ii]["cdp_data"];
-        let ns = tmp[0].length;
-        let ntrc = tmp.length;
-        for (let i = ns - 1; i >= 0; i--)
-        {
-          let tmp0 = [];
-          for (let j = 0; j < ntrc; j++)
-            tmp0.push(tmp[j][i]);
-          sgy_points.push(tmp0);
-        }
-        return(sgy_points);
+        return (this.points[ii]["cdp_data"]);
       },
       getSeismicDataX(ii)
       {
         let xx = this.points[ii]["x"];
         xx["data"] = this.points[ii]["cdp_header"];
-        return(xx);
+        return (xx);
       },
       getSeismicDataY(ii)
       {
-        return(this.points[ii]["y"]);
+        return (this.points[ii]["y"]);
       },
       getSeismicTitle(ii)
       {
-        return(this.points[ii]["title"] + this.points[ii]["cdp_no"]);
+        return (this.points[ii]["title"] + this.points[ii]["cdp_no"]);
       },
 
       getTabIcon()
@@ -477,7 +544,7 @@
       EventBus.$on(this.event_http.success, (msg) =>
       {
         this.list_segy = [];
-        for(let i=0; i<msg.length; i++)
+        for (let i = 0; i < msg.length; i++)
           this.list_segy.push({
             value: msg[i]["_id"]["$oid"],
             text: msg[i]["file_name"]
@@ -544,6 +611,10 @@
 </script>
 
 <style scoped>
+  .style_chart_proc {
+    height: 65vh;
+  }
+
   .lc_seismic_chart {
     height: 80vh;
   }

@@ -150,7 +150,4 @@
   }
 </script>
 <style scoped>
-  .sidebar {
-    background: #0d47a1;
-  }
 </style>

@@ -238,7 +238,6 @@
         cur_segy_ml: {},
         list_segy_ml: [],
         cur_area: {},
-        chart_image: ["https://picsum.photos/1024/400/?image=41", "https://picsum.photos/1024/400/?image=41", "https://picsum.photos/1024/400/?image=41"],
 
         model: {
           file_id: "",

@@ -80,8 +80,6 @@
       </pane>
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
-<!--          <vue-leaflet-heatmap :markers="markers" :center="center"/>-->
-<!--          <vue-leaflet-map :markers="markers" :center="center"/>-->
           <template v-if="showLoader===false">
             <template v-if="cur_area['view_mode']===0">
               <ApexChartLine class="lc_seismic_chart" :chartOptions="lineChartOptions" :series="series" :resizeevent="resizeevent"/>
@@ -135,8 +133,7 @@
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
-  import {createTableAreaListHeader, createTableGeobodyListHeader} from "../../libs/libVars";
-  // import VueLeafletHeatmap from "../components/vue-leaflet-heatmap";
+  import {createTableGeobodyListHeader} from "../../libs/libVars";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
@@ -340,11 +337,13 @@
       {
         this.$router.push({
           path: "process-wizard3-1",
+          // path: "process-wizard3-1-pick",
           query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
         });
       },
       openDataUrl3_1(item)
       {
+        // return("#/process-wizard3-1-pick?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
         return("#/process-wizard3-1?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
       openData3_2(item)

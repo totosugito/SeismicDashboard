@@ -28,6 +28,7 @@ export default class VarRouter {
     "processwizard2": ["process-wizard2", "/process-wizard2", "Process Wizard Step 2"],
     "processwizard3": ["process-wizard3", "/process-wizard3", "Process Wizard Step 3"],
     "processwizard3-1": ["process-wizard3-1", "/process-wizard3-1", "Process Wizard Step 3"],
+    "processwizard3-1-pick": ["process-wizard3-1-pick", "/process-wizard3-1-pick", "Process Wizard Step 3"],
     "processwizard3-2": ["process-wizard3-2", "/process-wizard3-2", "Process Wizard Step 3"],
     "processwizard3-3": ["process-wizard3-3", "/process-wizard3-3", "Process Wizard Step 3"],
     "processwizard4": ["process-wizard4", "/process-wizard4", "Process Wizard Step 4"],
