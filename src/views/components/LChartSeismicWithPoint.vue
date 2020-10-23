@@ -88,15 +88,6 @@
         let dmax_ = Math.abs(this.maxData * this.cmax / 100.0);
         this.minData = this.minData + dmin_;
         this.maxData = this.maxData - dmax_;
-
-        // let mm_data = 0;
-        // if (Math.abs(this.minData) > Math.abs(this.maxData))
-        //   mm_data = Math.abs(this.minData) * this.perc / 100.0;
-        // else
-        //   mm_data = Math.abs(this.maxData) * this.perc / 100.0;
-        // this.minData = this.minData + mm_data;
-        // this.maxData = this.maxData - mm_data;
-
         this.palette = getLcColormap(this.colormap, this.minData, this.maxData);
 
         this.ntrc = get2dColSize(this.points);
@@ -121,6 +112,7 @@
           .disableAnimations()
           .setInterval(this.ystart, this.yend)
           .setTitle(this.yaxis["label"]);
+
         this.chart.addHeatmapSeries({
           rows: resolutionX,
           columns: resolutionY,
@@ -134,6 +126,7 @@
           // Add data and invalidate the Series based on added data.
           .invalidateValuesOnly(this.points)
           .setFillStyle(new PalettedFill({lut: this.palette}));
+
         this.chart.getDefaultAxisX().dispose();
         this.chart.getDefaultAxisY().dispose();
 
@@ -146,19 +139,14 @@
             {
               x: this.chart.getDefaultAxisX().scale,
               y: this.chart.getDefaultAxisY().scale,
-              start: {x: 1, y: 0},
-              end: {x: 31, y: 1501},
             }
           )
           this.cursor_move_event(tmp_point);
         });
-
-        this.createLineChart();
       },
 
       createLineChart()
       {
-        console.log("createLineChart")
         if (this.chart_info_data === null)
           return;
 
@@ -184,13 +172,10 @@
       {
         if (this.isValidTrace(tmp_point))
         {
-          //console.log("0 : " + tmp_point.y)
           let x1 = getIndexFromArray(tmp_point.x, this.dx);
           let y1 = getIndexFromArray3(tmp_point.y, this.dy, this.ystart);
           let y2 = setPositionFromIndex(y1, this.dy, this.ystart);
 
-          // this.x_cursor_info = this.xaxis["label"] + " : " + Math.round(tmp_point.x) + " [" + x1 + "]";
-          // let y_cursor_info = this.yaxis["label"] + " : " + y2.toFixed(3) + " [" + y1 + "]";
           let x_cursor_info = "x : " + Math.round(tmp_point.x) + " [" + x1 + "]";
           let y_cursor_info = "y : " + y2 + " [" + y1 + "]";
           this.cursorInfo = {

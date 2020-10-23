@@ -321,8 +321,11 @@
           geobody_file_id: this.cur_area["geobody_file_id"],
           geobody_id: this.cur_area["geobody_id"],
           segy_file_id: this.model["file_id"],
-          radius: this.radius
+          radius: this.radius,
+          data: this.table_datas
         };
+
+        // console.log(JSON.stringify(param))
         this.$store.dispatch('http_post', ["/api/geobody/calc-prob", param, this.event_http_list_ava]).then();
 
         this.$refs.probabilityDialog.hideModal();

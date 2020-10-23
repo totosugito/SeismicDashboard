@@ -315,19 +315,17 @@
       {
         this.overlayClosed();
         let param = [
-          {
-            "segy_file_id": "5f770203f0522ed909b6d573",
-            "type": "iline",
-            "iline": 6774
-          }];
+            {"iline":1528,"xline":"-","freq":1,"segy_file_id":"5f88d205fbabe3bf86aec275","type":"iline","check":true},
+            {"iline":1532,"xline":"-","freq":9,"segy_file_id":"5f88d205fbabe3bf86aec275","type":"iline","check":true},
+            {"iline":1530,"xline":"-","freq":5,"segy_file_id":"5f88d205fbabe3bf86aec275","type":"iline","check":true}];
         param = this.listSelectedRow;
-        if(this.listSelectedRow.length===0)
+        if(param.length===0)
         {
           this.retStatus = {status: 0, title: "Information", message: "Please Select files from table ...", data: []};
           this.$refs.dialogMessage.showModal();
           return
         }
-        if(this.listSelectedRow.length>3)
+        if(param.length>3)
         {
           this.retStatus = {status: 0, title: "Information", message: "Maximum selected data 3", data: []};
           this.$refs.dialogMessage.showModal();

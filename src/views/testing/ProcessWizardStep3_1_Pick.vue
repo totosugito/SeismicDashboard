@@ -281,10 +281,9 @@
     methods: {
       updateLcPoint(e)
       {
-        this.timePos = (Math.round(e.y)).toFixed(this.fixedDec);
         if (e.isValid)
         {
-          console.log(JSON.stringify(e))
+          this.seriesSeismicInfo = [{x:e.x, y:e.y}];
         }
       },
       fgetColormapName(ii)
@@ -332,7 +331,6 @@
           cdp_header: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
           cdp_data: getData()
         });
-        this.seriesSeismicInfo = [{x:10, y:1000}];
 
         // console.log(this.points.length)
         // let data = [];
