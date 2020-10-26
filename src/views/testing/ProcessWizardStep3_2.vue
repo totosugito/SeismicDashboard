@@ -524,7 +524,8 @@
         for(let i=0; i<msg.length; i++)
           this.list_segy.push({
             value: msg[i]["_id"]["$oid"],
-            text: msg[i]["file_name"]
+            // text: msg[i]["file_name"]
+            text: msg[i]["label_name"]
           });
         this.showLoader = false;
       });

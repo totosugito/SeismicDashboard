@@ -256,6 +256,12 @@ export function createTableProbabilityHeader()
 {
   let table_headers = [
     {
+      key: 'check',
+      label: '#',
+      sortable: true,
+      thStyle: { width: '40px'}
+    },
+    {
       key: 'iline',
       label: 'Inline',
       sortable: true

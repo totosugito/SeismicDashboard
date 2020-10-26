@@ -26,13 +26,13 @@
                 <!--              </b-col>-->
                 <!--            </b-row>-->
                 <b-row>
-                  <b-col md="5">
-                    <b-form-group label-cols="5" label-size="md" label="Radius">
-                      <b-form-input size="md" v-model="radius"></b-form-input>
-                    </b-form-group>
-                  </b-col>
+<!--                  <b-col md="5">-->
+<!--                    <b-form-group label-cols="5" label-size="md" label="Radius">-->
+<!--                      <b-form-input size="md" v-model="radius"></b-form-input>-->
+<!--                    </b-form-group>-->
+<!--                  </b-col>-->
                   <b-col md="6">
-                    <b-btn class="btn btn-md mr-1" variant="success" @click="getListFindAVA()">AVA List</b-btn>
+                    <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA List</b-btn>
                     <b-btn class="btn btn-md" variant="primary" @click="openProbabilityDialog()">Probability</b-btn>
                   </b-col>
                 </b-row>
@@ -78,6 +78,12 @@
                 @filtered="onFiltered"
                 :fields="table_headers"
                 :items="table_datas">
+
+                <template v-slot:cell(check)="row">
+                  <b-form-group>
+                    <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+                  </b-form-group>
+                </template>
 
                 <template v-slot:cell(cdp_x)="row">
                   {{row.item.cdp_x.toFixed(3)}}
@@ -146,6 +152,20 @@
     </b-row>
     <view-bottom-wizard-button class="mt-0" index="2" :left_clicked="wizardButtonClicked('processwizard2')"
                                :right_clicked="wizardButtonClicked('processwizard4')"/>
+
+    <vue-form-dialog
+      ref="avaDialog"
+      type="default"
+      header="Parameters" body="Body"
+      btn1_text="Close" btn2_text="Process"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="avaDialogBtn1Click()" @btn2Click="avaDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="schema_sgy_pick" :model="model_sgy_pick" :options="formOptions" @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
 
     <vue-form-dialog
       ref="probabilityDialog"
@@ -234,10 +254,51 @@
 
         table_headers: createTableProbabilityHeader(),
         table_datas: [],
-        radius: 25,
+        listSelectedRow: [],
         cur_segy_ml: {},
         list_segy_ml: [],
         cur_area: {},
+
+        model_sgy_pick: {
+          segy_gather_file_id : "",
+          segy_substack_file_id: "",
+          radius: 25,
+          vertical_window: 30.0
+        },
+        schema_sgy_pick: {
+          fields: [
+            {
+              type: 'select',
+              label: 'Select Gather File',
+              model: 'segy_gather_file_id',
+              selectOptions: {hideNoneSelectedText: true}
+            },
+            {
+              type: 'select',
+              label: 'Select SubStack File',
+              model: 'segy_substack_file_id',
+              selectOptions: {hideNoneSelectedText: true}
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Radius',
+              model: 'radius',
+              placeholder: 'Set Radius',
+              featured: true,
+              required: true
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Vertical Window',
+              model: 'vertical_window',
+              placeholder: 'Set Vertical Window',
+              featured: true,
+              required: true
+            },
+          ]
+        },
 
         model: {
           file_id: "",
@@ -257,9 +318,10 @@
           validateAfterChanged: true,
         },
 
-        event_http_list_ava: {success: "successListAva", fail: "failListAva"},
-        event_http: {success: "success", fail: "fail"},
+        event_http_list_sgy: {success: "successListSgy", fail: "failListSgy"},
         event_http_list_mlpick: {success: "successListML", fail: "failListML"},
+        event_http_list_ava: {success: "successListAva", fail: "failListAva"},
+        event_http_list_prob: {success: "successListProb", fail: "failListProb"},
       }
     },
 
@@ -269,16 +331,33 @@
     },
 
     methods: {
+      updateSelectedRow(m)
+      {
+        if(m.check)
+        {
+          for(let i=0; i<this.listSelectedRow.length; i++)
+          {
+            if((m["iline"]===this.listSelectedRow[i]["iline"]) & (m["xline"]===this.listSelectedRow[i]["xline"]))
+            {
+              this.listSelectedRow.splice(i, 1);
+              break
+            }
+          }
+        }
+        else
+          this.listSelectedRow.push(m);
+      },
+
       getUrlImage(imode)
       {
         // return("http://117.54.250.85:9000/220538_cumulative-distribution.png");
         let server_url = 'http://117.54.250.85:9000/';
         if(imode===0)
-          return(server_url + this.cur_area["geobody_id"] + "_cumulative-distribution.png" + createRandomCode());
-        else if(imode===1)
           return(server_url + this.cur_area["geobody_id"] + "_gas-probability-map.png" + createRandomCode());
-        else
+        else if(imode===1)
           return(server_url + this.cur_area["geobody_id"] + "_probability-score-distribution.png" + createRandomCode());
+        else
+          return(server_url + this.cur_area["geobody_id"] + "_cumulative-distribution.png" + createRandomCode());
       },
 
       parseProbabilityNumber(v)
@@ -302,6 +381,37 @@
         }
       },
 
+      //------------------------- ava dialog ----------------------------
+      openAvaDialog()
+      {
+        this.$refs.avaDialog.showModal();
+      },
+      avaDialogBtn1Click() {
+        this.$refs.avaDialog.hideModal();
+      },
+      avaDialogBtn2Click() {
+        if(!this.bvalidate) return;
+        if(this.model_sgy_pick["segy_gather_file_id"]==="")
+          return;
+        if(this.model_sgy_pick["segy_substack_file_id"]==="")
+          return;
+
+        this.listSelectedRow = [];
+        this.proc_completed = false;
+        this.showLoader = true;
+        let param = {
+          geobody_file_id: this.cur_area["geobody_file_id"],
+          geobody_id: this.cur_area["geobody_id"],
+          segy_gather_file_id : this.model_sgy_pick["segy_gather_file_id"],
+          segy_substack_file_id : this.model_sgy_pick["segy_substack_file_id"],
+          radius: this.model_sgy_pick["radius"],
+          vertical_window: this.model_sgy_pick["vertical_window"]
+        };
+        this.$store.dispatch('http_post', ["/api/geobody/find-ava-data", param, this.event_http_list_ava]).then();
+
+        this.$refs.avaDialog.hideModal();
+      },
+
       //------------------------- probability dialog ----------------------------
       openProbabilityDialog()
       {
@@ -315,18 +425,19 @@
         if(this.model["file_id"]==="")
           return;
 
+        this.listSelectedRow = [];
         this.proc_completed = false;
         this.showLoader = true;
         let param = {
           geobody_file_id: this.cur_area["geobody_file_id"],
           geobody_id: this.cur_area["geobody_id"],
           segy_file_id: this.model["file_id"],
-          radius: this.radius,
+          // radius: this.radius,
           data: this.table_datas
         };
 
         // console.log(JSON.stringify(param))
-        this.$store.dispatch('http_post', ["/api/geobody/calc-prob", param, this.event_http_list_ava]).then();
+        this.$store.dispatch('http_post', ["/api/geobody/calc-prob", param, this.event_http_list_prob]).then();
 
         this.$refs.probabilityDialog.hideModal();
       },
@@ -351,26 +462,14 @@
         this.cur_area["geobody_file_id"] = this.$route.query.geobody_file_id;
         this.cur_area["geobody_id"] = this.$route.query.geobody_id;
         this.cur_area["cls"] = this.$route.query.cls;
-        // this.showLoader = true;
-        // this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http]).then();
-        this.getMLPickFile();
+        this.showLoader = true;
+        this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http_list_sgy]).then();
+        // this.getMLPickFile();
       },
       getMLPickFile()
       {
         this.showLoader = true;
         this.$store.dispatch('http_get', ["/api/mlpick/file-list", {}, this.event_http_list_mlpick]).then();
-      },
-      getListFindAVA()
-      {
-        this.proc_completed = false;
-        this.showLoader = true;
-        let param = {
-          geobody_file_id: this.cur_area["geobody_file_id"],
-          geobody_id: this.cur_area["geobody_id"],
-          segy_file_id: {},
-          radius: this.radius
-        };
-        this.$store.dispatch('http_post', ["/api/geobody/find-ava-data", param, this.event_http_list_ava]).then();
       },
 
       getTabIcon()
@@ -425,17 +524,19 @@
     },
     mounted()
     {
-      //-------------- LIST AVA -------------------
-      EventBus.$on(this.event_http_list_ava.success, (msg) =>
+      //-------------- LIST SGY -------------------
+      EventBus.$on(this.event_http_list_sgy.success, (msg) =>
       {
-        // console.log(JSON.stringify(msg))
-        //fill table contents
-        this.table_datas = msg;
-        this.ndata = this.table_datas.length;
-        this.proc_completed = true;
-        this.showLoader = false;
+        this.list_segy_pick = [];
+        for (let i = 0; i < msg.length; i++)
+          this.list_segy_pick.push({id: msg[i]["_id"]["$oid"], name:msg[i]["label_name"]});
+        // console.log(JSON.stringify(this.list_segy_pick))
+
+        this.schema_sgy_pick.fields[0].values = this.list_segy_pick;
+        this.schema_sgy_pick.fields[1].values = this.list_segy_pick;
+        this.getMLPickFile();
       });
-      EventBus.$on(this.event_http_list_ava.fail, (msg) =>
+      EventBus.$on(this.event_http_list_sgy.fail, (msg) =>
       {
         this.showLoader = false;
         this.table_datas = [];
@@ -461,34 +562,49 @@
         this.$refs.dialogMessage.showModal();
       });
 
-      EventBus.$on(this.event_http.success, (msg) =>
+      //-------------- LIST AVA -------------------
+      EventBus.$on(this.event_http_list_ava.success, (msg) =>
       {
-        // this.list_segy = [];
-        // for (let i = 0; i < msg.length; i++)
-        //   this.list_segy.push({
-        //     value: msg[i]["_id"]["$oid"],
-        //     text: msg[i]["file_name"]
-        //   });
-        // this.showLoader = false;
+        this.table_datas = msg;
+        this.ndata = this.table_datas.length;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_list_ava.fail, (msg) =>
+      {
+        this.showLoader = false;
+        this.table_datas = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
       });
 
-      EventBus.$on(this.event_http.fail, (msg) =>
+      //-------------- LIST PROB -------------------
+      EventBus.$on(this.event_http_list_prob.success, (msg) =>
       {
-        // this.list_segy = [];
-        // this.showLoader = false;
-        // this.retStatus = msg;
-        // this.$refs.dialogMessage.showModal();
+        this.table_datas = msg;
+        this.ndata = this.table_datas.length;
+        this.proc_completed = true;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_list_prob.fail, (msg) =>
+      {
+        this.showLoader = false;
+        this.proc_completed = false;
+        this.table_datas = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
       });
     },
 
     beforeDestroy()
     {
-      EventBus.$off(this.event_http_list_ava.success);
-      EventBus.$off(this.event_http_list_ava.fail);
+      EventBus.$off(this.event_http_list_sgy.success);
+      EventBus.$off(this.event_http_list_sgy.fail);
       EventBus.$off(this.event_http_list_mlpick.success);
       EventBus.$off(this.event_http_list_mlpick.fail);
-      EventBus.$off(this.event_http.success);
-      EventBus.$off(this.event_http.fail);
+      EventBus.$off(this.event_http_list_ava.success);
+      EventBus.$off(this.event_http_list_ava.fail);
+      EventBus.$off(this.event_http_list_prob.success);
+      EventBus.$off(this.event_http_list_prob.fail);
       this.showLoader = false;
     },
   }
