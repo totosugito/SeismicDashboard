@@ -224,7 +224,12 @@
       EventBus.$on(this.event_http_list_sgy.success, (msg) => {
         this.table_segy = [];
         for(let i=0; i<msg.length; i++)
-          this.table_segy.push({id: msg[i]["_id"]["$oid"], name:msg[i]["file_name"]})
+          this.table_segy.push(
+            {
+              id: msg[i]["_id"]["$oid"],
+              // name:msg[i]["file_name"],
+              name:msg[i]["label_name"]
+            })
         this.schema.fields[0].values = this.table_segy;
         this.showLoader = false;
         this.getListWell();

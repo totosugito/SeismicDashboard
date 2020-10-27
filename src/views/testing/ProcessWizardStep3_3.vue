@@ -12,7 +12,9 @@
         <b-card>
           <div slot="header">
             <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i class="fa fa-hand-o-right"></i></strong>
-            </span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}} ({{cur_area.geobody_id}})</strong> , Class : {{cur_area.cls}}</div>
+            </span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}} ({{cur_area.geobody_id}})</strong> , Class
+              : {{cur_area.cls}}
+            </div>
           </div>
 
           <splitpanes class="default-theme" vertical style="height: 60vh" vertical>
@@ -26,19 +28,20 @@
                 <!--              </b-col>-->
                 <!--            </b-row>-->
                 <b-row>
-<!--                  <b-col md="5">-->
-<!--                    <b-form-group label-cols="5" label-size="md" label="Radius">-->
-<!--                      <b-form-input size="md" v-model="radius"></b-form-input>-->
-<!--                    </b-form-group>-->
-<!--                  </b-col>-->
+                  <!--                  <b-col md="5">-->
+                  <!--                    <b-form-group label-cols="5" label-size="md" label="Radius">-->
+                  <!--                      <b-form-input size="md" v-model="radius"></b-form-input>-->
+                  <!--                    </b-form-group>-->
+                  <!--                  </b-col>-->
                   <b-col md="6">
                     <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA List</b-btn>
+                    <b-btn class="btn btn-md mr-1" variant="warning" @click="httpPlotAva()">Plot AVA</b-btn>
                     <b-btn class="btn btn-md" variant="primary" @click="openProbabilityDialog()">Probability</b-btn>
                   </b-col>
                 </b-row>
                 <b-row class="text-right">
                   <b-col md="5">
-<!--                    <b-btn class="btn btn-md" variant="success" @click="getListFindAVA()">Find AVA</b-btn>-->
+                    <!--                    <b-btn class="btn btn-md" variant="success" @click="getListFindAVA()">Find AVA</b-btn>-->
                   </b-col>
                 </b-row>
               </div>
@@ -48,7 +51,16 @@
               <!-- table header -->
               <div class="group-header">
                 <b-row>
-                  <b-col md="6" class="my-1">
+                  <b-col md="3" class="my-1">
+                    <b-form-checkbox
+                      id="checkbox-1"
+                      v-model="bCheckAll"
+                      name="checkbox-1"
+                    @change="selectAllChecked()">
+                      Check All
+                    </b-form-checkbox>
+                  </b-col>
+                  <b-col md="3" class="my-1">
                     <strong>Total : {{ndata}}</strong>
                   </b-col>
                   <b-col md="6" class="my-1">
@@ -119,12 +131,22 @@
             <pane class="pl-2 pt-2 pb-2 pr-0">
               <b-card no-body>
                 <b-tabs card>
-                  <b-tab title="Probability Map" active>
+                  <b-tab title="Plot AVA" active>
+                    <template v-slot:title>
+                      <i class="fa fa-file-image-o"/> Plot AVA
+                    </template>
+                    <template v-if="proc_plot_ava">
+                    <ApexChartLine class="style_chart_proc" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
+                    </template>
+                  </b-tab>
+
+                  <b-tab title="Probability Map">
                     <template v-slot:title>
                       <i class="fa fa-image"/> Probability Map
                     </template>
                     <template v-if="proc_completed">
-                      <expandable-image :close-on-background-click="true" :src="getUrlImage(0)" alt="Probability Map" style="width: 100%; height: 100%"/>
+                      <expandable-image :close-on-background-click="true" :src="getUrlImage(0)" alt="Probability Map"
+                                        style="width: 100%; height: 100%"/>
                     </template>
                   </b-tab>
                   <b-tab title="Probability Distribution">
@@ -132,7 +154,7 @@
                       <i class="fa fa-bar-chart"/> Probability Distribution
                     </template>
                     <template v-if="proc_completed">
-                    <expandable-image :close-on-background-click="true" :src="getUrlImage(1)" alt="Probability Distribution"/>
+                      <expandable-image :close-on-background-click="true" :src="getUrlImage(1)" alt="Probability Distribution"/>
                     </template>
                   </b-tab>
                   <b-tab title="Cumulative Distribution">
@@ -140,7 +162,7 @@
                       <i class="fa fa-line-chart"/> Cumulative Distribution
                     </template>
                     <template v-if="proc_completed">
-                    <expandable-image :close-on-background-click="true" :src="getUrlImage(2)" alt="Cumulative Distribution"/>
+                      <expandable-image :close-on-background-click="true" :src="getUrlImage(2)" alt="Cumulative Distribution"/>
                     </template>
                   </b-tab>
                 </b-tabs>
@@ -215,6 +237,8 @@
 
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
+  import {apexChartSimpleProperties, createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
+  import ApexChartLine from "../components/ApexChartLine";
 
   export default {
     name: "ProcessWizardStep3_3",
@@ -228,6 +252,7 @@
       ExpandableImage,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
+      ApexChartLine
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -242,7 +267,9 @@
     {
       return {
         proc_completed: false,
+        proc_plot_ava: false,
         showLoader: false,
+        bCheckAll: false,
         retStatus: {status: 0, title: "", message: "", data: []},
         perPageView: 15,
         perPage: 15,
@@ -254,13 +281,15 @@
 
         table_headers: createTableProbabilityHeader(),
         table_datas: [],
-        listSelectedRow: [],
         cur_segy_ml: {},
         list_segy_ml: [],
         cur_area: {},
 
+        avaPlotSeries: [],
+        avaPlotOptions: {},
+
         model_sgy_pick: {
-          segy_gather_file_id : "",
+          segy_gather_file_id: "",
           segy_substack_file_id: "",
           radius: 25,
           vertical_window: 30.0
@@ -322,6 +351,7 @@
         event_http_list_mlpick: {success: "successListML", fail: "failListML"},
         event_http_list_ava: {success: "successListAva", fail: "failListAva"},
         event_http_list_prob: {success: "successListProb", fail: "failListProb"},
+        event_http_ava_plot: {success: "successListAvaPlot", fail: "failListAvaPlot"},
       }
     },
 
@@ -333,37 +363,24 @@
     methods: {
       updateSelectedRow(m)
       {
-        if(m.check)
-        {
-          for(let i=0; i<this.listSelectedRow.length; i++)
-          {
-            if((m["iline"]===this.listSelectedRow[i]["iline"]) & (m["xline"]===this.listSelectedRow[i]["xline"]))
-            {
-              this.listSelectedRow.splice(i, 1);
-              break
-            }
-          }
-        }
-        else
-          this.listSelectedRow.push(m);
       },
 
       getUrlImage(imode)
       {
         // return("http://117.54.250.85:9000/220538_cumulative-distribution.png");
         let server_url = 'http://117.54.250.85:9000/';
-        if(imode===0)
-          return(server_url + this.cur_area["geobody_id"] + "_gas-probability-map.png" + createRandomCode());
-        else if(imode===1)
-          return(server_url + this.cur_area["geobody_id"] + "_probability-score-distribution.png" + createRandomCode());
+        if (imode === 0)
+          return (server_url + this.cur_area["geobody_id"] + "_gas-probability-map.png" + createRandomCode());
+        else if (imode === 1)
+          return (server_url + this.cur_area["geobody_id"] + "_probability-score-distribution.png" + createRandomCode());
         else
-          return(server_url + this.cur_area["geobody_id"] + "_cumulative-distribution.png" + createRandomCode());
+          return (server_url + this.cur_area["geobody_id"] + "_cumulative-distribution.png" + createRandomCode());
       },
 
       parseProbabilityNumber(v)
       {
         if (v === undefined)
-          return("");
+          return ("");
         else
           return (v.toFixed(6));
       },
@@ -381,29 +398,68 @@
         }
       },
 
+      selectAllChecked()
+      {
+        for (let i=0; i<this.table_datas.length; i++)
+          this.table_datas[i]["check"] = !this.bCheckAll;
+      },
+      httpPlotAva()
+      {
+        this.proc_plot_ava = false;
+
+        let param = [
+          {"segy_file_id": "5f9429011b384324bf882091", "label": "gth", "iline": 8835, "xline": 2609, "cdp_z": 411.252},
+          {"segy_file_id": "5f9429011b384324bf882091", "label": "gth", "iline": 8847, "xline": 2613, "cdp_z": 411.252},
+          {"segy_file_id": "5f9429011b384324bf882091", "label": "gth", "iline": 8855, "xline": 2645, "cdp_z": 414.440}
+        ];
+        param = [];
+        for(let i=0; i<this.table_datas.length; i++)
+        {
+          if(this.table_datas[i]["check"] === true)
+            param.push(this.table_datas[i])
+        }
+
+        if (param.length === 0)
+        {
+          this.retStatus = {status: 0, title: "Information", message: "Please Select data from table ...", data: []};
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+        if (param.length > 10)
+        {
+          this.retStatus = {status: 0, title: "Information", message: "Maximum selected data 10", data: []};
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', ["/api/segy/view-list-ava", param, this.event_http_ava_plot]).then();
+      },
+
       //------------------------- ava dialog ----------------------------
       openAvaDialog()
       {
         this.$refs.avaDialog.showModal();
       },
-      avaDialogBtn1Click() {
+      avaDialogBtn1Click()
+      {
         this.$refs.avaDialog.hideModal();
       },
-      avaDialogBtn2Click() {
-        if(!this.bvalidate) return;
-        if(this.model_sgy_pick["segy_gather_file_id"]==="")
+      avaDialogBtn2Click()
+      {
+        if (!this.bvalidate) return;
+        if (this.model_sgy_pick["segy_gather_file_id"] === "")
           return;
-        if(this.model_sgy_pick["segy_substack_file_id"]==="")
+        if (this.model_sgy_pick["segy_substack_file_id"] === "")
           return;
 
-        this.listSelectedRow = [];
         this.proc_completed = false;
         this.showLoader = true;
         let param = {
           geobody_file_id: this.cur_area["geobody_file_id"],
           geobody_id: this.cur_area["geobody_id"],
-          segy_gather_file_id : this.model_sgy_pick["segy_gather_file_id"],
-          segy_substack_file_id : this.model_sgy_pick["segy_substack_file_id"],
+          segy_gather_file_id: this.model_sgy_pick["segy_gather_file_id"],
+          segy_substack_file_id: this.model_sgy_pick["segy_substack_file_id"],
           radius: this.model_sgy_pick["radius"],
           vertical_window: this.model_sgy_pick["vertical_window"]
         };
@@ -417,15 +473,16 @@
       {
         this.$refs.probabilityDialog.showModal();
       },
-      probabilityDialogBtn1Click() {
+      probabilityDialogBtn1Click()
+      {
         this.$refs.probabilityDialog.hideModal();
       },
-      probabilityDialogBtn2Click() {
-        if(!this.bvalidate) return;
-        if(this.model["file_id"]==="")
+      probabilityDialogBtn2Click()
+      {
+        if (!this.bvalidate) return;
+        if (this.model["file_id"] === "")
           return;
 
-        this.listSelectedRow = [];
         this.proc_completed = false;
         this.showLoader = true;
         let param = {
@@ -529,7 +586,7 @@
       {
         this.list_segy_pick = [];
         for (let i = 0; i < msg.length; i++)
-          this.list_segy_pick.push({id: msg[i]["_id"]["$oid"], name:msg[i]["label_name"]});
+          this.list_segy_pick.push({id: msg[i]["_id"]["$oid"], name: msg[i]["label_name"]});
         // console.log(JSON.stringify(this.list_segy_pick))
 
         this.schema_sgy_pick.fields[0].values = this.list_segy_pick;
@@ -549,7 +606,7 @@
       {
         this.list_segy_ml = [];
         for (let i = 0; i < msg.length; i++)
-          this.list_segy_ml.push({id: msg[i]["_id"]["$oid"], name:msg[i]["file_name"]});
+          this.list_segy_ml.push({id: msg[i]["_id"]["$oid"], name: msg[i]["file_name"]});
         this.schema.fields[0].values = this.list_segy_ml;
         this.showLoader = false;
       });
@@ -567,6 +624,14 @@
       {
         this.table_datas = msg;
         this.ndata = this.table_datas.length;
+
+        let segy_file_id = this.model_sgy_pick["segy_gather_file_id"];
+        for(let i=0; i<this.table_datas.length; i++)
+        {
+          this.table_datas[i]["segy_file_id"] = segy_file_id;
+          this.table_datas[i]["label"] = "gth";
+        }
+
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list_ava.fail, (msg) =>
@@ -574,6 +639,43 @@
         this.showLoader = false;
         this.table_datas = [];
         this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      //-------------- LIST AVA PLOT -------------------
+      EventBus.$on(this.event_http_ava_plot.success, (msg) =>
+      {
+        // this.table_datas = msg;
+        // this.ndata = this.table_datas.length;
+        this.avaPlotSeries = [];
+        for(let i=0; i<msg.length; i++)
+        {
+          let m = msg[i];
+          let line_title = m["label"] + "-" + m["iline"] + "/" + m["xline"] + "(" + m["cdp_z"] + ")";
+          this.avaPlotSeries.push({
+            type: 'line',
+            name: line_title,
+            data: m["ava"]
+          });
+        }
+        // this.avaPlotOptions = createDefaultParam();
+        this.avaPlotOptions = apexChartSimpleProperties();
+        // this.avaPlotOptions["title"]["text"] = this.lineChartTitle;
+        this.avaPlotOptions["xaxis"]["categories"] = msg[0]["header"];
+        // this.avaPlotOptions["xaxis"]["title"]["text"] = this.XAxis["label"];
+        // this.avaPlotOptions["yaxis"]["title"]["text"] = "Amplitude";
+        // this.avaPlotOptions["colors"] = createDefaultColor(t1, t2 + 1, [pp, t2 + 1]);
+        this.avaPlotOptions["legend"]["position"] = "bottom";
+        this.avaPlotOptions["markers"] = 4;
+
+        this.proc_plot_ava = true;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_ava_plot.fail, (msg) =>
+      {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.proc_plot_ava = false;
         this.$refs.dialogMessage.showModal();
       });
 
@@ -605,6 +707,8 @@
       EventBus.$off(this.event_http_list_ava.fail);
       EventBus.$off(this.event_http_list_prob.success);
       EventBus.$off(this.event_http_list_prob.fail);
+      EventBus.$off(this.event_http_ava_plot.success);
+      EventBus.$off(this.event_http_ava_plot.fail);
       this.showLoader = false;
     },
   }
@@ -612,6 +716,6 @@
 
 <style scoped>
   .style_chart_proc {
-    height: 65vh;
+    height: 53vh;
   }
 </style>

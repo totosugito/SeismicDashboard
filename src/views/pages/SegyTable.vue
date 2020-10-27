@@ -290,9 +290,14 @@
 
         selected_data: {},
         table_headers: [
+          // {
+          //   key: 'file_name',
+          //   label: 'Filename',
+          //   sortable: true,
+          // },
           {
-            key: 'file_name',
-            label: 'Filename',
+            key: 'label_name',
+            label: 'Label Name',
             sortable: true,
           },
           {
