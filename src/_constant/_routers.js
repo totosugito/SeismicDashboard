@@ -140,6 +140,11 @@ export default new Router({
               component: () => import('../views/testing/ProcessWizardStep2')
             },
             {
+              path: varRouter.getRoute("processwizard2-1", 1),
+              name: varRouter.getRoute("processwizard2-1", 2),
+              component: () => import('../views/testing/ProcessWizardStep2_1')
+            },
+            {
               path: varRouter.getRoute("processwizard3", 1),
               name: varRouter.getRoute("processwizard3", 2),
               component: () => import('../views/testing/ProcessWizardStep3')
