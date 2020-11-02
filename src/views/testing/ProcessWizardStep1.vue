@@ -283,7 +283,7 @@
 
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
-          path: this.varRouter.getRoute("processwizard2", 1),
+          path: this.varRouter.getRoute("processwizard2-1", 1),
         });
 
         this.$refs.radiusDialog.hideModal();

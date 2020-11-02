@@ -12,6 +12,29 @@
     <splitpanes class="default-theme" vertical style="height: 70vh" @resized="splitResizedEvent('resized', $event)">
       <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
         <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>
+        <b-row>
+          <b-col md="3">
+            <b-input-group prepend="x : ">
+              <b-form-input v-model="inp_x" placeholder="x coord"/>
+            </b-input-group>
+          </b-col>
+          <b-col md="3">
+            <b-input-group prepend="y : ">
+              <b-form-input v-model="inp_y" placeholder="y coord"/>
+            </b-input-group>
+          </b-col>
+          <b-col md="3">
+            <b-input-group prepend="z : ">
+              <b-form-input v-model="inp_z" placeholder="z coord"/>
+            </b-input-group>
+          </b-col>
+          <b-dropdown right text="Select Action">
+            <b-dropdown-item>Well</b-dropdown-item>
+            <b-dropdown-item>Gather</b-dropdown-item>
+            <b-dropdown-item>Section</b-dropdown-item>
+            <b-dropdown-item>Probability</b-dropdown-item>
+          </b-dropdown>
+        </b-row>
 
         <!-- -------------------------------------------- -->
         <!-- TABLE -->
@@ -178,6 +201,10 @@
         showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
 
+        inp_x: 0.0,
+        inp_y: 0.0,
+        inp_z: 0.0,
+
         cur_area: {},
         cur_tab: 0,
         center: L.latLng(-6.90389, 107.61861),
@@ -193,96 +220,11 @@
         chartWellSeries: [],
         chartGeobodyOptions: {},
         chartGeobodySeries: [],
+        chartGeobodyPointSeries: [],
         axis_bound: [],
 
         table_headers: createTableGeobodyListHeader(),
-        table_datas: [
-          {
-            "_id": {
-              "$oid": "5f94962dfcc3228d7992e9c0"
-            },
-            "cls": 1,
-            "file_id": {
-              "$oid": "5f9493af71891dc5ad904cf2"
-            },
-            "geobody_id": "220009",
-            "nop": 11741,
-            "x_max": 565994.18089384,
-            "x_min": 560944.18089384,
-            "y_max": 9909352.54338531,
-            "y_min": 9900852.54338531,
-            "z_max": 609.00914001,
-            "z_min": 499.70882034
-          },
-          {
-            "_id": {
-              "$oid": "5f94962dfcc3228d7992e9c1"
-            },
-            "cls": 1,
-            "file_id": {
-              "$oid": "5f9493af71891dc5ad904cf2"
-            },
-            "geobody_id": "220022",
-            "nop": 2764,
-            "x_max": 572769.18089384,
-            "x_min": 568069.18089384,
-            "y_max": 9943727.54338531,
-            "y_min": 9939927.54338531,
-            "z_max": 475.67821121,
-            "z_min": 406.23402023
-          },
-          {
-            "_id": {
-              "$oid": "5f94962dfcc3228d7992e9c2"
-            },
-            "cls": 1,
-            "file_id": {
-              "$oid": "5f9493af71891dc5ad904cf2"
-            },
-            "geobody_id": "220027",
-            "nop": 6066,
-            "x_max": 563044.18089384,
-            "x_min": 558919.18089384,
-            "y_max": 9899752.54338531,
-            "y_min": 9896402.54338531,
-            "z_max": 548.91819,
-            "z_min": 432.43982697
-          },
-          {
-            "_id": {
-              "$oid": "5f94962dfcc3228d7992e9c3"
-            },
-            "cls": 1,
-            "file_id": {
-              "$oid": "5f9493af71891dc5ad904cf2"
-            },
-            "geobody_id": "220072",
-            "nop": 1647,
-            "x_max": 560294.18089384,
-            "x_min": 558644.18089384,
-            "y_max": 9901027.54338531,
-            "y_min": 9897127.54338531,
-            "z_max": 508.4780426,
-            "z_min": 445.02983475
-          },
-          {
-            "_id": {
-              "$oid": "5f94962dfcc3228d7992e9c4"
-            },
-            "cls": 1,
-            "file_id": {
-              "$oid": "5f9493af71891dc5ad904cf2"
-            },
-            "geobody_id": "220074",
-            "nop": 935,
-            "x_max": 566119.18089384,
-            "x_min": 564044.18089384,
-            "y_max": 9911627.54338531,
-            "y_min": 9909302.54338531,
-            "z_max": 570.80909729,
-            "z_min": 488.00214386
-          }
-        ],
+        table_datas: [],
         table_well: [],
 
         resizeevent: false,
@@ -315,19 +257,20 @@
 
     beforeMount: function ()
     {
-      this.series = [];
+      this.chartGeobodySeries = [];
       this.cur_area = this.$store.getters.readSelectedArea;
-      this.table_headers.splice(0, 0, {
-        key: 'check',
-        label: 'Plot',
-        sortable: false,
-        thStyle: { width: '50px'}
-      });
-      this.cur_area["view_mode"] = 1;
-      // if(this.cur_area["view_mode"] === 0)
-      //   this.getListWell();
-      // else
-      //   this.getListGeobodyData();
+      if(this.cur_area["view_mode"] === 0)
+        this.getListWell();
+      else
+      {
+        this.table_headers.splice(0, 0, {
+          key: 'check',
+          label: 'Plot',
+          sortable: false,
+          thStyle: { width: '50px'}
+        });
+        this.getListGeobodyData();
+      }
     },
 
     methods: {
@@ -393,6 +336,34 @@
         return (this.varRouter.getRoute(str_router, 1))
       },
 
+      plotSelectedRow(m)
+      {
+        if (m.check)
+        {
+          for (let i = 1; i < this.chartGeobodySeries.length; i++)
+          {
+            if (m["geobody_id"] === this.chartGeobodySeries[i]["name"])
+            {
+              this.chartGeobodySeries.splice(i, 1);
+              break
+            }
+          }
+        }
+        else
+        {
+          if(this.cur_area["view_mode"] === 0)
+          {}
+          else
+          {
+            this.chartGeobodySeries.push({
+              name: m["geobody_id"],
+              type: "scatter",
+              point_size: 4,
+              data: [{x: m["x_min"], y: m["y_min"]}]
+            });
+          }
+        }
+      },
       getListGeobodyData()
       {
         this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
@@ -521,18 +492,6 @@
         this.chartGeobodySeries = [];
         this.table_datas = msg; //fill table contents
 
-        let all_x = [];
-        let all_y = [];
-        all_x.push(this.cur_area["p1x"]);
-        all_x.push(this.cur_area["p2x"]);
-        all_x.push(this.cur_area["p3x"]);
-        all_x.push(this.cur_area["p4x"]);
-        all_y.push(this.cur_area["p1y"]);
-        all_y.push(this.cur_area["p2y"]);
-        all_y.push(this.cur_area["p3y"]);
-        all_y.push(this.cur_area["p4y"]);
-        this.axis_bound = getBoundaryData(all_x, all_y,0.05);
-
         let series_item = {
           name: this.cur_area["area"],
           type: "line",
@@ -546,32 +505,18 @@
             {x: this.cur_area["p1x"], y: this.cur_area["p1y"]},
           ]
         };
-        this.chartWellSeries.push(series_item);
-
 
         if(this.cur_area["view_mode"] === 0)
         {
+          this.chartWellSeries.push(series_item);
           this.chartWellOptions = apexChartSimpleProperties();
+          this.chartWellOptions["legend"]["position"] = "bottom";
         }
         else
         {
-          // let tmp_point = [];
-          // // for(let i=0; i< 100/*msg.length*/; i++)
-          // for (let i = 0; i < msg.length; i++)
-          // {
-          //   let item = msg[i];
-          //   let xx = (item["x_max"] - item["x_min"]) / 2.0;
-          //   let yy = (item["y_max"] - item["y_min"]) / 2.0;
-          //   tmp_point.push({x: item["x_min"] + xx, y: item["y_min"] + yy});
-          // }
-          // let tmp_series_point = {
-          //   name: "Geobody",
-          //   type: "scatter",
-          //   point_size: 2,
-          //   color: "#FF3333",
-          //   data: tmp_point,
-          // };
-          // this.chartGeobodySeries.push(tmp_series_point);
+          this.chartGeobodySeries.push(series_item);
+          this.chartGeobodyOptions = apexChartSimpleProperties();
+          this.chartGeobodyOptions["legend"]["position"] = "bottom";
         }
         this.showLoader = false;
       });

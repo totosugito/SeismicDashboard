@@ -174,7 +174,7 @@
         </b-card>
       </b-col>
     </b-row>
-    <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2')"
+    <view-bottom-wizard-button class="mt-2" index="2" :left_clicked="wizardButtonClicked('processwizard2-1')"
                                :right_clicked="wizardButtonClicked('processwizard4')"/>
 
     <!-- show error dialog -->

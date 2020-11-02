@@ -172,7 +172,7 @@
         </b-card>
       </b-col>
     </b-row>
-    <view-bottom-wizard-button class="mt-0" index="2" :left_clicked="wizardButtonClicked('processwizard2')"
+    <view-bottom-wizard-button class="mt-0" index="2" :left_clicked="wizardButtonClicked('processwizard2-1')"
                                :right_clicked="wizardButtonClicked('processwizard4')"/>
 
     <vue-form-dialog
