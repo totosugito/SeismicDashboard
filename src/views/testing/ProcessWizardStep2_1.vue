@@ -164,7 +164,7 @@
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-  import {getBoundaryData} from "../../libs/simpleLib";
+  import {getBoundaryData, getJsonPythonId} from "../../libs/simpleLib";
   import {apexChartSimpleProperties} from "../../libs/defApexChartLine";
   import ApexChartLineWithPointId from "../components/ApexChartLineWithPointId";
   import ApexChartLine from "../components/ApexChartLine";
@@ -374,7 +374,12 @@
       getListWell() {
         this.showLoader = true;
         this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
-        this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list_well]).then();
+        // this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list_well]).then();
+        let param = {
+          "area": getJsonPythonId(this.cur_area)
+        };
+        console.log(JSON.stringify(this.cur_area))
+        this.$store.dispatch('http_post', ["/api/well/list-in-area", param, this.event_http_list_well]).then();
       },
 
       createDemoCss(cc)

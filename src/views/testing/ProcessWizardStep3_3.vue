@@ -622,7 +622,7 @@
       //-------------- LIST AVA -------------------
       EventBus.$on(this.event_http_list_ava.success, (msg) =>
       {
-        this.table_datas = msg;
+        this.table_datas = msg["gather"];
         this.ndata = this.table_datas.length;
 
         let segy_file_id = this.model_sgy_pick["segy_gather_file_id"];

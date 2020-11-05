@@ -79,3 +79,7 @@ export function getBoundaryData(x, y, max_perc)
   // console.log(YU - YB)
   return([XL, XR, YB, YU]);
 }
+
+export function getJsonPythonId(obj) {
+  return(obj["_id"]["$oid"])
+}
