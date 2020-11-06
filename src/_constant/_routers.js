@@ -107,7 +107,8 @@ export default new Router({
           path: '/',
           name: '',
           // component: () => import('../views/Dashboard') //Dashboard
-          component: () => import('../views/pages/WellTable') //Dashboard
+          // component: () => import('../views/pages/WellTable') //Dashboard
+          component: () => import('../views/pages/GeobodyTable') //Dashboard
         },
         {
           path: '',
@@ -143,6 +144,11 @@ export default new Router({
               path: varRouter.getRoute("processwizard2-1", 1),
               name: varRouter.getRoute("processwizard2-1", 2),
               component: () => import('../views/testing/ProcessWizardStep2_1')
+            },
+            {
+              path: varRouter.getRoute("processwizard2-2", 1),
+              name: varRouter.getRoute("processwizard2-2", 2),
+              component: () => import('../views/testing/ProcessWizardStep2_2')
             },
             {
               path: varRouter.getRoute("processwizard3", 1),

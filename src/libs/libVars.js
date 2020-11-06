@@ -71,16 +71,16 @@ export function createTableAreaListHeader()
       label: 'Note',
       sortable: true
     },
-    {
-      key: 'lat',
-      label: 'Latitude',
-      sortable: false,
-    },
-    {
-      key: 'lon',
-      label: 'Longitude',
-      sortable: false,
-    },
+    // {
+    //   key: 'lat',
+    //   label: 'Latitude',
+    //   sortable: false,
+    // },
+    // {
+    //   key: 'lon',
+    //   label: 'Longitude',
+    //   sortable: false,
+    // },
     {
       key: 'action',
       label: 'Action',
@@ -90,6 +90,32 @@ export function createTableAreaListHeader()
   return (table_headers);
 }
 
+export function createTableWellListHeader() {
+  let table_headers = [
+    // {
+    //   key: 'area',
+    //   label: 'Area',
+    //   sortable: true
+    // },
+    {
+      key: 'well_id',
+      label: 'Well ID',
+      sortable: true
+    },
+    {
+      key: 'depth_corr',
+      label: 'Depth Corr.',
+      sortable: true
+    },
+    {
+      key: 'check',
+      label: 'Plot',
+      sortable: false,
+      thStyle: { width: '40px'}
+    },
+  ];
+  return(table_headers);
+}
 export function createTableGeobodyListHeader()
 {
   let table_headers = [

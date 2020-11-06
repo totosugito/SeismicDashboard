@@ -7,34 +7,34 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="2" :textsize="190" class="mb-3"/>
+    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="1" :textsize="190" class="mb-3"/>
 
     <splitpanes class="default-theme" vertical style="height: 70vh" @resized="splitResizedEvent('resized', $event)">
       <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
         <b-alert variant="success" class="p-1" show>Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}</strong></b-alert>
-        <b-row>
-          <b-col md="3">
-            <b-input-group prepend="x : ">
-              <b-form-input v-model="inp_x" placeholder="x coord"/>
-            </b-input-group>
-          </b-col>
-          <b-col md="3">
-            <b-input-group prepend="y : ">
-              <b-form-input v-model="inp_y" placeholder="y coord"/>
-            </b-input-group>
-          </b-col>
-          <b-col md="3">
-            <b-input-group prepend="z : ">
-              <b-form-input v-model="inp_z" placeholder="z coord"/>
-            </b-input-group>
-          </b-col>
-          <b-dropdown right text="Select Action">
-            <b-dropdown-item>Well</b-dropdown-item>
-            <b-dropdown-item>Gather</b-dropdown-item>
-            <b-dropdown-item>Section</b-dropdown-item>
-            <b-dropdown-item>Probability</b-dropdown-item>
-          </b-dropdown>
-        </b-row>
+<!--        <b-row>-->
+<!--          <b-col md="3">-->
+<!--            <b-input-group prepend="x : ">-->
+<!--              <b-form-input v-model="inp_x" placeholder="x coord"/>-->
+<!--            </b-input-group>-->
+<!--          </b-col>-->
+<!--          <b-col md="3">-->
+<!--            <b-input-group prepend="y : ">-->
+<!--              <b-form-input v-model="inp_y" placeholder="y coord"/>-->
+<!--            </b-input-group>-->
+<!--          </b-col>-->
+<!--          <b-col md="3">-->
+<!--            <b-input-group prepend="z : ">-->
+<!--              <b-form-input v-model="inp_z" placeholder="z coord"/>-->
+<!--            </b-input-group>-->
+<!--          </b-col>-->
+<!--          <b-dropdown right text="Select Action">-->
+<!--            <b-dropdown-item>Well</b-dropdown-item>-->
+<!--            <b-dropdown-item>Gather</b-dropdown-item>-->
+<!--            <b-dropdown-item>Section</b-dropdown-item>-->
+<!--            <b-dropdown-item>Probability</b-dropdown-item>-->
+<!--          </b-dropdown>-->
+<!--        </b-row>-->
 
         <!-- -------------------------------------------- -->
         <!-- TABLE -->
@@ -72,7 +72,7 @@
           :items="table_datas">
 
           <template v-slot:cell(check)="row">
-              <input type="checkbox" v-model="row.item.check" @click="plotSelectedRow(row.item)"/>
+              <b-form-checkbox v-model="row.item.check" @change="plotSelectedRow(row.item)" switch/>
           </template>
 
           <template v-slot:cell(action)="row">
@@ -83,13 +83,13 @@
           </template>
 
           <!-- X -->
-          <template v-slot:cell(xcoord)="row">
-            <strong>Min : </strong> {{row.item.x_min.toFixed(4)}}<br><strong>Max : </strong> {{row.item.x_max.toFixed(4)}}
-          </template>
-          <!-- Y -->
-          <template v-slot:cell(ycoord)="row">
-            <strong>Min : </strong> {{row.item.y_min.toFixed(4)}}<br><strong>Max : </strong> {{row.item.y_max.toFixed(4)}}
-          </template>
+<!--          <template v-slot:cell(xcoord)="row">-->
+<!--            <strong>Min : </strong> {{row.item.x_min.toFixed(4)}}<br><strong>Max : </strong> {{row.item.x_max.toFixed(4)}}-->
+<!--          </template>-->
+<!--          &lt;!&ndash; Y &ndash;&gt;-->
+<!--          <template v-slot:cell(ycoord)="row">-->
+<!--            <strong>Min : </strong> {{row.item.y_min.toFixed(4)}}<br><strong>Max : </strong> {{row.item.y_max.toFixed(4)}}-->
+<!--          </template>-->
 
         </b-table>
 
@@ -108,18 +108,13 @@
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
           <template v-if="showLoader===false">
-            <template v-if="cur_area['view_mode']===0">
               <ApexChartLine class="lc_seismic_chart" :chartOptions="chartWellOptions" :series="chartWellSeries" :resizeevent="resizeevent"/>
-            </template>
-            <template v-else>
-              <ApexChartLine class="lc_seismic_chart" :chartOptions="chartGeobodyOptions" :series="chartGeobodySeries" :resizeevent="resizeevent"/>
-            </template>
           </template>
         </div>
       </pane>
     </splitpanes>
 
-    <view-bottom-wizard-button class="mt-2" index="1" :left_clicked="wizardButtonClicked('processwizard2-2')" :right_clicked="wizardButtonClicked('processwizard3')"/>
+    <view-bottom-wizard-button class="mt-2" index="1" :left_clicked="wizardButtonClicked('processwizard1')" :right_clicked="wizardButtonClicked('processwizard2-1')"/>
 
     <vue-form-dialog
       ref="radiusDialog"
@@ -160,7 +155,7 @@
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
-  import {createTableGeobodyListHeader} from "../../libs/libVars";
+  import {createTableGeobodyListHeader, createTableWellListHeader} from "../../libs/libVars";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
@@ -218,12 +213,9 @@
 
         chartWellOptions: {},
         chartWellSeries: [],
-        chartGeobodyOptions: {},
-        chartGeobodySeries: [],
-        chartGeobodyPointSeries: [],
         axis_bound: [],
 
-        table_headers: createTableGeobodyListHeader(),
+        table_headers: createTableWellListHeader(),
         table_datas: [],
         table_well: [],
 
@@ -257,20 +249,8 @@
 
     beforeMount: function ()
     {
-      this.chartGeobodySeries = [];
       this.cur_area = this.$store.getters.readSelectedArea;
-      if(this.cur_area["view_mode"] === 0)
-        this.getListWell();
-      else
-      {
-        this.table_headers.splice(0, 0, {
-          key: 'check',
-          label: 'Plot',
-          sortable: false,
-          thStyle: { width: '50px'}
-        });
-        this.getListGeobodyData();
-      }
+      this.getListWell();
     },
 
     methods: {
@@ -321,7 +301,31 @@
         this.totalRows = filteredItems.length;
         this.currentPage = 1;
       },
+
       //-----------------------------------------------------
+      plotSelectedRow(m)
+      {
+        if (m.check)
+        {
+          for (let i = 2; i < this.chartWellSeries.length; i++)
+          {
+            if (m["well_id"] === this.chartWellSeries[i]["name"])
+            {
+              this.chartWellSeries.splice(i, 1);
+              break
+            }
+          }
+        }
+        else
+        {
+            this.chartWellSeries.push({
+              name: m["well_id"],
+              type: "line",
+              point_size: 0,
+              data: [{x: m["x_min"], y: m["y_min"]}, {x: m["x_max"], y: m["y_max"]}]
+            });
+        }
+      },
 
       getTabIcon()
       {
@@ -336,41 +340,6 @@
         return (this.varRouter.getRoute(str_router, 1))
       },
 
-      plotSelectedRow(m)
-      {
-        if (m.check)
-        {
-          for (let i = 1; i < this.chartGeobodySeries.length; i++)
-          {
-            if (m["geobody_id"] === this.chartGeobodySeries[i]["name"])
-            {
-              this.chartGeobodySeries.splice(i, 1);
-              break
-            }
-          }
-        }
-        else
-        {
-          if(this.cur_area["view_mode"] === 0)
-          {}
-          else
-          {
-            this.chartGeobodySeries.push({
-              name: m["geobody_id"],
-              type: "scatter",
-              point_size: 4,
-              data: [{x: m["x_min"], y: m["y_min"]}]
-            });
-          }
-        }
-      },
-      getListGeobodyData()
-      {
-        this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
-
-        this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list]).then();
-      },
       getListWell() {
         this.showLoader = true;
         this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
@@ -378,7 +347,6 @@
         let param = {
           "area": getJsonPythonId(this.cur_area)
         };
-        // console.log(JSON.stringify(this.cur_area))
         this.$store.dispatch('http_post', ["/api/well/list-in-area", param, this.event_http_list_well]).then();
       },
 
@@ -463,6 +431,7 @@
     {
       //-------------- LIST Well -------------------
       EventBus.$on(this.event_http_list_well.success, (msg) => {
+        this.table_datas = msg.data;
         let tmp_point = [];
         this.chartWellSeries = [];
         for(let i=0; i< msg.data.length; i++)
@@ -481,22 +450,6 @@
         };
         this.chartWellSeries.push(tmp_series_point);
 
-        this.getListGeobodyData();
-      });
-      EventBus.$on(this.event_http_list_well.fail, (msg) => {
-        this.table_well = [];
-        this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
-        this.showLoader = false;
-      });
-
-      //-------------- LIST Geobody -------------------
-      EventBus.$on(this.event_http_list.success, (msg) =>
-      {
-        // console.log(JSON.stringify(msg))
-        this.chartGeobodySeries = [];
-        this.table_datas = msg; //fill table contents
-
         let series_item = {
           name: this.cur_area["area"],
           type: "line",
@@ -510,27 +463,26 @@
             {x: this.cur_area["p1x"], y: this.cur_area["p1y"]},
           ]
         };
+        this.chartWellSeries.push(series_item);
+        this.chartWellOptions = apexChartSimpleProperties();
+        this.chartWellOptions["legend"]["position"] = "bottom";
+        this.chartWellOptions["markers"]["size"] = [4, 4, 0, 0, 0, 0, 0, 0];
 
-        if(this.cur_area["view_mode"] === 0)
-        {
-          this.chartWellSeries.push(series_item);
-          this.chartWellOptions = apexChartSimpleProperties();
-          this.chartWellOptions["legend"]["position"] = "bottom";
-        }
-        else
-        {
-          this.chartGeobodySeries.push(series_item);
-          this.chartGeobodyOptions = apexChartSimpleProperties();
-          this.chartGeobodyOptions["legend"]["position"] = "bottom";
-        }
         this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_list_well.fail, (msg) => {
+        this.table_well = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+        this.showLoader = false;
+      });
+
+      //-------------- LIST Geobody -------------------
+      EventBus.$on(this.event_http_list.success, (msg) =>
+      {
       });
       EventBus.$on(this.event_http_list.fail, (msg) =>
       {
-        this.showLoader = false;
-        this.table_datas = [];
-        this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
       });
 
       EventBus.$on(this.event_http.success, (msg) =>

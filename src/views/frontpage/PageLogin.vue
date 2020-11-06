@@ -89,7 +89,7 @@ export default {
         return;
       }
 
-      this.$router.push(this.varRouter.getRoute("well", 1))
+      this.$router.push(this.varRouter.getRoute("geobody", 1))
     },
     authenticate () {
       this.showLoader = true;

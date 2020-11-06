@@ -23,12 +23,12 @@ export default {
         attributes: {}
       }
     },
-    {
-      name: 'Well',
-      url: '/well',
-      router: 'well',
-      icon: 'fa fa-fire '
-    },
+    // {
+    //   name: 'Well',
+    //   url: '/well',
+    //   router: 'well',
+    //   icon: 'fa fa-fire '
+    // },
     {
       name: 'Geobody',
       url: '/geobody',

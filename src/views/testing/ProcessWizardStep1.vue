@@ -178,25 +178,25 @@
         selected_data: {},
 
         model: {
-          file_id: "",
-          mode: 0,
+          geobody_file_id: "",
+          // mode: 0,
         },
         schema: {
           fields: [
             {
               type: 'select',
               label: 'Select File',
-              model: 'file_id',
+              model: 'geobody_file_id',
               selectOptions: {hideNoneSelectedText: true}
             },
-            {
-              type: 'select',
-              inputType: 'Select Mode',
-              label: 'Plot Data',
-              model: 'mode',
-              values: [{id:0, name: "Well"}, {id:1, name: "Geobody"}],
-              selectOptions: {hideNoneSelectedText: true}
-            },
+            // {
+            //   type: 'select',
+            //   inputType: 'Select Mode',
+            //   label: 'Plot Data',
+            //   model: 'mode',
+            //   values: [{id:0, name: "Well"}, {id:1, name: "Geobody"}],
+            //   selectOptions: {hideNoneSelectedText: true}
+            // },
           ]
         },
         formOptions: {
@@ -265,25 +265,26 @@
       },
       radiusDialogBtn2Click() {
         if(!this.bvalidate) return;
-        if(this.model["file_id"]==="")
+        if(this.model["geobody_file_id"]==="")
           return;
 
         for(let i=0; i<this.geobody_data.length; i++)
         {
-          if(this.geobody_data[i]["id"] === this.model["file_id"])
+          if(this.geobody_data[i]["id"] === this.model["geobody_file_id"])
           {
             this.selected_data["geobody_name"] = this.geobody_data[i]["name"];
             break;
           }
         }
-        this.selected_data["file_id"] = this.model["file_id"];
-        this.selected_data["view_mode"] = this.model["mode"];
+        this.selected_data["geobody_file_id"] = this.model["geobody_file_id"];
+        this.selected_data["view_mode"] = 1;
+        // this.selected_data["view_mode"] = this.model["mode"];
         // console.log(JSON.stringify(this.selected_data))
         // console.log(JSON.stringify(this.geobody_data))
 
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
-          path: this.varRouter.getRoute("processwizard2-1", 1),
+          path: this.varRouter.getRoute("processwizard2-2", 1),
         });
 
         this.$refs.radiusDialog.hideModal();

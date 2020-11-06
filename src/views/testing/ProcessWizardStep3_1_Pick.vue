@@ -65,7 +65,7 @@
       </template>
     </Overlay>
 
-    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="2" :textsize="190" class="mb-3"/>
+    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="3" :textsize="190" class="mb-3"/>
     <vue-element-loading
       :spinner="spinLoader.spinner"
       :color="spinLoader.color"
