@@ -398,12 +398,12 @@
       {
         this.$router.push({
           path: "process-wizard3",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"], cls: item['cls']}
+          query: {geobody_file_id:item["geobody_file_id"], geobody_id: item["geobody_id"], cls: item['cls']}
         });
       },
       openDataUrl3(item)
       {
-        return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
+        return("#/process-wizard3?geobody_file_id=" + item["geobody_file_id"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
 
       openData3_1(item)
@@ -411,35 +411,35 @@
         this.$router.push({
           path: "process-wizard3-1",
           // path: "process-wizard3-1-pick",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
+          query: {geobody_file_id:item["geobody_file_id"], geobody_id: item["geobody_id"]}
         });
       },
       openDataUrl3_1(item)
       {
         // return("#/process-wizard3-1-pick?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
-        return("#/process-wizard3-1?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
+        return("#/process-wizard3-1?geobody_file_id=" + item["geobody_file_id"] + "&geobody_id=" + item["geobody_id"]);
       },
       openData3_2(item)
       {
         this.$router.push({
           path: "process-wizard3-2",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"] , cls: item['cls']}
+          query: {geobody_file_id:item["geobody_file_id"], geobody_id: item["geobody_id"] , cls: item['cls']}
         });
       },
       openDataUrl3_2(item)
       {
-        return("#/process-wizard3-2?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
+        return("#/process-wizard3-2?geobody_file_id=" + item["geobody_file_id"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
       openData3_3(item)
       {
         this.$router.push({
           path: "process-wizard3-3",
-          query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"], cls: item['cls']}
+          query: {geobody_file_id:item["geobody_file_id"], geobody_id: item["geobody_id"], cls: item['cls']}
         });
       },
       openDataUrl3_3(item)
       {
-        return("#/process-wizard3-3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
+        return("#/process-wizard3-3?geobody_file_id=" + item["geobody_file_id"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
 
       radiusDialogBtn1Click() {
@@ -493,7 +493,7 @@
       //-------------- LIST Geobody -------------------
       EventBus.$on(this.event_http_list.success, (msg) =>
       {
-        // console.log(JSON.stringify(msg))
+        console.log(JSON.stringify(msg))
         this.chartGeobodySeries = [];
         this.table_datas = msg; //fill table contents
 

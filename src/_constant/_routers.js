@@ -52,11 +52,11 @@ export default new Router({
       name: "3dview",
       component: () => import('../views/testing/Test3DScatterView')
     },
-    // {
-    //   path: "/plotly",
-    //   name: "plotly",
-    //   component: () => import('../views/testing/TestPlotly')
-    // },
+    {
+      path: "/test-apex",
+      name: "test-apex",
+      component: () => import('../views/testing/testApexChart')
+    },
     // ---------------------------------------------------------------
     // FRONT PAGE
     // ---------------------------------------------------------------
