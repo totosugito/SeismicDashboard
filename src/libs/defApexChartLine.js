@@ -1,17 +1,15 @@
-export function getDefaultDarkColor()
-{
+export function getDefaultDarkColor() {
   let dark_color = ["#0000CD", "#FF0000", "#008000", "#FF00FF"];
-  return(dark_color);
+  return (dark_color);
 }
-export function getDefaultDarkColorAtIdx(ii)
-{
+
+export function getDefaultDarkColorAtIdx(ii) {
   let dark_color = ["#0000CD", "#FF0000", "#008000", "#FF00FF"];
-  return(dark_color[ii]);
+  return (dark_color[ii]);
 }
 
 
-export function createDefaultColor(idx1, idx2, idxc)
-{
+export function createDefaultColor(idx1, idx2, idxc) {
   let list_color = [
     // "#FFFF00", "#FFFFE0", "#FFFACD", "#FAFAD2",
     // "#FFEFD5", "#FFE4B5", "#FFDAB9", "#EEE8AA",
@@ -44,42 +42,33 @@ export function createDefaultColor(idx1, idx2, idxc)
   let tmp_color = [];
   let ii = 0;
   let idark = 0;
-  for (let i=idx1; i<=idx2; i++)
-  {
-    if(i===idxc[idark])
-    {
+  for (let i = idx1; i <= idx2; i++) {
+    if (i === idxc[idark]) {
       tmp_color.push(dark_color[idark]);
       idark = idark + 1;
-    }
-    else
-    {
+    } else {
       tmp_color.push(list_color[ii]);
       ii = ii + 1;
     }
   }
-  return(tmp_color);
+  return (tmp_color);
 }
 
-export function createDefaultMarker(idx1, idx2, idxc, center_size, other_size)
-{
+export function createDefaultMarker(idx1, idx2, idxc, center_size, other_size) {
   let tmp_marker = [];
   let idx_marker = 0;
-  for (let i=idx1; i<=idx2; i++)
-  {
-    if(i===idxc[idx_marker])
-    {
+  for (let i = idx1; i <= idx2; i++) {
+    if (i === idxc[idx_marker]) {
       tmp_marker.push(center_size);
-      idx_marker = idx_marker+1;
-    }
-    else
+      idx_marker = idx_marker + 1;
+    } else
       tmp_marker.push(other_size);
   }
 
-  return({size: tmp_marker});
+  return ({size: tmp_marker});
 }
 
-export function createDefaultParam()
-{
+export function createDefaultParam() {
   let chartOptions = {
     chart: {
       id: "chart-data",
@@ -199,8 +188,7 @@ export function createDefaultParam()
       labels: {
         show: true,
         align: 'left',
-        formatter: (value) =>
-        {
+        formatter: (value) => {
           return value.toFixed(2)
         },
       },
@@ -233,7 +221,7 @@ export function createDefaultParam()
         show: true,
       },
       y: {
-        formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+        formatter: function (value, {series, seriesIndex, dataPointIndex, w}) {
           return value.toFixed(6)
         },
         // title: {
@@ -245,11 +233,10 @@ export function createDefaultParam()
       },
     }
   };
-  return(chartOptions);
+  return (chartOptions);
 }
 
-export function apexChartSimpleProperties()
-{
+export function apexChartSimpleProperties() {
   let chartOptions = {
     chart: {
       id: "chart-data",
@@ -288,8 +275,7 @@ export function apexChartSimpleProperties()
       labels: {
         show: true,
         align: 'left',
-        formatter: (value) =>
-        {
+        formatter: (value) => {
           return value.toFixed(2)
         },
         min: undefined,
@@ -300,8 +286,7 @@ export function apexChartSimpleProperties()
       labels: {
         show: true,
         align: 'left',
-        formatter: (value) =>
-        {
+        formatter: (value) => {
           return value.toFixed(2)
         },
         min: undefined,
@@ -339,5 +324,160 @@ export function apexChartSimpleProperties()
       },
     },
   };
-  return(chartOptions);
+  return (chartOptions);
+}
+
+export function createAvgProbChartOptions() {
+  let chartOptions = {
+    chart: {
+      type: 'bar',
+      animations: {
+        speed: 10
+      },
+    },
+    plotOptions: {
+      bar: {
+        barHeight: '100%',
+        distributed: false,
+        // horizontal: false,
+        dataLabels: {
+          position: 'bottom'
+        },
+      }
+    },
+    colors: ['#313695'],
+    dataLabels: {
+      enabled: false,
+      textAnchor: 'start',
+      style: {
+        colors: ['#fff']
+      },
+      formatter: function (val, opt) {
+        return val.toFixed(3)
+      },
+      offsetX: 0,
+      dropShadow: {
+        enabled: true
+      }
+    },
+    stroke: {
+      width: 1,
+      colors: ['#fff']
+    },
+    xaxis: {
+      categories: [],
+    },
+    yaxis: {
+      labels: {
+        show: true,
+        formatter: function (val, opt) {
+          return val.toFixed(3)
+        },
+      }
+    },
+    title: {
+      text: 'Custom DataLabels',
+      align: 'center',
+      floating: true
+    },
+    // subtitle: {
+    //   text: 'Category Names as DataLabels inside bars',
+    //     align: 'center',
+    // },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        show: false
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return ''
+          }
+        }
+      }
+    },
+    legend: {
+      show: false
+    }
+  };
+  return (chartOptions);
+}
+
+export function createEcdfChartOptions() {
+  let chartOptions = {
+    chart: {
+      type: 'line',
+      animations: {
+        speed: 10
+      },
+    },
+    colors: ['#990000', '#000000'],
+    dataLabels: {
+      enabled: false,
+      textAnchor: 'start',
+      style: {
+        colors: ['#fff']
+      },
+      formatter: function (val, opt) {
+        return val.toFixed(3)
+      },
+      offsetX: 0,
+      dropShadow: {
+        enabled: true
+      }
+    },
+    stroke: {
+      // curve: 'stepline',
+      width: 1,
+      // colors: ['#fff']
+    },
+    xaxis: {
+      title: {text: "x"},
+      tickAmount: 10,
+      labels: {
+        formatter: function(val) {
+          return parseFloat(val).toFixed(2)
+        }
+      }
+    },
+    yaxis: {
+      title: {text: "y"},
+      labels: {
+        show: true,
+        formatter: function (val, opt) {
+          return val.toFixed(3)
+        },
+      }
+    },
+    markers: {
+      size: [4, 0, 0, 0]
+    },
+    title: {
+      text: 'Custom DataLabels',
+      align: 'center',
+      floating: true
+    },
+    // subtitle: {
+    //   text: 'Category Names as DataLabels inside bars',
+    //     align: 'center',
+    // },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        show: false
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return ''
+          }
+        }
+      }
+    },
+    legend: {
+      show: false
+    }
+  };
+  return (chartOptions);
 }

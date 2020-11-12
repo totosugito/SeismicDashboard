@@ -22,7 +22,7 @@
           plotOptions: {
             bar: {
               barHeight: '100%',
-              distributed: true,
+              distributed: false,
               // horizontal: false,
               dataLabels: {
                 position: 'bottom'

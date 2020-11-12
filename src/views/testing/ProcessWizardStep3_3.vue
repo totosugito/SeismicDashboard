@@ -11,8 +11,10 @@
       <b-col md="12">
         <b-card>
           <div slot="header">
-            <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i class="fa fa-hand-o-right"></i></strong>
-            </span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}} ({{cur_area.geobody_id}})</strong> , Class
+            <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i
+              class="fa fa-hand-o-right"></i></strong>
+            </span> Area : <strong>{{cur_area.area}}</strong>, Geobody : <strong>{{cur_area.geobody_name}}
+              ({{cur_area.geobody_id}})</strong> , Class
               : {{cur_area.cls}}
             </div>
           </div>
@@ -56,7 +58,7 @@
                       id="checkbox-1"
                       v-model="bCheckAll"
                       name="checkbox-1"
-                    @change="selectAllChecked()">
+                      @change="selectAllChecked()">
                       Check All
                     </b-form-checkbox>
                   </b-col>
@@ -92,9 +94,7 @@
                 :items="table_datas">
 
                 <template v-slot:cell(check)="row">
-                  <b-form-group>
                     <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
-                  </b-form-group>
                 </template>
 
                 <template v-slot:cell(cdp_x)="row">
@@ -136,7 +136,7 @@
                       <i class="fa fa-file-image-o"/> Plot AVA
                     </template>
                     <template v-if="proc_plot_ava">
-                    <ApexChartLine class="style_chart_proc" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
+                      <ApexChartLine class="lc_seismic_chart" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
                     </template>
                   </b-tab>
 
@@ -154,7 +154,8 @@
                       <i class="fa fa-bar-chart"/> Probability Distribution
                     </template>
                     <template v-if="proc_completed">
-                      <expandable-image :close-on-background-click="true" :src="getUrlImage(1)" alt="Probability Distribution"/>
+                      <!--                      <expandable-image :close-on-background-click="true" :src="getUrlImage(1)" alt="Probability Distribution"/>-->
+                      <ApexChartLine class="lc_seismic_chart" :chartOptions="avgProbOptions" :series="avgProbSeries"/>
                     </template>
                   </b-tab>
                   <b-tab title="Cumulative Distribution">
@@ -162,7 +163,8 @@
                       <i class="fa fa-line-chart"/> Cumulative Distribution
                     </template>
                     <template v-if="proc_completed">
-                      <expandable-image :close-on-background-click="true" :src="getUrlImage(2)" alt="Cumulative Distribution"/>
+<!--                                            <expandable-image :close-on-background-click="true" :src="getUrlImage(2)" alt="Cumulative Distribution"/>-->
+                      <ApexChartLine class="lc_seismic_chart" :chartOptions="ecdfOptions" :series="ecdfSeries"/>
                     </template>
                   </b-tab>
                 </b-tabs>
@@ -185,7 +187,8 @@
 
       <!-- body slot -->
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
-              <vue-form-generator :schema="schema_sgy_pick" :model="model_sgy_pick" :options="formOptions" @validated="onValidated"/>
+              <vue-form-generator :schema="schema_sgy_pick" :model="model_sgy_pick" :options="formOptions"
+                                  @validated="onValidated"/>
             </span>
     </vue-form-dialog>
 
@@ -237,7 +240,13 @@
 
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-  import {apexChartSimpleProperties, createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
+  import {
+    apexChartSimpleProperties, createAvgProbChartOptions,
+    createDefaultColor,
+    createDefaultMarker,
+    createDefaultParam,
+    createEcdfChartOptions
+  } from "../../libs/defApexChartLine";
   import ApexChartLine from "../components/ApexChartLine";
 
   export default {
@@ -259,20 +268,18 @@
       spinLoader: state => state.spinLoader,
     }),
 
-    created()
-    {
+    created() {
       this.$store.dispatch('createVarRouter').then(); //no selected project
     },
-    data()
-    {
+    data() {
       return {
         proc_completed: false,
         proc_plot_ava: false,
         showLoader: false,
         bCheckAll: false,
         retStatus: {status: 0, title: "", message: "", data: []},
-        perPageView: 15,
-        perPage: 15,
+        perPageView: 10,
+        perPage: 10,
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
         currentPage: 1,
         totalRows: 0,
@@ -284,6 +291,154 @@
         cur_segy_ml: {},
         list_segy_ml: [],
         cur_area: {},
+
+        avgProbOptions: {},
+        avgProbSeries: [],
+        avg_prob: {
+          "width": 0.00795710024670182,
+          "x": [
+            0.5179116140167084,
+            0.5258687142634102,
+            0.5338258145101119,
+            0.5417829147568136,
+            0.5497400150035154,
+            0.5576971152502173,
+            0.565654215496919,
+            0.5736113157436207,
+            0.5815684159903225,
+            0.5895255162370243,
+            0.597482616483726,
+            0.6054397167304277,
+            0.6133968169771296,
+            0.6213539172238314,
+            0.6293110174705331,
+            0.6372681177172348,
+            0.6452252179639366,
+            0.6531823182106384,
+            0.6611394184573401,
+            0.6690965187040419,
+            0.6770536189507437,
+            0.6850107191974455,
+            0.6929678194441472,
+            0.7009249196908489,
+            0.7088820199375507,
+            0.7168391201842526,
+            0.7247962204309543,
+            0.732753320677656,
+            0.7407104209243578,
+            0.7486675211710596,
+            0.7566246214177613,
+            0.764581721664463,
+            0.7725388219111649,
+            0.7804959221578667,
+            0.7884530224045684,
+            0.7964101226512701,
+            0.8043672228979719,
+            0.8123243231446737,
+            0.8202814233913754,
+            0.8282385236380772
+          ],
+          "y": [
+            5.026956901363675,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            5.026956901363675,
+            0.0,
+            5.026956901363675,
+            0.0,
+            0.0,
+            5.026956901363675,
+            0.0,
+            0.0,
+            0.0,
+            10.05391380272735,
+            10.05391380272735,
+            10.05391380272735,
+            5.026956901363675,
+            10.05391380272735,
+            5.026956901363675,
+            0.0,
+            15.080870704091023,
+            0.0,
+            0.0,
+            5.026956901363675,
+            5.026956901363675,
+            0.0,
+            5.026956901363675,
+            0.0,
+            0.0,
+            5.026956901363675,
+            10.05391380272735,
+            0.0,
+            0.0,
+            5.026956901363675,
+            0.0,
+            5.026956901363675
+          ]
+        },
+        ecdfOptions: {},
+        ecdfSeries: [],
+        ECDF: {
+          "x": [
+            0.5179116140167084,
+            0.5877749394547752,
+            0.5985429335204717,
+            0.6236300730424209,
+            0.6599179363006475,
+            0.6606144073931045,
+            0.6615821233099756,
+            0.6639834732983946,
+            0.6736672157792468,
+            0.6754727666772445,
+            0.6773188522915229,
+            0.6879918321625553,
+            0.6913439032525904,
+            0.6960998823640733,
+            0.7117633000630877,
+            0.7124697451762972,
+            0.7164507445809706,
+            0.7330044179034407,
+            0.7449700431278303,
+            0.7613433999875685,
+            0.7869704031367958,
+            0.7903920731615668,
+            0.7915110987441472,
+            0.8124242134692171,
+            0.836195623884779
+          ],
+          "y": [
+            0.04,
+            0.08,
+            0.12,
+            0.16,
+            0.2,
+            0.24,
+            0.28,
+            0.32,
+            0.36,
+            0.4,
+            0.44,
+            0.48,
+            0.52,
+            0.56,
+            0.6,
+            0.64,
+            0.68,
+            0.72,
+            0.76,
+            0.8,
+            0.84,
+            0.88,
+            0.92,
+            0.96,
+            1.0
+          ]
+        },
 
         avaPlotSeries: [],
         avaPlotOptions: {},
@@ -355,18 +510,15 @@
       }
     },
 
-    beforeMount: function ()
-    {
+    beforeMount: function () {
       this.getListSegy();
     },
 
     methods: {
-      updateSelectedRow(m)
-      {
+      updateSelectedRow(m) {
       },
 
-      getUrlImage(imode)
-      {
+      getUrlImage(imode) {
         // return("http://117.54.250.85:9000/220538_cumulative-distribution.png");
         let server_url = 'http://117.54.250.85:9000/';
         if (imode === 0)
@@ -377,34 +529,27 @@
           return (server_url + this.cur_area["geobody_id"] + "_cumulative-distribution.png" + createRandomCode());
       },
 
-      parseProbabilityNumber(v)
-      {
+      parseProbabilityNumber(v) {
         if (v === undefined)
           return ("");
         else
           return (v.toFixed(6));
       },
       //MESSAGE HTTP I/O
-      dialogMessageBtn1Click()
-      {
-        if (this.retStatus.status === -1)
-        { //error http
+      dialogMessageBtn1Click() {
+        if (this.retStatus.status === -1) { //error http
           //this.$router.push({path: this.varRouter.getRoute("login", 0)}); //goto login page
           this.$refs.dialogMessage.hideModal();
-        }
-        else
-        { //error token
+        } else { //error token
           this.$refs.dialogMessage.hideModal();
         }
       },
 
-      selectAllChecked()
-      {
-        for (let i=0; i<this.table_datas.length; i++)
+      selectAllChecked() {
+        for (let i = 0; i < this.table_datas.length; i++)
           this.table_datas[i]["check"] = !this.bCheckAll;
       },
-      httpPlotAva()
-      {
+      httpPlotAva() {
         this.proc_plot_ava = false;
 
         let param = [
@@ -413,20 +558,17 @@
           {"segy_file_id": "5f9429011b384324bf882091", "label": "gth", "iline": 8855, "xline": 2645, "cdp_z": 414.440}
         ];
         param = [];
-        for(let i=0; i<this.table_datas.length; i++)
-        {
-          if(this.table_datas[i]["check"] === true)
+        for (let i = 0; i < this.table_datas.length; i++) {
+          if (this.table_datas[i]["check"] === true)
             param.push(this.table_datas[i])
         }
 
-        if (param.length === 0)
-        {
+        if (param.length === 0) {
           this.retStatus = {status: 0, title: "Information", message: "Please Select data from table ...", data: []};
           this.$refs.dialogMessage.showModal();
           return;
         }
-        if (param.length > 10)
-        {
+        if (param.length > 10) {
           this.retStatus = {status: 0, title: "Information", message: "Maximum selected data 10", data: []};
           this.$refs.dialogMessage.showModal();
           return;
@@ -437,16 +579,13 @@
       },
 
       //------------------------- ava dialog ----------------------------
-      openAvaDialog()
-      {
+      openAvaDialog() {
         this.$refs.avaDialog.showModal();
       },
-      avaDialogBtn1Click()
-      {
+      avaDialogBtn1Click() {
         this.$refs.avaDialog.hideModal();
       },
-      avaDialogBtn2Click()
-      {
+      avaDialogBtn2Click() {
         if (!this.bvalidate) return;
         if (this.model_sgy_pick["segy_gather_file_id"] === "")
           return;
@@ -469,16 +608,43 @@
       },
 
       //------------------------- probability dialog ----------------------------
-      openProbabilityDialog()
-      {
+      openProbabilityDialog() {
+
+        // this.avgProbSeries = [];
+        // this.avgProbOptions = createAvgProbChartOptions();
+        // this.avgProbOptions["title"]["text"] = "Probability Distributions";
+        // this.avgProbOptions["xaxis"]["categories"] = this.avg_prob["x"].map(function(e){return e.toFixed(2).toString()});
+        // this.avgProbSeries.push({data: this.avg_prob["y"]});
+        //
+        // this.ecdfSeries = [];
+        // this.ecdfOptions = createEcdfChartOptions();
+        // this.ecdfOptions["title"]["text"] = "Cumulative Distributions";
+        // this.ecdfOptions["xaxis"]["title"]["text"] = "Probability";
+        // this.ecdfOptions["yaxis"]["title"]["text"] = "ECDF";
+        // let tmp = [];
+        // let tmp_line = [];
+        // let nx = this.ECDF["x"].length;
+        //
+        // tmp_line.push([this.ECDF["x"][0], 0.0]); //add first point
+        // for(let i=0; i<nx; i++) {
+        //   tmp.push([this.ECDF["x"][i], this.ECDF["y"][i]]);
+        //
+        //   if( (i>0) )
+        //     tmp_line.push([this.ECDF["x"][i], this.ECDF["y"][i-1]]);
+        //   tmp_line.push([this.ECDF["x"][i], this.ECDF["y"][i]]);
+        // }
+        // tmp_line.push([this.ECDF["x"][nx-1]+0.02, this.ECDF["y"][nx-1]]); //add last point
+        //
+        // this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
+        // this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
+        // this.proc_completed = true;
+
         this.$refs.probabilityDialog.showModal();
       },
-      probabilityDialogBtn1Click()
-      {
+      probabilityDialogBtn1Click() {
         this.$refs.probabilityDialog.hideModal();
       },
-      probabilityDialogBtn2Click()
-      {
+      probabilityDialogBtn2Click() {
         if (!this.bvalidate) return;
         if (this.model["file_id"] === "")
           return;
@@ -500,21 +666,18 @@
       },
       //------------------------- end of probability dialog ----------------------------
 
-      openData(item)
-      {
+      openData(item) {
         // this.$router.push({
         //   path: "process-wizard3",
         //   query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
         // });
       },
-      openDataUrl(item)
-      {
+      openDataUrl(item) {
         return ("");
         // return("#/process-wizard3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"]);
       },
 
-      getListSegy()
-      {
+      getListSegy() {
         this.cur_area = this.$store.getters.readSelectedArea;
         this.cur_area["geobody_file_id"] = this.$route.query.geobody_file_id;
         this.cur_area["geobody_id"] = this.$route.query.geobody_id;
@@ -523,18 +686,15 @@
         this.$store.dispatch('http_get', ["/api/segy/file-list", {}, this.event_http_list_sgy]).then();
         // this.getMLPickFile();
       },
-      getMLPickFile()
-      {
+      getMLPickFile() {
         this.showLoader = true;
         this.$store.dispatch('http_get', ["/api/mlpick/file-list", {}, this.event_http_list_mlpick]).then();
       },
 
-      getTabIcon()
-      {
+      getTabIcon() {
         return (createTabProcessIcon())
       },
-      getTabText()
-      {
+      getTabText() {
         let tab_text = createTabProcessText();
         tab_text[2] = "Probability List";
         return (tab_text)
@@ -543,47 +703,37 @@
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------
-      showPerPage(selected_per_page)
-      {
+      showPerPage(selected_per_page) {
         if (selected_per_page === "All" || selected_per_page === "Semua")
           this.perPage = this.table_datas.length;
         else
           this.perPage = selected_per_page;
         this.perPageView = selected_per_page;
       },
-      computeTotalRow()
-      {
-        try
-        {
+      computeTotalRow() {
+        try {
           return (this.table_datas.length);
-        }
-        catch (e)
-        {
+        } catch (e) {
           return (0);
         }
       },
-      onFiltered(filteredItems)
-      {
+      onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
         this.totalRows = filteredItems.length;
         this.currentPage = 1;
       },
 
-      onValidated(isValid, errors)
-      {
+      onValidated(isValid, errors) {
         this.bvalidate = isValid;
       },
 
-      wizardButtonClicked(str_router)
-      {
+      wizardButtonClicked(str_router) {
         return (this.varRouter.getRoute(str_router, 1))
       }
     },
-    mounted()
-    {
+    mounted() {
       //-------------- LIST SGY -------------------
-      EventBus.$on(this.event_http_list_sgy.success, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_sgy.success, (msg) => {
         this.list_segy_pick = [];
         for (let i = 0; i < msg.length; i++)
           this.list_segy_pick.push({id: msg[i]["_id"]["$oid"], name: msg[i]["label_name"]});
@@ -593,8 +743,7 @@
         this.schema_sgy_pick.fields[1].values = this.list_segy_pick;
         this.getMLPickFile();
       });
-      EventBus.$on(this.event_http_list_sgy.fail, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_sgy.fail, (msg) => {
         this.showLoader = false;
         this.table_datas = [];
         this.retStatus = msg;
@@ -602,8 +751,7 @@
       });
 
       //-------------- LIST ML Pick -------------------
-      EventBus.$on(this.event_http_list_mlpick.success, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_mlpick.success, (msg) => {
         this.list_segy_ml = [];
         for (let i = 0; i < msg.length; i++)
           this.list_segy_ml.push({id: msg[i]["_id"]["$oid"], name: msg[i]["file_name"]});
@@ -611,8 +759,7 @@
         this.showLoader = false;
       });
 
-      EventBus.$on(this.event_http_list_mlpick.fail, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_mlpick.fail, (msg) => {
         this.list_segy_ml = [];
         this.showLoader = false;
         this.retStatus = msg;
@@ -620,22 +767,19 @@
       });
 
       //-------------- LIST AVA -------------------
-      EventBus.$on(this.event_http_list_ava.success, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_ava.success, (msg) => {
         this.table_datas = msg["gather"];
         this.ndata = this.table_datas.length;
 
         let segy_file_id = this.model_sgy_pick["segy_gather_file_id"];
-        for(let i=0; i<this.table_datas.length; i++)
-        {
+        for (let i = 0; i < this.table_datas.length; i++) {
           this.table_datas[i]["segy_file_id"] = segy_file_id;
           this.table_datas[i]["label"] = "gth";
         }
 
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http_list_ava.fail, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_ava.fail, (msg) => {
         this.showLoader = false;
         this.table_datas = [];
         this.retStatus = msg;
@@ -643,13 +787,11 @@
       });
 
       //-------------- LIST AVA PLOT -------------------
-      EventBus.$on(this.event_http_ava_plot.success, (msg) =>
-      {
+      EventBus.$on(this.event_http_ava_plot.success, (msg) => {
         // this.table_datas = msg;
         // this.ndata = this.table_datas.length;
         this.avaPlotSeries = [];
-        for(let i=0; i<msg.length; i++)
-        {
+        for (let i = 0; i < msg.length; i++) {
           let m = msg[i];
           let line_title = m["label"] + "-" + m["iline"] + "/" + m["xline"] + "(" + m["cdp_z"] + ")";
           this.avaPlotSeries.push({
@@ -671,8 +813,7 @@
         this.proc_plot_ava = true;
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http_ava_plot.fail, (msg) =>
-      {
+      EventBus.$on(this.event_http_ava_plot.fail, (msg) => {
         this.showLoader = false;
         this.retStatus = msg;
         this.proc_plot_ava = false;
@@ -680,25 +821,57 @@
       });
 
       //-------------- LIST PROB -------------------
-      EventBus.$on(this.event_http_list_prob.success, (msg) =>
-      {
-        this.table_datas = msg;
+      EventBus.$on(this.event_http_list_prob.success, (msg) => {
+        this.table_datas = msg["data"];
+        this.ECDF = msg["ECDF"];
+
+        //average probability
+        this.avgProbSeries = [];
+        this.avgProbOptions = createAvgProbChartOptions();
+        this.avgProbOptions["title"]["text"] = "Probability Distributions";
+        this.avgProbOptions["xaxis"]["categories"] = msg["avg_prob"]["x"].map(function (e) {
+          return e.toFixed(2).toString()
+        });
+        this.avgProbSeries.push({data: msg["avg_prob"]["y"]});
+
+        //ecdf
+        let ecdf_ = msg["ECDF"];
+        this.ecdfSeries = [];
+        this.ecdfOptions = createEcdfChartOptions();
+        this.ecdfOptions["title"]["text"] = "Cumulative Distributions";
+        this.ecdfOptions["xaxis"]["title"]["text"] = "Probability";
+        this.ecdfOptions["yaxis"]["title"]["text"] = "ECDF";
+        let tmp = [];
+        let tmp_line = [];
+        let nx = ecdf_["x"].length;
+
+        tmp_line.push([ecdf_["x"][0], 0.0]); //add first point
+        for(let i=0; i<nx; i++) {
+          tmp.push([ecdf_["x"][i], ecdf_["y"][i]]);
+
+          if( (i>0) )
+            tmp_line.push([ecdf_["x"][i], ecdf_["y"][i-1]]);
+          tmp_line.push([ecdf_["x"][i], ecdf_["y"][i]]);
+        }
+        tmp_line.push([ecdf_["x"][nx-1]+0.02, ecdf_["y"][nx-1]]); //add last point
+
+        this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
+        this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
+
         this.ndata = this.table_datas.length;
         this.proc_completed = true;
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http_list_prob.fail, (msg) =>
-      {
+      EventBus.$on(this.event_http_list_prob.fail, (msg) => {
         this.showLoader = false;
         this.proc_completed = false;
-        this.table_datas = [];
+        this.ECDF = {};
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
     },
 
-    beforeDestroy()
-    {
+    beforeDestroy() {
       EventBus.$off(this.event_http_list_sgy.success);
       EventBus.$off(this.event_http_list_sgy.fail);
       EventBus.$off(this.event_http_list_mlpick.success);
@@ -715,7 +888,8 @@
 </script>
 
 <style scoped>
-  .style_chart_proc {
-    height: 53vh;
+  .lc_seismic_chart {
+    width: 100%;
+    height: 50vh;
   }
 </style>
