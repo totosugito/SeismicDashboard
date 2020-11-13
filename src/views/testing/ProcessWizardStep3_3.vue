@@ -145,8 +145,9 @@
                       <i class="fa fa-image"/> Probability Map
                     </template>
                     <template v-if="proc_completed">
-                      <expandable-image :close-on-background-click="true" :src="getUrlImage(0)" alt="Probability Map"
-                                        style="width: 100%; height: 100%"/>
+<!--                      <expandable-image :close-on-background-click="true" :src="getUrlImage(0)" alt="Probability Map"-->
+<!--                                        style="width: 100%; height: 100%"/>-->
+                      <ApexChartLine class="lc_seismic_chart" :chartOptions="probMapOptions" :series="probMapSeries"/>
                     </template>
                   </b-tab>
                   <b-tab title="Probability Distribution">
@@ -245,7 +246,7 @@
     createDefaultColor,
     createDefaultMarker,
     createDefaultParam,
-    createEcdfChartOptions
+    createEcdfChartOptions, createProbMapParam
   } from "../../libs/defApexChartLine";
   import ApexChartLine from "../components/ApexChartLine";
 
@@ -437,6 +438,137 @@
             0.92,
             0.96,
             1.0
+          ]
+        },
+
+        probMapOptions: {},
+        probMapSeries: [],
+        prob_map: {
+          "x": [
+            7527.0,
+            7527.0,
+            7531.0,
+            7531.0,
+            7531.0,
+            7531.0,
+            7531.0,
+            7531.0,
+            7535.0,
+            7535.0,
+            7535.0,
+            7535.0,
+            7535.0,
+            7539.0,
+            7539.0,
+            7539.0,
+            7539.0,
+            7539.0,
+            7543.0,
+            7543.0,
+            7543.0,
+            7543.0,
+            7547.0,
+            7551.0,
+            7555.0,
+            7555.0,
+            7559.0,
+            7559.0,
+            7559.0,
+            7559.0,
+            7559.0,
+            7563.0,
+            7563.0,
+            7563.0,
+            7563.0,
+            7563.0,
+            7563.0,
+            7567.0,
+            7567.0,
+            7567.0
+          ],
+          "y": [
+            2209.0,
+            2213.0,
+            2209.0,
+            2213.0,
+            2217.0,
+            2225.0,
+            2225.0,
+            2229.0,
+            2205.0,
+            2209.0,
+            2213.0,
+            2225.0,
+            2229.0,
+            2201.0,
+            2205.0,
+            2209.0,
+            2213.0,
+            2217.0,
+            2201.0,
+            2205.0,
+            2209.0,
+            2213.0,
+            2209.0,
+            2285.0,
+            2285.0,
+            2289.0,
+            2249.0,
+            2253.0,
+            2285.0,
+            2289.0,
+            2293.0,
+            2237.0,
+            2241.0,
+            2249.0,
+            2285.0,
+            2285.0,
+            2289.0,
+            2237.0,
+            2241.0,
+            2285.0
+          ],
+          "z": [
+            0.7219859189361647,
+            0.7634342913620984,
+            0.7713661324149228,
+            0.5943303497589943,
+            0.5945371237587471,
+            0.6830714400567749,
+            0.646494392910275,
+            0.6339206449655198,
+            0.7547850904077965,
+            0.7423649173553823,
+            0.7642618448299291,
+            0.6200932365232533,
+            0.6300173047604724,
+            0.6611068533145303,
+            0.7711656944195597,
+            0.7321926217522591,
+            0.7553579528214112,
+            0.7229781276107434,
+            0.793327170974043,
+            0.686456098593622,
+            0.7319833824064361,
+            0.594705060816473,
+            0.593097529281292,
+            0.6356153476893993,
+            0.6772801432462057,
+            0.6532472160759148,
+            0.6635490022510264,
+            0.7063434451488125,
+            0.6297712204625486,
+            0.5633887261074908,
+            0.8233617006759866,
+            0.7047070216369253,
+            0.705604078390133,
+            0.6373804254751368,
+            0.7779782180268544,
+            0.7681409675504467,
+            0.6771521625803821,
+            0.6421934398589123,
+            0.7523204505696771,
+            0.7950691976286666
           ]
         },
 
@@ -637,6 +769,20 @@
         //
         // this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
         // this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
+        //
+        // this.probMapSeries = [];
+        // let prob_map = this.prob_map;
+        // this.probMapOptions = createProbMapParam();
+        // this.probMapOptions["title"]["text"] = "Gas Probability Map";
+        // this.probMapOptions["xaxis"]["title"]["text"] = "iline";
+        // this.probMapOptions["yaxis"]["title"]["text"] = "xline";
+        // let n_prob_map = prob_map["x"].length;
+        // for(let i=0; i<n_prob_map; i++) {
+        //   this.probMapSeries.push({
+        //     type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
+        //   });
+        // }
+
         // this.proc_completed = true;
 
         this.$refs.probabilityDialog.showModal();
@@ -823,16 +969,17 @@
       //-------------- LIST PROB -------------------
       EventBus.$on(this.event_http_list_prob.success, (msg) => {
         this.table_datas = msg["data"];
-        this.ECDF = msg["ECDF"];
 
         //average probability
+        let avg_prob = msg["avg_prob"];
+        console.log(JSON.stringify(avg_prob));
         this.avgProbSeries = [];
         this.avgProbOptions = createAvgProbChartOptions();
         this.avgProbOptions["title"]["text"] = "Probability Distributions";
-        this.avgProbOptions["xaxis"]["categories"] = msg["avg_prob"]["x"].map(function (e) {
+        this.avgProbOptions["xaxis"]["categories"] = avg_prob["x"].map(function (e) {
           return e.toFixed(2).toString()
         });
-        this.avgProbSeries.push({data: msg["avg_prob"]["y"]});
+        this.avgProbSeries.push({data: avg_prob["y"]});
 
         //ecdf
         let ecdf_ = msg["ECDF"];
@@ -858,6 +1005,20 @@
         this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
         this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
 
+        // prob map series
+        this.probMapSeries = [];
+        let prob_map = msg["prob_map"];
+        this.probMapOptions = createProbMapParam();
+        this.probMapOptions["title"]["text"] = "Gas Probability Map";
+        this.probMapOptions["xaxis"]["title"]["text"] = "iline";
+        this.probMapOptions["yaxis"]["title"]["text"] = "xline";
+        let n_prob_map = prob_map["x"].length;
+        for(let i=0; i<n_prob_map; i++) {
+          this.probMapSeries.push({
+            type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
+          });
+        }
+
         this.ndata = this.table_datas.length;
         this.proc_completed = true;
         this.showLoader = false;
@@ -865,7 +1026,8 @@
       EventBus.$on(this.event_http_list_prob.fail, (msg) => {
         this.showLoader = false;
         this.proc_completed = false;
-        this.ECDF = {};
+        this.avgProbSeries = [];
+        this.ecdfSeries = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });

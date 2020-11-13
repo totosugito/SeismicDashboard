@@ -481,3 +481,91 @@ export function createEcdfChartOptions() {
   };
   return (chartOptions);
 }
+
+export function createProbMapParam() {
+  let chartOptions = {
+    chart: {
+      id: "chart-data",
+      animations: {
+        speed: 20
+      }
+    },
+    title: {
+      text: "title",
+      align: 'center',
+    },
+    legend: {
+      show: false,
+    },
+    markers: {
+      size: [6]
+    },
+    colors: ['#FF8000'/*, '#1E90FF', '#008000', '#800000', '#800080'*/],
+    stroke: {
+      show: true,
+      width: 2,
+    },
+    plotOptions: {
+      line: {
+        distributed: true
+      }
+    },
+    xaxis: {
+      type: 'numeric',
+      title: {
+        text: "X",
+      },
+      labels: {
+        show: true,
+        formatter: function (val, opt) {
+          return val.toFixed(0)
+        },
+      },
+    },
+    yaxis: {
+      title: {
+        text: "Y",
+      },
+      labels: {
+        show: true,
+        formatter: function (val, opt) {
+          return val.toFixed(0)
+        },
+      },
+    },
+    grid: {
+      show: true,
+      borderColor: '#C0C0C0',
+      strokeDashArray: 0,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: true
+        },
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      },
+    },
+    tooltip: {
+      enabled: true,
+      x: {
+        show: true,
+      },
+      y: {
+        // formatter: function (value, {series, seriesIndex, dataPointIndex, w}) {
+        //   return ("X:" + value.toFixed(6));
+        // },
+        // title: {
+        //   formatter: (seriesName) => seriesName,
+        // },
+      },
+      marker: {
+        show: true,
+      },
+    }
+  };
+  return (chartOptions);
+}
