@@ -297,21 +297,21 @@ export function createTableProbabilityHeader()
       label: 'XLine',
       sortable: true
     },
-    {
-      key: 'cdp_x',
-      label: 'CDP X',
-      sortable: true
-    },
-    {
-      key: 'cdp_y',
-      label: 'CDP Y',
-      sortable: true
-    },
-    {
-      key: 'cdp_z',
-      label: 'CDP Z',
-      sortable: true
-    },
+    // {
+    //   key: 'cdp_x',
+    //   label: 'CDP X',
+    //   sortable: true
+    // },
+    // {
+    //   key: 'cdp_y',
+    //   label: 'CDP Y',
+    //   sortable: true
+    // },
+    // {
+    //   key: 'cdp_z',
+    //   label: 'CDP Z',
+    //   sortable: true
+    // },
     {
       key: 'prob',
       label: 'Prob',

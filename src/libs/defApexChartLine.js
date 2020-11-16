@@ -338,7 +338,7 @@ export function createAvgProbChartOptions() {
     plotOptions: {
       bar: {
         barHeight: '100%',
-        distributed: false,
+        distributed: true,
         // horizontal: false,
         dataLabels: {
           position: 'bottom'
@@ -498,12 +498,12 @@ export function createProbMapParam() {
       show: false,
     },
     markers: {
-      size: [6]
+      size: 6
     },
-    colors: ['#FF8000'/*, '#1E90FF', '#008000', '#800000', '#800080'*/],
+    colors: ['#FF8000', '#1E90FF', '#008000', '#800000', '#800080'],
     stroke: {
-      show: true,
-      width: 2,
+      show: false,
+      width: 0,
     },
     plotOptions: {
       line: {

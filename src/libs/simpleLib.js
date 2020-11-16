@@ -83,3 +83,52 @@ export function getBoundaryData(x, y, max_perc)
 export function getJsonPythonId(obj) {
   return(obj["_id"]["$oid"])
 }
+
+export function rgbToHex1(r, g, b)
+{
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+export function rgbToHex2(color_)
+{
+  let r = Math.round(color_[0]*255);
+  let g = Math.round(color_[1]*255);
+  let b = Math.round(color_[2]*255);
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+export function rgbToHexColormap(rgb_) {
+  let hex_cm = [];
+  for(let i=0; i<rgb_.length; i++)
+  {
+    hex_cm.push(rgbToHex2(rgb_[i]));
+  }
+  return(hex_cm);
+}
+
+export function getColormapColorv1(colormap_, cm_val) {
+  //input hex colormap
+  let n_cm = colormap_.length;
+  let d_cm = 1.0 / n_cm;
+  let idx_cm = Math.fround(cm_val/d_cm);
+  if(idx_cm<0)
+    idx_cm = 0;
+  else if(idx_cm>=n_cm)
+    idx_cm = n_cm-1;
+  return(colormap_[idx_cm]);
+}
+
+export function getColormapColorv2(colormap_, cm_val, b_reverse) {
+  //input rgb colormap
+  let n_cm = colormap_.length;
+  let d_cm = 1.0 / n_cm;
+  let idx_cm = Math.round(cm_val/d_cm);
+  if(idx_cm<0)
+    idx_cm = 0;
+  else if(idx_cm>=n_cm)
+    idx_cm = n_cm-1;
+  if(b_reverse === true)
+    return(rgbToHex2(colormap_[255-idx_cm]));
+  else
+    return(rgbToHex2(colormap_[idx_cm]));
+}

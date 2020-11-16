@@ -249,6 +249,8 @@
     createEcdfChartOptions, createProbMapParam
   } from "../../libs/defApexChartLine";
   import ApexChartLine from "../components/ApexChartLine";
+  import {colormapDensity} from "../../libs/var_colormaps";
+  import {getColormapColorv2} from "../../libs/simpleLib";
 
   export default {
     name: "ProcessWizardStep3_3",
@@ -297,90 +299,8 @@
         avgProbSeries: [],
         avg_prob: {
           "width": 0.00795710024670182,
-          "x": [
-            0.5179116140167084,
-            0.5258687142634102,
-            0.5338258145101119,
-            0.5417829147568136,
-            0.5497400150035154,
-            0.5576971152502173,
-            0.565654215496919,
-            0.5736113157436207,
-            0.5815684159903225,
-            0.5895255162370243,
-            0.597482616483726,
-            0.6054397167304277,
-            0.6133968169771296,
-            0.6213539172238314,
-            0.6293110174705331,
-            0.6372681177172348,
-            0.6452252179639366,
-            0.6531823182106384,
-            0.6611394184573401,
-            0.6690965187040419,
-            0.6770536189507437,
-            0.6850107191974455,
-            0.6929678194441472,
-            0.7009249196908489,
-            0.7088820199375507,
-            0.7168391201842526,
-            0.7247962204309543,
-            0.732753320677656,
-            0.7407104209243578,
-            0.7486675211710596,
-            0.7566246214177613,
-            0.764581721664463,
-            0.7725388219111649,
-            0.7804959221578667,
-            0.7884530224045684,
-            0.7964101226512701,
-            0.8043672228979719,
-            0.8123243231446737,
-            0.8202814233913754,
-            0.8282385236380772
-          ],
-          "y": [
-            5.026956901363675,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            5.026956901363675,
-            0.0,
-            5.026956901363675,
-            0.0,
-            0.0,
-            5.026956901363675,
-            0.0,
-            0.0,
-            0.0,
-            10.05391380272735,
-            10.05391380272735,
-            10.05391380272735,
-            5.026956901363675,
-            10.05391380272735,
-            5.026956901363675,
-            0.0,
-            15.080870704091023,
-            0.0,
-            0.0,
-            5.026956901363675,
-            5.026956901363675,
-            0.0,
-            5.026956901363675,
-            0.0,
-            0.0,
-            5.026956901363675,
-            10.05391380272735,
-            0.0,
-            0.0,
-            5.026956901363675,
-            0.0,
-            5.026956901363675
-          ]
+          "x": [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.30, 0.35, 0.4, 0.45, 0.5, 0.55, 0.60, 0.65, 0.70, 0.75, 0.8, 0.85, 0.9, 0.95],
+          "y": [0, 0,    0,   0,    0,   0,    0,    0,    0,   0,    1,   2,    1,    10,   5,    4,    2,   0,    0,   0]
         },
         ecdfOptions: {},
         ecdfSeries: [],
@@ -742,11 +662,19 @@
       //------------------------- probability dialog ----------------------------
       openProbabilityDialog() {
 
+        // create colormap
+        // let density_colormap = colormapDensity();
+
         // this.avgProbSeries = [];
         // this.avgProbOptions = createAvgProbChartOptions();
         // this.avgProbOptions["title"]["text"] = "Probability Distributions";
         // this.avgProbOptions["xaxis"]["categories"] = this.avg_prob["x"].map(function(e){return e.toFixed(2).toString()});
         // this.avgProbSeries.push({data: this.avg_prob["y"]});
+        // let prob_map_color = [];
+        // for(let i=0; i<this.avg_prob["x"].length; i++) {
+        //   prob_map_color.push(getColormapColorv2(density_colormap, this.avg_prob["x"][i], true));
+        // }
+        // this.avgProbOptions["colors"] = prob_map_color;
         //
         // this.ecdfSeries = [];
         // this.ecdfOptions = createEcdfChartOptions();
@@ -769,7 +697,8 @@
         //
         // this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
         // this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
-        //
+
+        // // probability map
         // this.probMapSeries = [];
         // let prob_map = this.prob_map;
         // this.probMapOptions = createProbMapParam();
@@ -777,12 +706,14 @@
         // this.probMapOptions["xaxis"]["title"]["text"] = "iline";
         // this.probMapOptions["yaxis"]["title"]["text"] = "xline";
         // let n_prob_map = prob_map["x"].length;
+        // let probability_map_color = [];
         // for(let i=0; i<n_prob_map; i++) {
+        //   probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], true));
         //   this.probMapSeries.push({
         //     type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
         //   });
         // }
-
+        // this.probMapOptions["colors"] = probability_map_color;
         // this.proc_completed = true;
 
         this.$refs.probabilityDialog.showModal();
@@ -797,12 +728,20 @@
 
         this.proc_completed = false;
         this.showLoader = true;
+
+        let tmp_table_datas = [];
+        for(let i=0; i<this.table_datas.length; i++)
+        {
+          let m = this.table_datas[i];
+          delete m["check"];
+          tmp_table_datas.push(m);
+        }
         let param = {
           geobody_file_id: this.cur_area["geobody_file_id"],
           geobody_id: this.cur_area["geobody_id"],
           segy_file_id: this.model["file_id"],
           // radius: this.radius,
-          data: this.table_datas
+          data: tmp_table_datas
         };
 
         // console.log(JSON.stringify(param))
@@ -970,6 +909,9 @@
       EventBus.$on(this.event_http_list_prob.success, (msg) => {
         this.table_datas = msg["data"];
 
+        // create colormap
+        let density_colormap = colormapDensity();
+
         //average probability
         let avg_prob = msg["avg_prob"];
         console.log(JSON.stringify(avg_prob));
@@ -980,6 +922,11 @@
           return e.toFixed(2).toString()
         });
         this.avgProbSeries.push({data: avg_prob["y"]});
+        let prob_map_color = [];
+        for(let i=0; i<this.avg_prob["x"].length; i++) {
+          prob_map_color.push(getColormapColorv2(density_colormap, this.avg_prob["x"][i], true));
+        }
+        this.avgProbOptions["colors"] = prob_map_color;
 
         //ecdf
         let ecdf_ = msg["ECDF"];
@@ -1013,11 +960,14 @@
         this.probMapOptions["xaxis"]["title"]["text"] = "iline";
         this.probMapOptions["yaxis"]["title"]["text"] = "xline";
         let n_prob_map = prob_map["x"].length;
+        let probability_map_color = [];
         for(let i=0; i<n_prob_map; i++) {
+          probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], true));
           this.probMapSeries.push({
             type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
           });
         }
+        this.probMapOptions["colors"] = probability_map_color;
 
         this.ndata = this.table_datas.length;
         this.proc_completed = true;

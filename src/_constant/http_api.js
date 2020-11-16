@@ -1,4 +1,5 @@
 import axios from "axios";
+import {globalVar} from "../../config";
 
 const DEBUG_MODE = true;
 const DEBUG_SERVER = true;
@@ -54,7 +55,8 @@ export function getApronServerAPI()
   }
   else
   {
-    return ('http://jasdig.com:5151')
+    // return ('http://jasdig.com:5151')
+    return globalVar()["SERVER_ADDRESS"];
   }
 }
 
