@@ -493,7 +493,7 @@
       //-------------- LIST Geobody -------------------
       EventBus.$on(this.event_http_list.success, (msg) =>
       {
-        console.log(JSON.stringify(msg))
+        // console.log(JSON.stringify(msg))
         this.chartGeobodySeries = [];
         this.table_datas = msg; //fill table contents
 

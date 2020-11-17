@@ -145,8 +145,6 @@
                       <i class="fa fa-image"/> Probability Map
                     </template>
                     <template v-if="proc_completed">
-<!--                      <expandable-image :close-on-background-click="true" :src="getUrlImage(0)" alt="Probability Map"-->
-<!--                                        style="width: 100%; height: 100%"/>-->
                       <ApexChartLine class="lc_seismic_chart" :chartOptions="probMapOptions" :series="probMapSeries"/>
                     </template>
                   </b-tab>
@@ -155,7 +153,6 @@
                       <i class="fa fa-bar-chart"/> Probability Distribution
                     </template>
                     <template v-if="proc_completed">
-                      <!--                      <expandable-image :close-on-background-click="true" :src="getUrlImage(1)" alt="Probability Distribution"/>-->
                       <ApexChartLine class="lc_seismic_chart" :chartOptions="avgProbOptions" :series="avgProbSeries"/>
                     </template>
                   </b-tab>
@@ -164,7 +161,6 @@
                       <i class="fa fa-line-chart"/> Cumulative Distribution
                     </template>
                     <template v-if="proc_completed">
-<!--                                            <expandable-image :close-on-background-click="true" :src="getUrlImage(2)" alt="Cumulative Distribution"/>-->
                       <ApexChartLine class="lc_seismic_chart" :chartOptions="ecdfOptions" :series="ecdfSeries"/>
                     </template>
                   </b-tab>
@@ -224,8 +220,6 @@
 
 <script>
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
-  import {getData} from "../../libs/data";
-  import LChartSeismic from "../components/LChartSeismic";
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
@@ -236,20 +230,15 @@
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
-  import ExpandableImage from "../components/ExpandableImage";
-  import {createRandomCode} from "../../_constant/mylib";
 
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {
     apexChartSimpleProperties, createAvgProbChartOptions,
-    createDefaultColor,
-    createDefaultMarker,
-    createDefaultParam,
     createEcdfChartOptions, createProbMapParam
   } from "../../libs/defApexChartLine";
   import ApexChartLine from "../components/ApexChartLine";
-  import {colormapDensity} from "../../libs/var_colormaps";
+  import {colormapDensity, colormapSpectral} from "../../libs/var_colormaps";
   import {getColormapColorv2} from "../../libs/simpleLib";
 
   export default {
@@ -258,10 +247,8 @@
     components: {
       ViewProcessWizardButton,
       ViewBottomWizardButton,
-      LChartSeismic,
       VueSimpleDialog,
       Splitpanes, Pane,
-      ExpandableImage,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
       ApexChartLine
@@ -294,6 +281,7 @@
         cur_segy_ml: {},
         list_segy_ml: [],
         cur_area: {},
+        selected_check_ava: [],
 
         avgProbOptions: {},
         avgProbSeries: [],
@@ -305,191 +293,22 @@
         ecdfOptions: {},
         ecdfSeries: [],
         ECDF: {
-          "x": [
-            0.5179116140167084,
-            0.5877749394547752,
-            0.5985429335204717,
-            0.6236300730424209,
-            0.6599179363006475,
-            0.6606144073931045,
-            0.6615821233099756,
-            0.6639834732983946,
-            0.6736672157792468,
-            0.6754727666772445,
-            0.6773188522915229,
-            0.6879918321625553,
-            0.6913439032525904,
-            0.6960998823640733,
-            0.7117633000630877,
-            0.7124697451762972,
-            0.7164507445809706,
-            0.7330044179034407,
-            0.7449700431278303,
-            0.7613433999875685,
-            0.7869704031367958,
-            0.7903920731615668,
-            0.7915110987441472,
-            0.8124242134692171,
-            0.836195623884779
-          ],
-          "y": [
-            0.04,
-            0.08,
-            0.12,
-            0.16,
-            0.2,
-            0.24,
-            0.28,
-            0.32,
-            0.36,
-            0.4,
-            0.44,
-            0.48,
-            0.52,
-            0.56,
-            0.6,
-            0.64,
-            0.68,
-            0.72,
-            0.76,
-            0.8,
-            0.84,
-            0.88,
-            0.92,
-            0.96,
-            1.0
-          ]
+          "x": [0.51, 0.58, 0.59, 0.62, 0.65, 0.66, 0.66, 0.66, 0.67, 0.67, 0.67, 0.68, 0.69, 0.69, 0.71, 0.71, 0.71, 0.73, 0.74, 0.76, 0.78, 0.79, 0.79, 0.81, 0.83],
+          "y": [0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 0.8, 0.84, 0.88, 0.92, 0.96, 1.0]
         },
 
         probMapOptions: {},
         probMapSeries: [],
         prob_map: {
-          "x": [
-            7527.0,
-            7527.0,
-            7531.0,
-            7531.0,
-            7531.0,
-            7531.0,
-            7531.0,
-            7531.0,
-            7535.0,
-            7535.0,
-            7535.0,
-            7535.0,
-            7535.0,
-            7539.0,
-            7539.0,
-            7539.0,
-            7539.0,
-            7539.0,
-            7543.0,
-            7543.0,
-            7543.0,
-            7543.0,
-            7547.0,
-            7551.0,
-            7555.0,
-            7555.0,
-            7559.0,
-            7559.0,
-            7559.0,
-            7559.0,
-            7559.0,
-            7563.0,
-            7563.0,
-            7563.0,
-            7563.0,
-            7563.0,
-            7563.0,
-            7567.0,
-            7567.0,
-            7567.0
-          ],
-          "y": [
-            2209.0,
-            2213.0,
-            2209.0,
-            2213.0,
-            2217.0,
-            2225.0,
-            2225.0,
-            2229.0,
-            2205.0,
-            2209.0,
-            2213.0,
-            2225.0,
-            2229.0,
-            2201.0,
-            2205.0,
-            2209.0,
-            2213.0,
-            2217.0,
-            2201.0,
-            2205.0,
-            2209.0,
-            2213.0,
-            2209.0,
-            2285.0,
-            2285.0,
-            2289.0,
-            2249.0,
-            2253.0,
-            2285.0,
-            2289.0,
-            2293.0,
-            2237.0,
-            2241.0,
-            2249.0,
-            2285.0,
-            2285.0,
-            2289.0,
-            2237.0,
-            2241.0,
-            2285.0
-          ],
-          "z": [
-            0.7219859189361647,
-            0.7634342913620984,
-            0.7713661324149228,
-            0.5943303497589943,
-            0.5945371237587471,
-            0.6830714400567749,
-            0.646494392910275,
-            0.6339206449655198,
-            0.7547850904077965,
-            0.7423649173553823,
-            0.7642618448299291,
-            0.6200932365232533,
-            0.6300173047604724,
-            0.6611068533145303,
-            0.7711656944195597,
-            0.7321926217522591,
-            0.7553579528214112,
-            0.7229781276107434,
-            0.793327170974043,
-            0.686456098593622,
-            0.7319833824064361,
-            0.594705060816473,
-            0.593097529281292,
-            0.6356153476893993,
-            0.6772801432462057,
-            0.6532472160759148,
-            0.6635490022510264,
-            0.7063434451488125,
-            0.6297712204625486,
-            0.5633887261074908,
-            0.8233617006759866,
-            0.7047070216369253,
-            0.705604078390133,
-            0.6373804254751368,
-            0.7779782180268544,
-            0.7681409675504467,
-            0.6771521625803821,
-            0.6421934398589123,
-            0.7523204505696771,
-            0.7950691976286666
-          ]
+          "x": [7527.0, 7527.0, 7531.0, 7531.0, 7531.0, 7531.0, 7531.0, 7531.0, 7535.0, 7535.0, 7535.0, 7535.0, 7535.0, 7539.0, 7539.0, 7539.0, 7539.0,
+            7539.0, 7543.0, 7543.0, 7543.0, 7543.0, 7547.0, 7551.0, 7555.0, 7555.0, 7559.0, 7559.0, 7559.0, 7559.0, 7559.0, 7563.0, 7563.0, 7563.0,
+            7563.0, 7563.0, 7563.0, 7567.0, 7567.0, 7567.0],
+          "y": [2209.0, 2213.0, 2209.0, 2213.0, 2217.0, 2225.0, 2225.0, 2229.0, 2205.0, 2209.0, 2213.0, 2225.0, 2229.0, 2201.0, 2205.0, 2209.0,
+            2213.0, 2217.0, 2201.0, 2205.0, 2209.0, 2213.0, 2209.0, 2285.0, 2285.0, 2289.0, 2249.0, 2253.0, 2285.0, 2289.0, 2293.0,2237.0,
+            2241.0, 2249.0, 2285.0, 2285.0, 2289.0, 2237.0, 2241.0, 2285.0],
+          "z": [0.7219, 0.7634, 0.7713, 0.5943, 0.5945, 0.6830, 0.6464, 0.6339, 0.7547, 0.7423, 0.7642, 0.6200, 0.6300, 0.6611, 0.7711, 0.7321,
+            0.7553, 0.7229, 0.7933, 0.6864, 0.7319, 0.5947, 0.5930, 0.6356, 0.6772, 0.6532, 0.6635, 0.7063, 0.6297, 0.5633, 0.8233, 0.7047,
+            0.7056, 0.6373, 0.7779, 0.7681, 0.6771, 0.6421, 0.7523, 0.7950]
         },
 
         avaPlotSeries: [],
@@ -570,17 +389,6 @@
       updateSelectedRow(m) {
       },
 
-      getUrlImage(imode) {
-        // return("http://117.54.250.85:9000/220538_cumulative-distribution.png");
-        let server_url = 'http://117.54.250.85:9000/';
-        if (imode === 0)
-          return (server_url + this.cur_area["geobody_id"] + "_gas-probability-map.png" + createRandomCode());
-        else if (imode === 1)
-          return (server_url + this.cur_area["geobody_id"] + "_probability-score-distribution.png" + createRandomCode());
-        else
-          return (server_url + this.cur_area["geobody_id"] + "_cumulative-distribution.png" + createRandomCode());
-      },
-
       parseProbabilityNumber(v) {
         if (v === undefined)
           return ("");
@@ -627,6 +435,7 @@
         }
 
         this.showLoader = true;
+        this.selected_check_ava = param;
         this.$store.dispatch('http_post', ["/api/segy/view-list-ava", param, this.event_http_ava_plot]).then();
       },
 
@@ -662,9 +471,9 @@
       //------------------------- probability dialog ----------------------------
       openProbabilityDialog() {
 
-        // create colormap
-        // let density_colormap = colormapDensity();
-
+        // // create colormap
+        // let density_colormap = colormapSpectral();
+        //
         // this.avgProbSeries = [];
         // this.avgProbOptions = createAvgProbChartOptions();
         // this.avgProbOptions["title"]["text"] = "Probability Distributions";
@@ -672,7 +481,7 @@
         // this.avgProbSeries.push({data: this.avg_prob["y"]});
         // let prob_map_color = [];
         // for(let i=0; i<this.avg_prob["x"].length; i++) {
-        //   prob_map_color.push(getColormapColorv2(density_colormap, this.avg_prob["x"][i], true));
+        //   prob_map_color.push(getColormapColorv2(density_colormap, this.avg_prob["x"][i], false));
         // }
         // this.avgProbOptions["colors"] = prob_map_color;
         //
@@ -697,7 +506,7 @@
         //
         // this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
         // this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
-
+        //
         // // probability map
         // this.probMapSeries = [];
         // let prob_map = this.prob_map;
@@ -708,7 +517,7 @@
         // let n_prob_map = prob_map["x"].length;
         // let probability_map_color = [];
         // for(let i=0; i<n_prob_map; i++) {
-        //   probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], true));
+        //   probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], false));
         //   this.probMapSeries.push({
         //     type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
         //   });
@@ -909,12 +718,28 @@
       EventBus.$on(this.event_http_list_prob.success, (msg) => {
         this.table_datas = msg["data"];
 
+        for (let i=0; i<this.selected_check_ava.length; i++)
+        {
+          let iline_ = this.selected_check_ava[i]["iline"];
+          let xline_ = this.selected_check_ava[i]["xline"];
+          for(let j=0; j<this.table_datas.length; j++)
+          {
+            let iline1_ = this.table_datas[j]["iline"];
+            let xline1_ = this.table_datas[j]["xline"];
+
+            if( (iline_ === iline1_) && (xline_ === xline1_))
+            {
+              this.table_datas[j]["check"] = true;
+              break;
+            }
+          }
+        }
+
         // create colormap
-        let density_colormap = colormapDensity();
+        let density_colormap = colormapSpectral();
 
         //average probability
         let avg_prob = msg["avg_prob"];
-        console.log(JSON.stringify(avg_prob));
         this.avgProbSeries = [];
         this.avgProbOptions = createAvgProbChartOptions();
         this.avgProbOptions["title"]["text"] = "Probability Distributions";
@@ -924,7 +749,7 @@
         this.avgProbSeries.push({data: avg_prob["y"]});
         let prob_map_color = [];
         for(let i=0; i<this.avg_prob["x"].length; i++) {
-          prob_map_color.push(getColormapColorv2(density_colormap, this.avg_prob["x"][i], true));
+          prob_map_color.push(getColormapColorv2(density_colormap, this.avg_prob["x"][i], false));
         }
         this.avgProbOptions["colors"] = prob_map_color;
 
@@ -962,7 +787,7 @@
         let n_prob_map = prob_map["x"].length;
         let probability_map_color = [];
         for(let i=0; i<n_prob_map; i++) {
-          probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], true));
+          probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], false));
           this.probMapSeries.push({
             type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
           });
