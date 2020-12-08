@@ -313,6 +313,11 @@ export function createTableProbabilityHeader()
     //   sortable: true
     // },
     {
+      key: 'eucd',
+      label: 'EUCD',
+      sortable: true
+    },
+    {
       key: 'prob',
       label: 'Prob',
       sortable: true
