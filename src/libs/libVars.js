@@ -58,37 +58,37 @@ export function createTableWellHeader()
 //   return (table_headers);
 // }
 
-export function createTableAreaListHeader()
-{
-  let table_headers = [
-    {
-      key: 'area',
-      label: 'Area',
-      sortable: true
-    },
-    {
-      key: 'note',
-      label: 'Note',
-      sortable: true
-    },
-    // {
-    //   key: 'lat',
-    //   label: 'Latitude',
-    //   sortable: false,
-    // },
-    // {
-    //   key: 'lon',
-    //   label: 'Longitude',
-    //   sortable: false,
-    // },
-    {
-      key: 'action',
-      label: 'Action',
-      sortable: false,
-    },
-  ];
-  return (table_headers);
-}
+// export function createTableAreaListHeader()
+// {
+//   let table_headers = [
+//     {
+//       key: 'area',
+//       label: 'Area',
+//       sortable: true
+//     },
+//     {
+//       key: 'note',
+//       label: 'Note',
+//       sortable: true
+//     },
+//     // {
+//     //   key: 'lat',
+//     //   label: 'Latitude',
+//     //   sortable: false,
+//     // },
+//     // {
+//     //   key: 'lon',
+//     //   label: 'Longitude',
+//     //   sortable: false,
+//     // },
+//     {
+//       key: 'action',
+//       label: 'Action',
+//       sortable: false,
+//     },
+//   ];
+//   return (table_headers);
+// }
 
 export function createTableWellListHeader() {
   let table_headers = [
@@ -144,6 +144,85 @@ export function createTableGeobodyListHeader()
       label: 'Y',
       sortable: false,
     },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+export function createTableGeobodyListHeaderV0()
+{
+  let table_headers = [
+    {
+      key: 'geobody_id',
+      label: 'Geobody ID',
+      sortable: true
+    },
+    {
+      key: 'cls',
+      label: 'Class',
+      sortable: true
+    },
+    {
+      key: 'nop',
+      label: 'NPoints',
+      sortable: true
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+export function createTableAreaListHeaderV0()
+{
+  let table_headers = [
+    // {
+    //   key: 'id_area',
+    //   label: 'ID Area',
+    //   sortable: true
+    // },
+    {
+      key: 'area',
+      label: 'Area Name',
+      sortable: true
+    },
+    {
+      key: 'note',
+      label: 'Area Note',
+      sortable: false
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+
+export function createTableAreaListHeader()
+{
+  let table_headers = [
+    {
+      key: 'id_area',
+      label: 'ID Area',
+      sortable: true
+    },
+    {
+      key: 'name',
+      label: 'Area Name',
+      sortable: true
+    },
+    // {
+    //   key: 'coordinate',
+    //   label: 'Coordinate',
+    //   sortable: false
+    // },
     {
       key: 'action',
       label: 'Action',
@@ -307,11 +386,11 @@ export function createTableProbabilityHeader()
     //   label: 'CDP Y',
     //   sortable: true
     // },
-    // {
-    //   key: 'cdp_z',
-    //   label: 'CDP Z',
-    //   sortable: true
-    // },
+    {
+      key: 'cdp_z',
+      label: 'CDP Z',
+      sortable: true
+    },
     {
       key: 'eucd',
       label: 'EUCD',

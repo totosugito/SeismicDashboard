@@ -108,7 +108,8 @@ export default new Router({
           name: '',
           // component: () => import('../views/Dashboard') //Dashboard
           // component: () => import('../views/pages/WellTable') //Dashboard
-          component: () => import('../views/pages/GeobodyTable') //Dashboard
+          // component: () => import('../views/pages/GeobodyTable') //Dashboard
+          component: () => import('../views/pages/AreaTable') //Dashboard
         },
         {
           path: '',
@@ -133,17 +134,17 @@ export default new Router({
             {
               path: varRouter.getRoute("processwizard1", 1),
               name: varRouter.getRoute("processwizard1", 2),
-              component: () => import('../views/testing/ProcessWizardStep1')
+              component: () => import('../views/v0/ProcessWizardStep1')
             },
             {
               path: varRouter.getRoute("processwizard2", 1),
               name: varRouter.getRoute("processwizard2", 2),
-              component: () => import('../views/testing/ProcessWizardStep2')
+              component: () => import('../views/v0/ProcessWizardStep2')
             },
             {
               path: varRouter.getRoute("processwizard2-1", 1),
               name: varRouter.getRoute("processwizard2-1", 2),
-              component: () => import('../views/testing/ProcessWizardStep2_1')
+              component: () => import('../views/v0/ProcessWizardStep2_1')
             },
             {
               path: varRouter.getRoute("processwizard2-2", 1),

@@ -53,8 +53,11 @@
           :items="table_datas">
 
           <template v-slot:cell(action)="row">
-            <button type="button" class="btn-sm btn-primary" @click="openData(row.item)"
-                    style="margin: 3px">Open
+            <button type="button" class="btn-sm btn-primary" @click="openGeobodyPage(row.item)"
+                    style="margin: 3px">Calculate Geobody Prob.
+            </button><br>
+            <button type="button" class="btn-sm btn-primary" @click="openXYZPage(row.item)"
+                    style="margin: 3px">Calculate XYZ Prob.
             </button>
           </template>
         </b-table>
@@ -75,30 +78,11 @@
         <div class="col p-0" style="height: 100%; width: 100%">
 <!--          <vue-leaflet-map :markers="markers" :center="center"/>-->
           <template v-if="showLoader===false">
-            <ApexChartLine class="lc_seismic_chart" :chartOptions="lineChartOptions" :series="series"/>
+            <ApexChartLine :style="chartStyles" :chartOptions="lineChartOptions" :series="series"/>
           </template>
         </div>
       </pane>
     </splitpanes>
-
-<!--        </b-card>-->
-<!--      </b-col>-->
-<!--    </b-row>-->
-    <vue-form-dialog
-      ref="radiusDialog"
-      type="default"
-      header="Parameters" body="Body"
-      btn1_text="Close" btn2_text="Process"
-      btn1_style="danger" btn2_style="primary"
-      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">
-
-      <!-- body slot -->
-      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
-              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>
-            </span>
-    </vue-form-dialog>
-
-<!--    <view-bottom-wizard-button class="mt-2" index="0" left_clicked="" :right_clicked="wizardButtonClicked('processwizard2')"/>-->
 
     <!-- show error dialog -->
     <vue-simple-dialog
@@ -125,29 +109,34 @@
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
   import {createTableAreaListHeader, createTableAreaListHeaderV0} from "../../libs/libVars";
-  import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
-  import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import ApexChartLine from "../components/ApexChartLine";
   import {apexChartSimpleProperties, createDefaultParam} from "../../libs/defApexChartLine";
   import {getBoundaryData} from "../../libs/simpleLib";
+  import VueScreenSize from 'vue-screen-size';
 
   export default {
     name: "ProcessWizardStep1",
 
+    mixins: [VueScreenSize.VueScreenSizeMixin],
     components: {
       ApexChartLine,
       ViewBottomWizardButton,
       ViewProcessWizardButton,
       Splitpanes, Pane,
       VueLeafletMap,
-      VueFormDialog,
       VueSimpleDialog,
-      "vue-form-generator": VueFormGenerator.component,
     },
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
+
+      chartStyles() {
+        return {
+          width: `${this.chart_width}px`,
+          height: `${this.chart_height}px`
+        };
+      }
     }),
 
     created() {
@@ -169,6 +158,8 @@
         currentPage: 1,
         totalRows: 0,
         filter: null,
+        chart_width: 400,
+        chart_height: 400,
 
         lineChartOptions: {},
         series: [],
@@ -177,28 +168,6 @@
         geobody_data: [],
         selected_data: {},
 
-        model: {
-          geobody_file_id: "",
-          // mode: 0,
-        },
-        schema: {
-          fields: [
-            {
-              type: 'select',
-              label: 'Select File',
-              model: 'geobody_file_id',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-            // {
-            //   type: 'select',
-            //   inputType: 'Select Mode',
-            //   label: 'Plot Data',
-            //   model: 'mode',
-            //   values: [{id:0, name: "Well"}, {id:1, name: "Geobody"}],
-            //   selectOptions: {hideNoneSelectedText: true}
-            // },
-          ]
-        },
         formOptions: {
           validateAfterLoad: true,
           validateAfterChanged: true,
@@ -211,10 +180,6 @@
     },
 
     beforeMount: function () {
-      // let bb = getBoundaryData([553903,564971.187300455,574337.187300455,563269], [9896783,9894631.96359927,9942816.96359927,9944968], 0.1)
-      // console.log((JSON.stringify(bb)));
-      // this.getListGeobody();
-      // this.plotDemoLineChart();
       this.getListArea();
     },
 
@@ -256,40 +221,23 @@
         this.currentPage = 1;
       },
       //-----------------------------------------------------
-      openData(item)
+      openGeobodyPage(item)
       {
         this.selected_data = item;
-        this.getListGeobody();
-        // this.$refs.radiusDialog.showModal();
-      },
-      radiusDialogBtn1Click() {
-        this.$refs.radiusDialog.hideModal();
-      },
-      radiusDialogBtn2Click() {
-        if(!this.bvalidate) return;
-        if(this.model["geobody_file_id"]==="")
-          return;
-
-        for(let i=0; i<this.geobody_data.length; i++)
-        {
-          if(this.geobody_data[i]["id"] === this.model["geobody_file_id"])
-          {
-            this.selected_data["geobody_name"] = this.geobody_data[i]["name"];
-            break;
-          }
-        }
-        this.selected_data["geobody_file_id"] = this.model["geobody_file_id"];
-        this.selected_data["view_mode"] = 1;
-        // this.selected_data["view_mode"] = this.model["mode"];
-        // console.log(JSON.stringify(this.selected_data))
-        // console.log(JSON.stringify(this.geobody_data))
-
+        this.selected_data["view_mode"] = 0;
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
-          path: this.varRouter.getRoute("processwizard2-2", 1),
+          path: "process-wizard2",
         });
-
-        this.$refs.radiusDialog.hideModal();
+      },
+      openXYZPage(item)
+      {
+        this.selected_data = item;
+        this.selected_data["view_mode"] = 0;
+        this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
+        this.$router.push({
+          path: "process-wizard2-1",
+        });
       },
 
       getTabIcon()
@@ -304,10 +252,6 @@
         return(this.varRouter.getRoute(str_router, 1))
       },
 
-      getListGeobody() {
-        this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.selected_data, this.event_http_list_geo]).then();
-      },
       getListArea() {
         this.showLoader = true;
         this.$store.dispatch('actionSaveSelectedArea', {}); //set selected project
@@ -326,7 +270,6 @@
         return(sstr);
       },
     },
-
     mounted() {
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) => {
@@ -343,7 +286,7 @@
           let item = this.table_datas[i];
           let mm = {
             id: i,
-            area: this.table_datas[i].area,
+            area: item["name"],
             latlng: L.latLng(0, 0),
             popup : this.createCustomMarkerPopup(item),
             icon: new L.DivIcon({
@@ -367,7 +310,7 @@
           all_y.push(coordinate["p4"]["y"]);
 
           let series_item = {
-            name: item["area"],
+            name: item["name"],
             data: [
               [coordinate["p1"]["x"], coordinate["p1"]["y"]],
               [coordinate["p2"]["x"], coordinate["p2"]["y"]],
@@ -378,12 +321,17 @@
           };
           this.series.push(series_item);
         }
-        let axis_bound = getBoundaryData(all_x, all_y,0.05);
+        let axis_bound = getBoundaryData(all_x, all_y,0.0);
         this.lineChartOptions = apexChartSimpleProperties();
-        this.lineChartOptions["xaxis"]["min"] = axis_bound[0];
-        this.lineChartOptions["xaxis"]["max"] = axis_bound[1];
-        this.lineChartOptions["yaxis"]["min"] = axis_bound[2];
-        this.lineChartOptions["yaxis"]["max"] = axis_bound[3];
+        // this.lineChartOptions["xaxis"]["min"] = axis_bound[0];
+        // this.lineChartOptions["xaxis"]["max"] = axis_bound[1];
+        // this.lineChartOptions["yaxis"]["min"] = axis_bound[2];
+        // this.lineChartOptions["yaxis"]["max"] = axis_bound[3];
+        // let dx = axis_bound[1] - axis_bound[0];
+        // let dy = axis_bound[3] - axis_bound[2];
+        this.chart_height = this.$vssHeight/1.5;
+        this.chart_width = this.chart_height;
+
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
@@ -395,10 +343,7 @@
 
       EventBus.$on(this.event_http_list_geo.success, (msg) => {
         this.geobody_data = [];
-        for(let i=0; i<msg.length; i++)
-          this.geobody_data.push({id: msg["data"][i]["geobody_id"], name:msg["data"][i]["geobody_id"]})
-        this.schema.fields[0].values = this.geobody_data;
-        // this.getListArea(); //read area
+        this.showLoader = false;
       });
 
       EventBus.$on(this.event_http_list_geo.fail, (msg) => {
@@ -437,7 +382,7 @@
   }
 
   .lc_seismic_chart {
-    width: 100%;
-    height: 70vh;
+    /*width: 400px;*/
+    /*height: 400px;*/
   }
 </style>

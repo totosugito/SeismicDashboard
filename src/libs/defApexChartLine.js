@@ -243,6 +243,8 @@ export function apexChartSimpleProperties() {
       animations: {
         speed: 50
       },
+      width: '100%',
+      height: '100%',
     },
     colors: ['#FF8000', '#1E90FF', '#008000', '#800000', '#800080'],
     stroke: {

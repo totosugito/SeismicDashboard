@@ -37,62 +37,9 @@ export default class VarRouter {
     "processwizard4": ["process-wizard4", "/process-wizard4", "Process Wizard Step 4"],
     "processwizard5": ["process-wizard5", "/process-wizard5", "Process Wizard Step 5"],
     "processwizard6": ["process-wizard6", "/process-wizard6", "Process Wizard Step 6"],
-
-    "lokasi-menu": ["lokasi-menu", "/lokasi-menu", "Menu Lokasi"],
-    "lokasi-edit": ["lokasi-edit", "/lokasi-edit", "Edit Lokasi"],
-    "lokasi-map": ["lokasi-map", "/lokasi-map", "Lokasi di Peta"],
-    "lokasi-data": ["lokasi-data", "/lokasi-data", "Managemen Lokasi"],
-
-    "street-data": ["street-data", "/street-data", "Data Jalan"],
-
-    "sips-menu": ["sips-menu", "/sips-menu", "SIPS"],
-    "sips-menu-payment" : ["sips-menu-payment", "/sips-menu-payment", "Menu Pembayaran"],
-    "sips-pungutan-qr" : ["sips-pungutan-qr", "/sips-pungutan-qr", "Pungutan QR"],
-    "sips-pungutan-rekap" : ["sips-pungutan-rekap", "/sips-pungutan-rekap", "Pungutan Rekap"],
-    "sips-pungutan-setor" : ["sips-pungutan-setor", "/sips-pungutan-setor", "Pungutan Setor"],
-    "sips-pungutan-sukses" : ["sips-pungutan-sukses", "/sips-pungutan-sukses", "Pungutan Sukses"],
-    "sips-setoran-qr" : ["sips-setoran-qr", "/sips-setoran-qr", "Setoran QR"],
-    "sips-setoran-rekap" : ["sips-setoran-rekap", "/sips-setoran-rekap", "Setoran Rekap"],
-    "sips-setoran-setor" : ["sips-setoran-setor", "/sips-setoran-setor", "Setoran Setor"],
-    "sips-setoran-sukses" : ["sips-setoran-sukses", "/sips-setoran-sukses", "Setoran Sukses"],
-    "sips-user-table" : ["sips-user-table", "/sips-user-table", "SIPS User Table"],
-
-    "kontrak-menu": ["kontrak-menu", "/kontrak-menu", "Menu Kontrak"],
-    "kontrak-edit": ["kontrak-edit", "/kontrak-edit", "Edit Kontrak"],
-    "kontrak-dokumen": ["kontrak-dokumen", "/kontrak-dokumen", "Kontrak Dokumen"],
-    "kontrak-data": ["kontrak-data", "/kontrak-data", "Managemen Kontrak"],
-    "kontrak-card": ["kontrak-card", "/kontrak-card", "ID Card"],
-
-    "perizinan-data": ["perizinan-data", "/perizinan-data", "Perizinan Data"],
-    "persetujuan-data": ["persetujuan-data", "/persetujuan-data", "Persetujuan Data"],
-
-    "user-menu": ["user-menu", "/user-menu", "Menu User"],
-    "user-edit": ["user-edit", "/user-edit", "Edit User"],
-    "user-detail": ["user-detail", "/user-detail", "Detil User"],
-    "user-data": ["user-data", "/user-data", "Managemen User"],
-
-    "subuser-data": ["subuser-data", "/subuser-data", "Managemen Asisten"],
-    "subuser-create": ["subuser-create", "/subuser-create", "Tambah Sub User"],
-    "subuser-edit": ["subuser-edit", "/subuser-edit", "Edit Sub User"],
-    "subuser-detail": ["subuser-detail", "/subuser-detail", "Detil Sub User"],
-
-    "pembayaran-data": ["pembayaran-data", "/pembayaran-data", "Pembayaran Data"],
-
-    "history-parkir": ["history-parkir", "/history-parkir", "History Parkir"],
-    "history-parkir-detail": ["history-parkir-detail", "/history-parkir-detail", "History Parkir Detail"],
-    "history-parkir-map": ["history-parkir-map", "/history-parkir-map", "Peta History Parkir"]
   };
 
   httptype = {
-    "user" : "user",
-    "location" : "location",
-    "contract" : "contract",
-    "contract_permit" : "contract_permit",
-    "contract_approval" : "contract_approval",
-    "invoice" : "invoice",
-    "street" : "street",
-    "subuser" : "subuser",
-    "parkSumm" : "parkSumm",
     "area-list": "/api/area/list"
   };
 

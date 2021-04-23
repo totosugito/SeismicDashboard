@@ -8,6 +8,6 @@ export function createTabProcessIcon()
 
 export function createTabProcessText()
 {
-  let tabtitle = ["Area List", "Well List", "Pick Geobody", "Section List", "Map Propagation", "Data Trend", "Recomendation"];
+  let tabtitle = ["Area List", "Geobody List", "Pick Geobody", "Section List", "Map Propagation", "Data Trend", "Recomendation"];
   return(tabtitle);
 }
