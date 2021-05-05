@@ -409,3 +409,119 @@ export function createTableProbabilityHeader()
   ];
   return (table_headers);
 }
+
+export function createTableAvaHeaderV0()
+{
+  let table_headers = [
+    {
+      key: 'check',
+      label: '#',
+      sortable: true,
+      thStyle: { width: '40px'}
+    },
+    {
+      key: 'iline',
+      label: 'Inline',
+      sortable: true
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      sortable: true
+    },
+    {
+      key: 'cdp_x',
+      label: 'CDP X',
+      sortable: true
+    },
+    {
+      key: 'cdp_y',
+      label: 'CDP Y',
+      sortable: true
+    },
+    {
+      key: 'cdp_z',
+      label: 'CDP Z',
+      sortable: true
+    },
+  ];
+  return (table_headers);
+}
+
+export function createTableProbHeaderV0()
+{
+  let table_headers = [
+    {
+      key: 'check',
+      label: '#',
+      sortable: true,
+      thStyle: { width: '40px'}
+    },
+    {
+      key: 'iline',
+      label: 'Inline',
+      sortable: true
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      sortable: true
+    },
+    {
+      key: 'cdp_x',
+      label: 'CDP X',
+      sortable: true
+    },
+    {
+      key: 'cdp_y',
+      label: 'CDP Y',
+      sortable: true
+    },
+    {
+      key: 'cdp_z',
+      label: 'CDP Z',
+      sortable: true
+    },
+    // {
+    //   key: 'count',
+    //   label: 'Count',
+    //   sortable: true
+    // },
+    {
+      key: 'prob1',
+      label: 'Prob1',
+      sortable: true
+    },
+    {
+      key: 'prob2',
+      label: 'Prob2',
+      sortable: true
+    },
+    {
+      key: 'cal_prob',
+      label: 'Calc. Prob',
+      sortable: true
+    },
+    // {
+    //   key: 'cdp_z',
+    //   label: 'CDP Z',
+    //   sortable: true
+    // },
+    // {
+    //   key: 'eucd',
+    //   label: 'EUCD',
+    //   sortable: true
+    // },
+    // {
+    //   key: 'prob',
+    //   label: 'Prob',
+    //   sortable: true
+    // },
+    // {
+    //   key: 'action',
+    //   label: 'Action',
+    //   sortable: false,
+    // },
+  ];
+  return (table_headers);
+}

@@ -38,6 +38,18 @@
         </div>
       </div>
     </div>
+
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="danger"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
+              <span slot="slot-body">
+                <h5>{{retStatus.mesg}}</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -45,7 +57,9 @@
 import { EventBus } from 'MyLibVue/src/libs/eventbus';
 import {mapState} from "vuex";
 import "../../_constant/_var-routers";
-import {appDebugServer, checkUserStartPage} from "../../_constant/http_api";
+import {appDebugServer, getDefaultUserIcon} from "../../_constant/http_api";
+import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+import {saveUser} from "../../_constant/active_user";
 
 export default {
   name: 'Login',
@@ -55,6 +69,9 @@ export default {
     spinLoader: state => state.spinLoader,
   }),
 
+  components: {
+    VueSimpleDialog,
+  },
   created() {
     this.$store.dispatch('createVarRouter').then(); //no selected project
     // this.$store.dispatch('logout').then(); //no selected project
@@ -77,44 +94,58 @@ export default {
   },
 
   methods: {
+    dialogMessageBtn1Click() {
+      this.$refs.dialogMessage.hideModal();
+    },
+
     gotoDashboardPage () {
-      if (this.textUserName.trim() !== "phm")
+      let user_name = this.textUserName.trim();
+      let user_password = this.textPassword.trim();
+      if (user_name.length === 0)
       {
         this.msg_error = "Error user login";
         return;
       }
-      if (this.textPassword.trim() !== "phm")
+      if (user_password.length === 0)
       {
         this.msg_error = "Error user password";
         return;
       }
 
-      this.$router.push(this.varRouter.getRoute("geobody", 1))
+      if((user_name==="phm") && (user_password==="phm")) {
+        let user = {
+          loginID: "phm",
+          pasfoto: getDefaultUserIcon()
+        };
+        saveUser(user);
+        this.$router.push(this.varRouter.getRoute("dashboard", 1));
+      }
+      else
+        this.authenticate(user_name, user_password);
     },
-    authenticate () {
+    authenticate (user_name, user_password) {
       this.showLoader = true;
-      this.$store.dispatch('login', [{
-        token: "",
-        type: this.varRouter.getHttpType("user"),
-        subtype: this.varRouter.getSchemaType("login", 0),
-        param: [{
-          loginID: this.textUserName, password: this.textPassword,
-          username: this.textUserName}]
-      }, this.event_http])
-        .then()
+      this.$store.dispatch('login', [
+        "/api/admin/login",
+        {
+          admin_name: user_name,
+          admin_password: user_password
+        },
+        this.event_http]).then()
     },
   },
   mounted () {
     EventBus.$on(this.event_http.success, (msg) => {
       this.showLoader = false;
-      // let model = msg.data[0];
-      //
-      // let start_page = checkUserStartPage(model.level);
-      // this.$router.push(this.varRouter.getRoute(start_page.router, 1));
+      // console.log(JSON.stringify(msg));
+      this.$router.push(this.varRouter.getRoute("dashboard", 1))
     });
     EventBus.$on(this.event_http.fail, (msg) => {
-      this.retStatus = msg;
+      console.log(JSON.stringify(msg))
+      this.retStatus["title"] = "Error";
+      this.retStatus["mesg"] = msg["mesg"];
       this.showLoader = false;
+      this.$refs.dialogMessage.showModal();
     });
   },
   beforeDestroy () {

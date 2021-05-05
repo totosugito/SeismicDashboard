@@ -19,6 +19,15 @@ export default new Router({
   linkActiveClass: 'open active',
   scrollBehavior: () => ({y: 0}),
   routes: [
+    // // ---------------------------------------------------------------
+    // // RESEARCH PAGE
+    // // ---------------------------------------------------------------
+    // {
+    //   path: "/overlay",
+    //   name: "overlay",
+    //   component: () => import('../views/research/DemoOverlay')
+    // },
+
     // ---------------------------------------------------------------
     // TESTING PAGE
     // ---------------------------------------------------------------
@@ -43,15 +52,20 @@ export default new Router({
       component: () => import('../views/testing/testHeatMapMesh')
     },
     {
-      path: "/test3",
-      name: "test3",
-      component: () => import('../views/testing/test3dScatter')
+      path: "/prob3dview",
+      name: "prob3dview",
+      component: () => import('../views/v0/View3dProb')
     },
     {
-      path: "/3dview",
-      name: "3dview",
-      component: () => import('../views/testing/Test3DScatterView')
+      path: "/ava3dview",
+      name: "ava3dview",
+      component: () => import('../views/v0/View3dAva')
     },
+    // {
+    //   path: "/3dview",
+    //   name: "3dview",
+    //   component: () => import('../views/testing/Test3DScatterView')
+    // },
     {
       path: "/test-apex",
       name: "test-apex",
@@ -106,11 +120,26 @@ export default new Router({
         {
           path: '/',
           name: '',
-          // component: () => import('../views/Dashboard') //Dashboard
+          component: () => import('../views/Dashboard') //Dashboard
           // component: () => import('../views/pages/WellTable') //Dashboard
           // component: () => import('../views/pages/GeobodyTable') //Dashboard
-          component: () => import('../views/pages/AreaTable') //Dashboard
+          // component: () => import('../views/pages/AreaTable') //Dashboard
         },
+
+        // {
+        //   path: varRouter.getRoute("admin-dashboard", 1),
+        //   name: varRouter.getRoute("admin-dashboard", 2),
+        //   component: () => import('../views/v0/AdminDashboard')
+        // },
+
+        // {
+        //   path: '/',
+        //   name: '',
+        //   // component: () => import('../views/Dashboard') //Dashboard
+        //   // component: () => import('../views/pages/WellTable') //Dashboard
+        //   // component: () => import('../views/pages/GeobodyTable') //Dashboard
+        //   component: () => import('../views/pages/AreaTable') //Dashboard
+        // },
         {
           path: '',
           meta: {label: ''},
@@ -121,6 +150,28 @@ export default new Router({
             }
           },
           children: [
+            // ---------------------------------------------------------
+            //                    ADMIN
+            // ---------------------------------------------------------
+            {
+              path: varRouter.getRoute("admin-area-list", 1),
+              name: varRouter.getRoute("admin-area-list", 2),
+              component: () => import('../views/v0/AdminAreaList')
+            },
+            {
+              path: varRouter.getRoute("admin-segy-list", 1),
+              name: varRouter.getRoute("admin-segy-list", 2),
+              component: () => import('../views/v0/AdminSegyList')
+            },
+            {
+              path: varRouter.getRoute("admin-geobody-list", 1),
+              name: varRouter.getRoute("admin-geobody-list", 2),
+              component: () => import('../views/v0/AdminAreaList')
+            },
+
+            // ---------------------------------------------------------
+            //                    USER
+            // ---------------------------------------------------------
             {
               path: varRouter.getRoute("segy-list", 1),
               name: varRouter.getRoute("segy-list", 2),
@@ -289,6 +340,15 @@ export default new Router({
         //     },
         //   ]
         // },
+
+        // ---------------------------------------------------------------
+        // RESEARCH PAGE
+        // ---------------------------------------------------------------
+        {
+          path: "/overlay",
+          name: "overlay",
+          component: () => import('../views/research/DemoOverlay')
+        },
       ]
     },
   ]

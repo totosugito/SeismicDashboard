@@ -14,6 +14,7 @@ import {
   url_http_post, url_http_post_with_header
 } from "./http_api";
 import {
+  getUser,
   isValidUser,
   logOut,
   researchGetProjects,
@@ -49,6 +50,7 @@ const state = {
   selectedWell : {},
   selectedGeobody: {},
   selectedInline : {},
+  AvaList : [],
 
   selectedUser : {},
   selected_user: {},
@@ -58,6 +60,7 @@ const state = {
 const actions = {
   createVarRouter(){
     state.varRouter = new VarRouter();
+    state.user = getUser();
   },
 
   createReturnStatus(status, title, msg)
@@ -76,34 +79,53 @@ const actions = {
   //--------------------------------
   login(context, http_param_)
   {
-    printJson("INPUT --> ", http_param_[0]);
-    let event_ = http_param_[1];
-    return (url_http_post(http_param_[0]))
+    printJson("IPOST --> ", appDebugMode(), http_param_);
+    let event_ = http_param_[2];
+    let header = create_auth_header();
+    return (url_http_post_with_header(http_param_[0], header, http_param_[1]))
       .then(response => {
         const response_ = JSON.parse(JSON.stringify(response));
         let data = response_.data;
 
-        printJson("OUTPUT --> ", data);
         //cek return data dari server
-        if(data.data.length<1)
+        if (response_.status !== 200)
         {
           EventBus.$emit(event_.fail, data);
           return;
         }
 
-        let user_info = data.data[0];
-        if((isValidUser(user_info)===false) && (user_info.request !== "success"))
+        if(data["state"] === 0)
         {
-          logOut(); //remove existing data
-          EventBus.$emit(event_.fail, data.message);
+          EventBus.$emit(event_.fail, data);
+          return;
         }
-        else {
-          if(user_info.pasfoto.length===0)
-            user_info.pasfoto = getDefaultUserIcon();
-          state.user =user_info;
-          saveUser(state.user); //save data
-          EventBus.$emit(event_.success, data);
-        }
+
+        state.user = {
+          loginID: "admin",
+          pasfoto: getDefaultUserIcon()
+        };
+        saveUser(state.user); //save data
+        EventBus.$emit(event_.success, data);
+        //cek return data dari server
+        // if(data.data.length<1)
+        // {
+        //   EventBus.$emit(event_.fail, data);
+        //   return;
+        // }
+        //
+        // let user_info = data.data[0];
+        // if((isValidUser(user_info)===false) && (user_info.request !== "success"))
+        // {
+        //   logOut(); //remove existing data
+        //   EventBus.$emit(event_.fail, data.message);
+        // }
+        // else {
+        //   if(user_info.pasfoto.length===0)
+        //     user_info.pasfoto = getDefaultUserIcon();
+        //   state.user =user_info;
+        //   saveUser(state.user); //save data
+        //   EventBus.$emit(event_.success, data);
+        // }
       })
       .catch(error =>
       {
@@ -204,6 +226,12 @@ const actions = {
   actionSaveSelectedArea(context, payload){
     context.commit("actionSaveSelectedArea", payload);
   },
+  actionSaveAvaList(context, payload){
+    context.commit("actionSaveAvaList", payload);
+  },
+  actionSaveProbList(context, payload){
+    context.commit("actionSaveProbList", payload);
+  },
     actionSaveSelectedWell(context, payload){
     context.commit("actionSaveSelectedWell", payload);
   },
@@ -231,6 +259,8 @@ const actions = {
 
 };
 
+const key_ava_list = "ava_list";
+const key_prob_list = "prob_list";
 const key_area = "area";
 const key_well = "well";
 const key_geobody = "geobody";
@@ -257,6 +287,14 @@ const mutations = {
   actionSaveSelectedArea(state, value){
     localStorage.setItem(key_area, JSON.stringify(value)); //save data
     state.selectedArea = value;
+  },
+  actionSaveAvaList(state, value){
+    localStorage.setItem(key_ava_list, JSON.stringify(value)); //save data
+    state.AvaList = value;
+  },
+  actionSaveProbList(state, value){
+    localStorage.setItem(key_prob_list, JSON.stringify(value)); //save data
+    state.AvaList = value;
   },
   actionSaveSelectedWell(state, value){
     localStorage.setItem(key_well, JSON.stringify(value)); //save data
@@ -310,6 +348,14 @@ const getters = {
   readSelectedArea(state){
     state.selectedArea = JSON.parse(localStorage.getItem(key_area));
     return(state.selectedArea);
+  },
+  readAvaList(state){
+    state.AvaList = JSON.parse(localStorage.getItem(key_ava_list));
+    return(state.AvaList);
+  },
+  readProbList(state){
+    state.AvaList = JSON.parse(localStorage.getItem(key_prob_list));
+    return(state.AvaList);
   },
   readSelectedWell(state){
     state.selectedWell = JSON.parse(localStorage.getItem(key_well));

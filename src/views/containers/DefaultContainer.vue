@@ -26,7 +26,12 @@
         <AppSidebar fixed>
           <SidebarHeader/>
           <SidebarForm/>
-          <SidebarNav :navItems="nav" :appSkin="appSkin"></SidebarNav>
+          <template v-if="user.loginID==='admin'">
+            <SidebarNav :navItems="nav_admin" :appSkin="appSkin"></SidebarNav>
+          </template>
+          <template v-else>
+            <SidebarNav :navItems="nav" :appSkin="appSkin"></SidebarNav>
+          </template>
           <SidebarFooter/>
           <SidebarMinimizer :appSkin="appSkin"/>
         </AppSidebar>
@@ -56,6 +61,7 @@
 
 <script>
   import nav from '../../_constant/_nav'
+  import nav_admin from '../../_constant/_nav_admin'
   import {
     Header as AppHeader, SidebarToggler, Sidebar as AppSidebar, SidebarFooter, SidebarForm, SidebarHeader,
     SidebarMinimizer, SidebarNav, Aside as AppAside, AsideToggler, Footer as TheFooter, Breadcrumb
@@ -86,6 +92,8 @@
     {
       return {
         //nav: this.updateDrawerMenu(), //nav.items,
+        nav: [],
+        nav_admin : [],
         item_menu: {}
       }
     },
@@ -118,33 +126,8 @@
       updateDrawerMenu()
       {
         //update drawer menu
-        this.nav = [];
-        let tmp_menu = nav.items;
-        let hui = this.user[HIDDEN_MENU()]; //get hidden menu
-        let bget;
-
-        if(hui===undefined)
-        {
-          this.nav = tmp_menu;
-          return;
-        }
-
-        for(let i=0; i<tmp_menu.length; i++)
-        {
-          bget = false;
-
-          let tmpname = tmp_menu[i].router;
-          for(let j=0; j<hui.length; j++)
-          {
-            if(tmpname===hui[j]) //compare with hidden menu list
-            {
-              bget = true;
-              break;
-            }
-          }
-          if(bget===false) //create drawer menu
-            this.nav.push(tmp_menu[i]);
-        }
+        this.nav = nav.items;
+        this.nav_admin = nav_admin.items;
       }
     }
   }

@@ -24,6 +24,9 @@
         <div class="group-header">
           <b-row>
             <b-col md="2" class="my-1">
+              <button type="button" class="btn-sm btn-secondary" @click=""
+                      style="margin: 3px">Add Area
+              </button>
             </b-col>
             <b-col md="10" class="my-1">
               <b-form-group  label-cols-lg="4" label-cols-md="3" label-cols-sm="6"  class="mb-0">
@@ -53,11 +56,11 @@
           :items="table_datas">
 
           <template v-slot:cell(action)="row">
-            <button type="button" class="btn-sm btn-primary" @click="openGeobodyPage(row.item)"
-                    style="margin: 3px">Calculate Geobody Prob.
-            </button><br>
-            <button type="button" class="btn-sm btn-primary" @click="openXYZPage(row.item)"
-                    style="margin: 3px">Calculate XYZ Prob.
+            <button type="button" class="btn-sm btn-primary" @click=""
+                    style="margin: 3px">Edit
+            </button>
+            <button type="button" class="btn-sm btn-primary" @click=""
+                    style="margin: 3px">Info
             </button>
           </template>
         </b-table>

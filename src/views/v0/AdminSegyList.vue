@@ -24,6 +24,9 @@
         <div class="group-header">
           <b-row>
             <b-col md="2" class="my-1">
+              <button type="button" class="btn-sm btn-secondary" @click=""
+                      style="margin: 3px">Add Area
+              </button>
             </b-col>
             <b-col md="10" class="my-1">
               <b-form-group  label-cols-lg="4" label-cols-md="3" label-cols-sm="6"  class="mb-0">

@@ -31,10 +31,6 @@ export default {
     user: state => state.user
   }),
   created() {
-    if(this.user.loginID===undefined)
-      this.user.loginID = "Guest";
-    if(this.user.pasfoto===undefined)
-      this.user.pasfoto = getDefaultUserIcon();
     this.$store.dispatch('createVarRouter').then(); //no selected project
   },
 

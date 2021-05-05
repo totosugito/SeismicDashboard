@@ -22,6 +22,11 @@ export default class VarRouter {
     "geobody": ["geobody", "/geobody", "Geobody"],
     "geobody-info": ["geobody-info", "/geobody/geobody-info", "Geobody Info"],
 
+    "admin-dashboard": ["admin-dashboard", "/admin-dashboard", "Admin Dashboard"],
+    "admin-area-list": ["admin-area-list", "/admin-area-list", "Admin Area"],
+    "admin-segy-list": ["admin-segy-list", "/admin-segy-list", "Admin SEGY"],
+    "admin-geobody-list": ["admin-geobody-list", "/admin-geobody-list", "Admin Geobody"],
+
     "segy-list": ["segy-list", "/segy-list", "SEGY List"],
     "processwizard": ["process-wizard", "/process-wizard", "Process Wizard"],
     "processwizard1": ["process-wizard1", "/process-wizard1", "Process Wizard Step 1"],
