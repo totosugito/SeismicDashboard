@@ -209,6 +209,12 @@ export function createTableAreaListHeader()
 {
   let table_headers = [
     {
+      thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
+      key: 'id_color',
+      label: '',
+      sortable: false
+    },
+    {
       key: 'id_area',
       label: 'ID Area',
       sortable: true

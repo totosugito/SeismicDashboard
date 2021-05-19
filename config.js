@@ -7,3 +7,8 @@ export function globalVar()
   };
   return(gv);
 }
+
+export function getConfigMapUrl()
+{
+  return('http://localhost/map');
+}

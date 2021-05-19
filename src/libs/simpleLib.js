@@ -1,4 +1,3 @@
-
 export function getIndexFromArray(x, dx)
 {
   let p = Math.round(x/dx);
@@ -79,6 +78,16 @@ export function getBoundaryData(x, y, max_perc)
   // console.log(YU - YB)
   return([XL, XR, YB, YU]);
 }
+export function getBoundaryDataV2(x, y, max_perc)
+{
+  let p_ = getBoundaryData(x, y, max_perc);
+  return([
+    [p_[0], p_[2]],
+    [p_[1], p_[2]],
+    [p_[1], p_[3]],
+    [p_[0], p_[3]],
+  ])
+}
 
 export function getJsonPythonId(obj) {
   return(obj["_id"]["$oid"])
@@ -131,4 +140,75 @@ export function getColormapColorv2(colormap_, cm_val, b_reverse) {
     return(rgbToHex2(colormap_[255-idx_cm]));
   else
     return(rgbToHex2(colormap_[idx_cm]));
+}
+
+import { CRS } from "leaflet";
+import * as L from "leaflet";
+export function createLeafletCrs(m)
+{
+  let mapMinResolution = Math.pow(2, m.maxZoom) * m.mapMaxResolution;
+
+  let crs = CRS.Simple;
+  crs.transformation = new L.Transformation(1, -m.tileExtent[0], -1, m.tileExtent[3]);
+  crs.scale = function(zoom) {
+    return Math.pow(2, zoom) / mapMinResolution;
+  };
+  crs.zoom = function(scale) {
+    return Math.log(scale * mapMinResolution) / Math.LN2;
+  };
+  return(crs);
+}
+
+export function createLeafletColormap(idx) {
+  let list_color = [
+    "#ff0000", "#40ff00", "#8000ff", "#ff8000",
+    "#ffff00", "#bfff00", "#00ffff", "#00bfff",
+    "#0040ff", "#4000ff", "#ff00ff", "#ff0080"
+  ]
+  if(idx<list_color.length)
+    return(list_color[idx]);
+  else
+    return (list_color[0]);
+}
+
+export function fillLeafletAreaVariable(m, coordinate, idx_color)
+{
+  if(idx_color===0)
+    m.crs = createLeafletCrs(m);
+
+  m.polygon.push([
+    [coordinate["p1"]["y"], coordinate["p1"]["x"]],
+    [coordinate["p2"]["y"], coordinate["p2"]["x"]],
+    [coordinate["p3"]["y"], coordinate["p3"]["x"]],
+    [coordinate["p4"]["y"], coordinate["p4"]["x"]]
+  ]);
+
+  if(idx_color===0) {
+    let x = [coordinate["p1"]["x"], coordinate["p2"]["x"], coordinate["p3"]["x"], coordinate["p4"]["x"]];
+    let xmin = Math.min.apply(null, x);
+    let xmax = Math.max.apply(null, x);
+    let dx = Math.abs(xmax - xmin);
+    let y = [coordinate["p1"]["y"], coordinate["p2"]["y"], coordinate["p3"]["y"], coordinate["p4"]["y"]];
+    let ymin = Math.min.apply(null, y);
+    let ymax = Math.max.apply(null, y);
+    let dy = Math.abs(ymax - ymin);
+    m.center = L.latLng(ymin + dy/2, xmin + dx/2);
+  }
+
+  m.poly_color.push(createLeafletColormap(idx_color));
+  return(m);
+}
+
+export function createLeafletAreaPolygon(coordinate, idx_color)
+{
+  let pp = {
+    "polygon" : [
+      [coordinate["p1"]["y"], coordinate["p1"]["x"]],
+      [coordinate["p2"]["y"], coordinate["p2"]["x"]],
+      [coordinate["p3"]["y"], coordinate["p3"]["x"]],
+      [coordinate["p4"]["y"], coordinate["p4"]["x"]]
+    ],
+    "color": createLeafletColormap(idx_color)
+  };
+  return(pp);
 }

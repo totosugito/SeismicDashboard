@@ -49,9 +49,9 @@
           :items="table_datas">
 
           <template v-slot:cell(action)="row">
-              <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>
-              <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>
-            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)" class="mr-2">Section</b-link>
+<!--              <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>-->
+<!--              <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>-->
+<!--            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)" class="mr-2">Section</b-link>-->
             <b-link :href="openDataUrl3_3(row.item)" @click="openData3_3(row.item)">Prob</b-link>
           </template>
 
@@ -81,12 +81,14 @@
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
           <template v-if="showLoader===false">
-            <template v-if="cur_area['view_mode']===0">
-              <ApexChartLine :style="chartStyles" :chartOptions="lineChartOptions" :series="series"/>
-            </template>
-            <template v-else>
-              <LChartSeries :points="series" :axis_bound="axis_bound" :prop="chart_prop" style="width: 100%; height:100%"></LChartSeries>
-            </template>
+            <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
+                   :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
+              <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"></l-tile-layer>
+<!--              <l-marker :lat-lng="marker" :icon="defaultIcon"/>-->
+              <template v-for="(item, idx_poly) in map_var.polygon">
+                <l-polygon :lat-lngs="map_var.polygon[idx_poly]" :color="map_var.poly_color[idx_poly]"/>
+              </template>
+            </l-map>
           </template>
         </div>
       </pane>
@@ -137,18 +139,26 @@
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-  import {getBoundaryData} from "../../libs/simpleLib";
-  import {apexChartSimpleProperties} from "../../libs/defApexChartLine";
-  import ApexChartLineWithPointId from "../components/ApexChartLineWithPointId";
-  import ApexChartLine from "../components/ApexChartLine";
-  import LChartSeries from "../components/LChartSeries"
-  import VueScreenSize from 'vue-screen-size';
+  import {appDemoMode} from "../../_constant/http_api";
+  import {createAreaLeafletDemoData, createGeobodyDemoData} from "../../libs/demo_data";
+  import {
+    fillLeafletAreaVariable
+  } from "../../libs/simpleLib";
+
+  import * as L from "leaflet";
+  import {LMap, LTileLayer, LMarker, LPolygon} from 'vue2-leaflet'
+  import { CRS } from "leaflet";
+  import 'leaflet/dist/leaflet.css'
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  });
 
   export default {
     name: "ProcessWizardStep2",
-    mixins: [VueScreenSize.VueScreenSizeMixin],
     components: {
-      // VueLeafletHeatmap,
       ViewBottomWizardButton,
       ViewProcessWizardButton,
       Splitpanes, Pane,
@@ -156,20 +166,15 @@
       VueLeafletMap,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
-      ApexChartLineWithPointId,
-      LChartSeries,
-      ApexChartLine
+
+      LMap,
+      LTileLayer,
+      LMarker,
+      LPolygon
     },
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
-
-      chartStyles() {
-        return {
-          width: `${this.chart_width}px`,
-          height: `${this.chart_height}px`
-        };
-      }
     }),
 
     created()
@@ -182,6 +187,8 @@
         showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
 
+        map_var: {},
+
         cur_area: {},
         cur_tab: 0,
         center: L.latLng(-6.90389, 107.61861),
@@ -193,14 +200,8 @@
         totalRows: 0,
         filter: null,
 
-        chart_prop: {title:"", xlabel:"", ylabel:""},
-        lineChartOptions: {},
-        series: [],
-        axis_bound: [],
-
         table_headers: createTableGeobodyListHeaderV0(),
         table_datas: [],
-        table_well: [],
 
         resizeevent: false,
         model: {
@@ -224,22 +225,22 @@
           validateAfterChanged: true,
         },
 
-        event_http_list: {success: "successList", fail: "failList"},
-        event_http_list_well: {success: "successListWell", fail: "failListWell"},
-        event_http: {success: "success", fail: "fail"},
+        event_http_list_geobody: {success: "successListGeobody", fail: "failListGeobody"},
       }
     },
 
     beforeMount: function ()
     {
-      this.series = [];
       this.cur_area = this.$store.getters.readSelectedArea;
-      console.log(JSON.stringify(this.cur_area))
+      if (appDemoMode() === true)
+      {
+        this.table_datas = createGeobodyDemoData();
+        this.map_var = createAreaLeafletDemoData();
+        this.map_var = fillLeafletAreaVariable(this.map_var, this.cur_area["coordinate"], 0);
 
-      // if(this.cur_area["view_mode"] === 0)
-      //   this.getListWell();
-      // else
-      this.getListGeobody();
+      }
+      else
+        this.getListGeobody();
     },
 
     methods: {
@@ -310,12 +311,7 @@
         this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
 
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list]).then();
-      },
-      getListWell() {
-        this.showLoader = true;
-        this.$store.dispatch('actionSaveSelectedWell', {}); //set selected project
-        this.$store.dispatch('http_get', ["/api/well/list", {}, this.event_http_list_well]).then();
+        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list_geobody]).then();
       },
 
       createDemoCss(cc)
@@ -397,120 +393,25 @@
     },
     mounted()
     {
-      //-------------- LIST Well -------------------
-      EventBus.$on(this.event_http_list_well.success, (msg) => {
-        let tmp_point = [];
-        for(let i=0; i< msg.data.length; i++)
-        {
-          let item = msg.data[i]["edge"];
-          let xx = (item["x"]["max"] - item["x"]["min"]) / 2.0;
-          let yy = (item["y"]["max"] - item["y"]["min"]) / 2.0;
-          tmp_point.push({x:item["x"]["min"] + xx,  y:item["y"]["min"] + yy});
-        }
-        let tmp_series_point = {
-          name: "Well",
-          type: "scatter",
-          point_size: 2,
-          color: "#FF3333",
-          data: tmp_point,
-        };
-        this.series.push(tmp_series_point);
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'))
+      }, 250);
 
-        this.getListGeobodyData();
-      });
-      EventBus.$on(this.event_http_list_well.fail, (msg) => {
-        this.table_well = [];
-        this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
-        this.showLoader = false;
+      // DO
+      this.$nextTick(() => {
+        this.map = this.$refs.map.mapObject; // work as expected
       });
 
-      //-------------- LIST LOKASI -------------------
-      EventBus.$on(this.event_http_list.success, (msg) =>
+      //-------------- LIST GEOBODY -------------------
+      EventBus.$on(this.event_http_list_geobody.success, (msg) =>
       {
-        // console.log(JSON.stringify(msg))
         this.table_datas = msg.data; //fill table contents
-
-        let all_x = [];
-        let all_y = [];
-        let coordinate = this.cur_area["coordinate"];
-        all_x.push(coordinate["p1"]["x"]);
-        all_x.push(coordinate["p2"]["x"]);
-        all_x.push(coordinate["p3"]["x"]);
-        all_x.push(coordinate["p4"]["x"]);
-        all_y.push(coordinate["p1"]["y"]);
-        all_y.push(coordinate["p2"]["y"]);
-        all_y.push(coordinate["p3"]["y"]);
-        all_y.push(coordinate["p4"]["y"]);
-        this.axis_bound = getBoundaryData(all_x, all_y,0.05);
-
-        let series_item = {
-          name: this.cur_area["name"],
-          type: "line",
-          point_size: 2,
-          color: "#0000CD",
-          data: [
-            {x: coordinate["p1"]["x"], y: coordinate["p1"]["y"]},
-            {x: coordinate["p2"]["x"], y: coordinate["p2"]["y"]},
-            {x: coordinate["p3"]["x"], y: coordinate["p3"]["y"]},
-            {x: coordinate["p4"]["x"], y: coordinate["p4"]["y"]},
-            {x: coordinate["p1"]["x"], y: coordinate["p1"]["y"]},
-          ]
-        };
-        this.series.push(series_item);
-
-
-        if(this.cur_area["view_mode"] === 0)
-        {
-          this.lineChartOptions = apexChartSimpleProperties();
-          // this.lineChartOptions["xaxis"]["min"] = this.axis_bound[0];
-          // this.lineChartOptions["xaxis"]["max"] = this.axis_bound[1];
-          // this.lineChartOptions["yaxis"]["min"] = this.axis_bound[2];
-          // this.lineChartOptions["yaxis"]["max"] = this.axis_bound[3];
-          this.chart_height = this.$vssHeight/1.5;
-          this.chart_width = this.chart_height;
-        }
-        else
-        {
-          let tmp_point = [];
-          // for(let i=0; i< 100/*msg.length*/; i++)
-          for (let i = 0; i < msg.length; i++)
-          {
-            let item = msg[i];
-            let xx = (item["x_max"] - item["x_min"]) / 2.0;
-            let yy = (item["y_max"] - item["y_min"]) / 2.0;
-            tmp_point.push({x: item["x_min"] + xx, y: item["y_min"] + yy});
-          }
-          let tmp_series_point = {
-            name: "Geobody",
-            type: "scatter",
-            point_size: 2,
-            color: "#FF3333",
-            data: tmp_point,
-          };
-          this.series.push(tmp_series_point);
-          this.chart_prop["title"] = this.cur_area.geobody_name;
-          this.chart_prop["xlabel"] = "X";
-          this.chart_prop["ylabel"] = "Y";
-        }
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http_list.fail, (msg) =>
+      EventBus.$on(this.event_http_list_geobody.fail, (msg) =>
       {
         this.showLoader = false;
         this.table_datas = [];
-        this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
-      });
-
-      EventBus.$on(this.event_http.success, (msg) =>
-      {
-
-      });
-
-      EventBus.$on(this.event_http.fail, (msg) =>
-      {
-        this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
@@ -518,12 +419,8 @@
 
     beforeDestroy()
     {
-      EventBus.$off(this.event_http_list.success);
-      EventBus.$off(this.event_http_list.fail);
-      EventBus.$off(this.event_http_list_well.success);
-      EventBus.$off(this.event_http_list_well.fail);
-      EventBus.$off(this.event_http.success);
-      EventBus.$off(this.event_http.fail);
+      EventBus.$off(this.event_http_list_geobody.success);
+      EventBus.$off(this.event_http_list_geobody.fail);
       this.showLoader = false;
     },
   }

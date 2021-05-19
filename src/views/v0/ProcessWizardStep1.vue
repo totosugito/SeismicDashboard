@@ -7,14 +7,9 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="cur_tab" :textsize="190" class="mb-3"/>
+    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="cur_tab" :textsize="190"
+                                class="mb-3"/>
 
-<!--    <b-row  class="p-0 m-0">-->
-<!--      <b-col md="12" class="p-0 m-0">-->
-<!--        <b-card style="margin: 0px; padding: 0px">-->
-<!--          <div slot="header">-->
-<!--            <strong>Well List</strong>-->
-<!--          </div>-->
     <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
       <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
         <!-- -------------------------------------------- -->
@@ -26,7 +21,7 @@
             <b-col md="2" class="my-1">
             </b-col>
             <b-col md="10" class="my-1">
-              <b-form-group  label-cols-lg="4" label-cols-md="3" label-cols-sm="6"  class="mb-0">
+              <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
                 <b-input-group prepend="Filter : ">
                   <b-form-input v-model="filter" placeholder="Search"/>
                   <b-input-group-append>
@@ -52,13 +47,17 @@
           :fields="table_headers"
           :items="table_datas">
 
+          <template v-slot:cell(id_color)="row">
+<!--            <template v-if="row.item.plot===true">-->
+<!--              <span class="fa fa-circle" :style="createStyleFromIndex(row.item)" @click="eventSelectAreaClicked(row.index)"/>-->
+<!--            </template>-->
+<!--            <template v-else>-->
+              <span class="fa fa-circle" :style="createStyleFromIndex(row.item)" @click="eventSelectAreaClicked(row.index)"/>
+<!--            </template>-->
+          </template>
           <template v-slot:cell(action)="row">
-            <button type="button" class="btn-sm btn-primary" @click="openGeobodyPage(row.item)"
-                    style="margin: 3px">Calculate Geobody Prob.
-            </button><br>
-            <button type="button" class="btn-sm btn-primary" @click="openXYZPage(row.item)"
-                    style="margin: 3px">Calculate XYZ Prob.
-            </button>
+            <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>
+            <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>
           </template>
         </b-table>
 
@@ -76,9 +75,14 @@
       </pane>
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
-<!--          <vue-leaflet-map :markers="markers" :center="center"/>-->
           <template v-if="showLoader===false">
-            <ApexChartLine :style="chartStyles" :chartOptions="lineChartOptions" :series="series"/>
+            <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
+                   :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
+              <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"></l-tile-layer>
+              <template v-for="(item, idx_poly) in map_polygon">
+                <l-polygon :lat-lngs="item.polygon" :color="item.color"/>
+              </template>
+            </l-map>
           </template>
         </div>
       </pane>
@@ -110,47 +114,57 @@
   import VueLeafletMap from "../components/vue-leaflet-map"
   import {createTableAreaListHeader, createTableAreaListHeaderV0} from "../../libs/libVars";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
-  import ApexChartLine from "../components/ApexChartLine";
-  import {apexChartSimpleProperties, createDefaultParam} from "../../libs/defApexChartLine";
-  import {getBoundaryData} from "../../libs/simpleLib";
-  import VueScreenSize from 'vue-screen-size';
+  import {
+    fillLeafletAreaVariable,
+    getBoundaryData,
+    createLeafletColormap,
+    createLeafletAreaPolygon
+  } from "../../libs/simpleLib";
+  import {createAreaLeafletDemoData} from "../../libs/demo_data";
 
+  import * as L from "leaflet";
+  import {LMap, LTileLayer, LMarker, LPolygon} from 'vue2-leaflet'
+  import {CRS} from "leaflet";
+  import 'leaflet/dist/leaflet.css'
+
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  });
   export default {
     name: "ProcessWizardStep1",
 
-    mixins: [VueScreenSize.VueScreenSizeMixin],
     components: {
-      ApexChartLine,
       ViewBottomWizardButton,
       ViewProcessWizardButton,
       Splitpanes, Pane,
       VueLeafletMap,
       VueSimpleDialog,
+
+      LMap,
+      LTileLayer,
+      LMarker,
+      LPolygon
     },
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
-
-      chartStyles() {
-        return {
-          width: `${this.chart_width}px`,
-          height: `${this.chart_height}px`
-        };
-      }
     }),
 
     created() {
       this.$store.dispatch('createVarRouter').then(); //no selected project
     },
-    data()
-    {
+    data() {
       return {
-        showLoader : false,
+        showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
 
         cur_tab: 0,
-        center: L.latLng(-6.90389, 107.61861),
-        markers: [],
+
+        map_var: {},
+        map_polygon: [],
 
         perPageView: 10,
         perPage: 10,
@@ -158,14 +172,9 @@
         currentPage: 1,
         totalRows: 0,
         filter: null,
-        chart_width: 400,
-        chart_height: 400,
 
-        lineChartOptions: {},
-        series: [],
         table_headers: createTableAreaListHeader(),
         table_datas: [],
-        geobody_data: [],
         selected_data: {},
 
         formOptions: {
@@ -173,9 +182,7 @@
           validateAfterChanged: true,
         },
 
-        event_http_list :{success:"successList", fail:"failList"},
-        event_http_list_geo :{success:"successListGeo", fail:"failListGeo"},
-        event_http :{success:"success", fail:"fail"},
+        event_http_list: {success: "successList", fail: "failList"},
       }
     },
 
@@ -198,6 +205,28 @@
         this.bvalidate = isValid;
       },
 
+      createStyleFromIndex(item) {
+        let fg_color = item["poly"]["color"];
+        if(item.plot===false)
+          fg_color = "#696969";
+
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:150%;";
+        return (strstyle);
+      },
+      eventSelectAreaClicked(idx) {
+        let status = !this.table_datas[idx].plot;
+        this.table_datas[idx].plot = status; // select/unselect
+
+        this.map_polygon = [];
+        for(let i=0; i<this.table_datas.length; i++)
+        {
+          let item = this.table_datas[i];
+          if(item.plot === true)
+            this.map_polygon.push(item.poly);
+        }
+      },
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------
@@ -221,8 +250,7 @@
         this.currentPage = 1;
       },
       //-----------------------------------------------------
-      openGeobodyPage(item)
-      {
+      openGeobodyPage(item) {
         this.selected_data = item;
         this.selected_data["view_mode"] = 0;
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
@@ -230,8 +258,7 @@
           path: "process-wizard2",
         });
       },
-      openXYZPage(item)
-      {
+      openXYZPage(item) {
         this.selected_data = item;
         this.selected_data["view_mode"] = 0;
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
@@ -240,16 +267,14 @@
         });
       },
 
-      getTabIcon()
-      {
-        return(createTabProcessIcon())
+      getTabIcon() {
+        return (createTabProcessIcon())
       },
-      getTabText()
-      {
-        return(createTabProcessText())
+      getTabText() {
+        return (createTabProcessText())
       },
       wizardButtonClicked(str_router) {
-        return(this.varRouter.getRoute(str_router, 1))
+        return (this.varRouter.getRoute(str_router, 1))
       },
 
       getListArea() {
@@ -258,80 +283,30 @@
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_list]).then();
       },
 
-      createDemoCss(cc)
-      {
-        return('<span class="map-marker3" style="background-color:' + cc +'"/>');
+      createDemoCss(cc) {
+        return ('<span class="map-marker3" style="background-color:' + cc + '"/>');
       },
-      createCustomMarkerPopup(item)
-      {
+      createCustomMarkerPopup(item) {
         let sstr = 'Area : <b>' + item.area + '</b><br>';
         sstr = sstr + 'Lat : <b>' + item.lat + '</b><br>';
         sstr = sstr + 'Lon : <b>' + item.lon + '</b>';
-        return(sstr);
+        return (sstr);
       },
     },
     mounted() {
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) => {
-        // console.log(JSON.stringify(msg))
         this.table_datas = msg.data; //fill table contents
-        this.center = L.latLng(0, 0);
 
-        this.series = [];
-        this.markers = [];
-        let all_x = [];
-        let all_y = [];
-        for (let i=0; i<this.table_datas.length; i++)
-        {
+        this.map_var = createAreaLeafletDemoData();
+        for (let i = 0; i < this.table_datas.length; i++) {
           let item = this.table_datas[i];
-          let mm = {
-            id: i,
-            area: item["name"],
-            latlng: L.latLng(0, 0),
-            popup : this.createCustomMarkerPopup(item),
-            icon: new L.DivIcon({
-              html: this.createDemoCss("#990000")
-            })
-          };
-          this.markers.push(mm);
+          this.map_var = fillLeafletAreaVariable(this.map_var, item["coordinate"], i);
+          item.poly = createLeafletAreaPolygon(item["coordinate"], i);
+          item.plot = true;
 
-          let coordinate = item["coordinate"];
-          let x1 = coordinate["p1"]["x"];
-          if(x1===undefined)
-            continue;
-
-          all_x.push(coordinate["p1"]["x"]);
-          all_x.push(coordinate["p2"]["x"]);
-          all_x.push(coordinate["p3"]["x"]);
-          all_x.push(coordinate["p4"]["x"]);
-          all_y.push(coordinate["p1"]["y"]);
-          all_y.push(coordinate["p2"]["y"]);
-          all_y.push(coordinate["p3"]["y"]);
-          all_y.push(coordinate["p4"]["y"]);
-
-          let series_item = {
-            name: item["name"],
-            data: [
-              [coordinate["p1"]["x"], coordinate["p1"]["y"]],
-              [coordinate["p2"]["x"], coordinate["p2"]["y"]],
-              [coordinate["p3"]["x"], coordinate["p3"]["y"]],
-              [coordinate["p4"]["x"], coordinate["p4"]["y"]],
-              [coordinate["p1"]["x"], coordinate["p1"]["y"]],
-            ]
-          };
-          this.series.push(series_item);
+          this.map_polygon.push(item.poly);
         }
-        let axis_bound = getBoundaryData(all_x, all_y,0.0);
-        this.lineChartOptions = apexChartSimpleProperties();
-        // this.lineChartOptions["xaxis"]["min"] = axis_bound[0];
-        // this.lineChartOptions["xaxis"]["max"] = axis_bound[1];
-        // this.lineChartOptions["yaxis"]["min"] = axis_bound[2];
-        // this.lineChartOptions["yaxis"]["max"] = axis_bound[3];
-        // let dx = axis_bound[1] - axis_bound[0];
-        // let dy = axis_bound[3] - axis_bound[2];
-        this.chart_height = this.$vssHeight/1.5;
-        this.chart_width = this.chart_height;
-
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list.fail, (msg) => {
@@ -340,37 +315,11 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
-
-      EventBus.$on(this.event_http_list_geo.success, (msg) => {
-        this.geobody_data = [];
-        this.showLoader = false;
-      });
-
-      EventBus.$on(this.event_http_list_geo.fail, (msg) => {
-        this.showLoader = false;
-        this.geobody_data = [];
-        this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
-      });
-
-      EventBus.$on(this.event_http.success, (msg) => {
-
-      });
-
-      EventBus.$on(this.event_http.fail, (msg) => {
-        this.showLoader = false;
-        this.retStatus = msg;
-        this.$refs.dialogMessage.showModal();
-      });
     },
 
     beforeDestroy() {
       EventBus.$off(this.event_http_list.success);
       EventBus.$off(this.event_http_list.fail);
-      EventBus.$off(this.event_http_list_geo.success);
-      EventBus.$off(this.event_http_list_geo.fail);
-      EventBus.$off(this.event_http.success);
-      EventBus.$off(this.event_http.fail);
       this.showLoader = false;
     },
   }
@@ -379,10 +328,5 @@
 <style scoped>
   .table > tbody > tr > td {
     vertical-align: middle;
-  }
-
-  .lc_seismic_chart {
-    /*width: 400px;*/
-    /*height: 400px;*/
   }
 </style>

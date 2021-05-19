@@ -19,11 +19,15 @@
           <div>
             <b-row>
               <b-col md="6">
-                <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA List</b-btn>
-                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>
+                <b-dropdown right variant="success" text="AVA Data" class="mr-1">
+                  <b-dropdown-item @click="openAvaDialog(0)">Point</b-dropdown-item>
+                  <b-dropdown-item @click="openAvaDialog(1)">Geobody</b-dropdown-item>
+                </b-dropdown>
 
-                <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()">Calculate Prob</b-btn>
-                <b-dropdown right variant="warning"text="Prob 3D Chart">
+                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>
+                <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()">Calculate Prob
+                </b-btn>
+                <b-dropdown right variant="warning" text="Prob 3D Chart">
                   <b-dropdown-item @click="openAva3dProbChart('prob1')">Prob 1</b-dropdown-item>
                   <b-dropdown-item @click="openAva3dProbChart('prob2')">Prob 2</b-dropdown-item>
                   <b-dropdown-item @click="openAva3dProbChart('cal_prob')">Calc. Prob</b-dropdown-item>
@@ -36,92 +40,184 @@
               </b-col>
             </b-row>
           </div>
-          <!-- -------------------------------------------- -->
-          <!-- TABLE -->
-          <!-- -------------------------------------------- -->
-          <!-- table header -->
-          <div class="group-header">
-            <b-row>
-              <b-col md="3" class="my-1">
-                <b-form-checkbox
-                  id="checkbox-1"
-                  v-model="bCheckAll"
-                  name="checkbox-1"
-                  @change="selectAllChecked()">
-                  Check All
-                </b-form-checkbox>
-              </b-col>
-              <b-col md="3" class="my-1">
-                <strong>Total : {{ndata}}</strong>
-              </b-col>
-              <b-col md="6" class="my-1">
-                <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
-                  <b-input-group prepend="Filter : ">
-                    <b-form-input v-model="filter" placeholder="Search"/>
-                    <b-input-group-append>
-                      <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
-                    </b-input-group-append>
+          <b-tabs class="mt-1">
+            <b-tab title="AVA" pills card>
+              <!-- -------------------------------------------- -->
+              <!-- TABLE AVA -->
+              <!-- -------------------------------------------- -->
+              <!-- table header -->
+              <div class="group-header">
+                <b-row>
+                  <b-col md="3" class="my-1">
+                    <b-form-checkbox
+                      id="checkbox-1"
+                      v-model="bCheckAll"
+                      name="checkbox-1"
+                      @change="selectAllChecked()">
+                      Check All
+                    </b-form-checkbox>
+                  </b-col>
+                  <b-col md="3" class="my-1">
+                    <strong>Total : {{ndata}}</strong>
+                  </b-col>
+                  <b-col md="6" class="my-1">
+                    <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
+                      <b-input-group prepend="Filter : ">
+                        <b-form-input v-model="filter" placeholder="Search"/>
+                        <b-input-group-append>
+                          <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
+              </div>
+
+              <!-- table contents -->
+              <b-table
+                show-empty
+                sticky-header="53vh"
+                :small="true"
+                :striped="true"
+                :bordered="true"
+                :outlined="true"
+                :current-page="currentPage"
+                :per-page="perPage"
+                :filter="filter"
+                @filtered="onFiltered"
+                :fields="table_headers"
+                :items="table_ava">
+
+                <template v-slot:cell(check)="row">
+                  <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+                </template>
+
+                <template v-slot:cell(cdp_x)="row">
+                  {{row.item.cdp_x.toFixed(3)}}
+                </template>
+                <template v-slot:cell(cdp_y)="row">
+                  {{row.item.cdp_y.toFixed(3)}}
+                </template>
+                <template v-slot:cell(cdp_z)="row">
+                  {{row.item.cdp_z.toFixed(3)}}
+                </template>
+                <template v-slot:cell(prob1)="row">
+                  {{parseProbabilityNumber(row.item.prob1)}}
+                </template>
+                <template v-slot:cell(prob2)="row">
+                  {{parseProbabilityNumber(row.item.prob2)}}
+                </template>
+                <template v-slot:cell(cal_prob)="row">
+                  {{parseProbabilityNumber(row.item.cal_prob)}}
+                </template>
+
+                <!-- action status -->
+                <template v-slot:cell(action)="row">
+                  <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
+                </template>
+              </b-table>
+
+              <!-- table footer -->
+              <b-row>
+                <b-col md="8" class="my-1">
+                  <b-pagination :total-rows="computeTotalRow()" :per-page="perPage" v-model="currentPage" class="my-0"/>
+                </b-col>
+                <b-col md="4" class="my-1">
+                  <b-input-group prepend="Per Page : ">
+                    <b-form-select :options="pageOptions" v-model="perPageView" v-on:change="showPerPage"/>
                   </b-input-group>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </div>
+                </b-col>
+              </b-row>
+            </b-tab>
+            <b-tab title="Probability" pills card>
+              <!-- -------------------------------------------- -->
+              <!-- TABLE PROBABILITY -->
+              <!-- -------------------------------------------- -->
+              <!-- table header -->
+              <div class="group-header">
+                <b-row>
+                  <b-col md="3" class="my-1">
+                    <b-form-checkbox
+                      id="checkbox-2"
+                      v-model="bCheckAllProb"
+                      name="checkbox-2"
+                      @change="selectAllCheckedProb()">
+                      Check All
+                    </b-form-checkbox>
+                  </b-col>
+                  <b-col md="3" class="my-1">
+                    <strong>Total : {{ndata_prob}}</strong>
+                  </b-col>
+                  <b-col md="6" class="my-1">
+                    <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
+                      <b-input-group prepend="Filter : ">
+                        <b-form-input v-model="filterProb" placeholder="Search"/>
+                        <b-input-group-append>
+                          <b-btn :disabled="!filterProb" @click="filterProb = ''">Clear</b-btn>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
+              </div>
 
-          <!-- table contents -->
-          <b-table
-            show-empty
-            sticky-header="53vh"
-            :small="true"
-            :striped="true"
-            :bordered="true"
-            :outlined="true"
-            :current-page="currentPage"
-            :per-page="perPage"
-            :filter="filter"
-            @filtered="onFiltered"
-            :fields="table_headers"
-            :items="table_ava">
+              <!-- table contents -->
+              <b-table
+                show-empty
+                sticky-header="53vh"
+                :small="true"
+                :striped="true"
+                :bordered="true"
+                :outlined="true"
+                :current-page="currentPageProb"
+                :per-page="perPageProb"
+                :filter="filterProb"
+                @filtered="onFilteredProb"
+                :fields="table_headers_prob"
+                :items="table_prob">
 
-            <template v-slot:cell(check)="row">
-              <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
-            </template>
+                <template v-slot:cell(check)="row">
+                  <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+                </template>
 
-            <template v-slot:cell(cdp_x)="row">
-              {{row.item.cdp_x.toFixed(3)}}
-            </template>
-            <template v-slot:cell(cdp_y)="row">
-              {{row.item.cdp_y.toFixed(3)}}
-            </template>
-            <template v-slot:cell(cdp_z)="row">
-              {{row.item.cdp_z.toFixed(3)}}
-            </template>
-            <template v-slot:cell(prob1)="row">
-              {{parseProbabilityNumber(row.item.prob1)}}
-            </template>
-            <template v-slot:cell(prob2)="row">
-              {{parseProbabilityNumber(row.item.prob2)}}
-            </template>
-            <template v-slot:cell(cal_prob)="row">
-              {{parseProbabilityNumber(row.item.cal_prob)}}
-            </template>
+                <template v-slot:cell(cdp_x)="row">
+                  {{row.item.cdp_x.toFixed(3)}}
+                </template>
+                <template v-slot:cell(cdp_y)="row">
+                  {{row.item.cdp_y.toFixed(3)}}
+                </template>
+                <template v-slot:cell(cdp_z)="row">
+                  {{row.item.cdp_z.toFixed(3)}}
+                </template>
+                <template v-slot:cell(prob1)="row">
+                  {{parseProbabilityNumber(row.item.prob1)}}
+                </template>
+                <template v-slot:cell(prob2)="row">
+                  {{parseProbabilityNumber(row.item.prob2)}}
+                </template>
+                <template v-slot:cell(cal_prob)="row">
+                  {{parseProbabilityNumber(row.item.cal_prob)}}
+                </template>
 
-            <!-- action status -->
-            <template v-slot:cell(action)="row">
-              <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
-            </template>
-          </b-table>
+                <!-- action status -->
+                <template v-slot:cell(action)="row">
+                  <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
+                </template>
+              </b-table>
 
-          <!-- table footer -->
-          <b-row>
-            <b-col md="8" class="my-1">
-              <b-pagination :total-rows="computeTotalRow()" :per-page="perPage" v-model="currentPage" class="my-0"/>
-            </b-col>
-            <b-col md="4" class="my-1">
-              <b-input-group prepend="Per Page : ">
-                <b-form-select :options="pageOptions" v-model="perPageView" v-on:change="showPerPage"/>
-              </b-input-group>
-            </b-col>
-          </b-row>
+              <!-- table footer -->
+              <b-row>
+                <b-col md="8" class="my-1">
+                  <b-pagination :total-rows="computeTotalRowProb()" :per-page="perPageProb" v-model="currentPageProb" class="my-0"/>
+                </b-col>
+                <b-col md="4" class="my-1">
+                  <b-input-group prepend="Per Page : ">
+                    <b-form-select :options="pageOptions" v-model="perPageViewProb" v-on:change="showPerPageProb"/>
+                  </b-input-group>
+                </b-col>
+              </b-row>
+            </b-tab>
+          </b-tabs>
         </b-card>
       </b-col>
     </b-row>
@@ -153,7 +249,8 @@
 
       <!-- body slot -->
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
-              <vue-form-generator :schema="schema_prob" :model="model_prob" :options="formOptions" @validated="onValidated"/>
+              <vue-form-generator :schema="schema_prob" :model="model_prob" :options="formOptions"
+                                  @validated="onValidated"/>
             </span>
     </vue-form-dialog>
 
@@ -187,6 +284,7 @@
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {createAvaDemoData, createProbDemoData} from "../../libs/demo_data";
+  import {appDemoMode} from "../../_constant/http_api";
 
   export default {
     name: "ProcessWizardStep3_3",
@@ -208,28 +306,89 @@
     },
     data() {
       return {
-        bdemo: false,
-
         proc_completed: false,
         proc_plot_ava: false,
         showLoader: false,
         bCheckAll: false,
+        bCheckAllProb: false,
         retStatus: {status: 0, title: "Info", mesg: "", data: []},
         perPageView: 10,
+        perPageViewProb: 10,
         perPage: 10,
+        perPageProb: 10,
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
         currentPage: 1,
+        currentPageProb: 1,
         totalRows: 0,
+        totalRowsProb: 0,
         filter: null,
+        filterProb: null,
         ndata: 0,
+        ndata_prob: 0,
 
         table_headers: createTableAvaHeaderV0(),
+        table_headers_prob: createTableProbHeaderV0(),
         table_ava: [],
         table_prob: [],
         cur_area: {},
         selected_check_ava: [],
 
-        model_ava: {
+        schema_ava: {},
+        model_ava: {},
+        type_ava: 0,
+        model_ava_geobody: {
+          id_area: 0,
+          gather_file_name: "",
+          substack_file_name: "",
+          geobody_id: "",
+          rad_x: 50,
+          rad_y: 50,
+          rad_z: 15
+        },
+        schema_ava_geobody: {
+          fields: [
+            {
+              type: 'select',
+              label: 'Select Gather File',
+              model: 'gather_file_name',
+              selectOptions: {hideNoneSelectedText: true}
+            },
+            {
+              type: 'select',
+              label: 'Select SubStack File',
+              model: 'substack_file_name',
+              selectOptions: {hideNoneSelectedText: true}
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Radius X',
+              model: 'rad_x',
+              placeholder: 'Set Radius X',
+              featured: true,
+              required: true
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Radius Y',
+              model: 'rad_y',
+              placeholder: 'Set Radius Y',
+              featured: true,
+              required: true
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Radius Z',
+              model: 'rad_z',
+              placeholder: 'Set Radius Z',
+              featured: true,
+              required: true
+            },
+          ]
+        },
+        model_ava_point: {
           id_area: 0,
           gather_file_name: "",
           substack_file_name: "",
@@ -241,7 +400,7 @@
           rad_y: 50,
           rad_z: 15,
         },
-        schema_ava: {
+        schema_ava_point: {
           fields: [
             {
               type: 'select',
@@ -346,7 +505,13 @@
     beforeMount: function () {
       this.cur_area = this.$store.getters.readSelectedArea;
       this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
-      this.getListSegy();
+      if (appDemoMode() === true)
+      {
+        this.table_ava = createAvaDemoData();
+        this.table_prob = createProbDemoData();
+      }
+      else
+        this.getListSegy();
     },
 
     methods: {
@@ -367,6 +532,10 @@
         for (let i = 0; i < this.table_ava.length; i++)
           this.table_ava[i]["check"] = !this.bCheckAll;
       },
+      selectAllCheckedProb() {
+        for (let i = 0; i < this.table_prob.length; i++)
+          this.table_prob[i]["check"] = !this.bCheckAllProb;
+      },
       parseProbabilityNumber(v) {
         if (v === undefined)
           return ("");
@@ -382,15 +551,18 @@
       },
 
       //------------------------- ava dialog ----------------------------
-      openAvaDialog() {
-        // -------- DEMO ------------
-        // if(this.bdemo) {
-        //   this.table_ava = createAvaDemoData();
-        //   this.table_headers = createTableAvaHeaderV0();
-        //   this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
-        //   return;
-        // }
-
+      openAvaDialog(ava_type_) {
+        this.type_ava = ava_type_;
+        if (ava_type_===0)
+        {
+          this.schema_ava = this.schema_ava_point;
+          this.model_ava = this.model_ava_point;
+        }
+        else
+        {
+          this.schema_ava = this.schema_ava_geobody;
+          this.model_ava = this.model_ava_geobody;
+        }
         this.$refs.avaDialog.showModal();
       },
       avaDialogBtn1Click() {
@@ -398,88 +570,126 @@
       },
       avaDialogBtn2Click() {
         let param = {};
-        if(this.bdemo)
+        if (appDemoMode() === true)
         {
-          param = {
-            "id_area": 1,
-            "gather_file_name": "10_TUN_CT3DTZ_19_KPSTM_GTHR_D_FINAL_ANGLE_SCALED_Big_Endian.segy",
-            "substack_file_name": "10_TUN_CT3DTZ_19_KPSTM_FAR_D_ELNWG_ZEROPHASED_Scaled.segy",
-            "type": "ilxl",
-            "cdp_z": 500,
-            "rad_x": 100,
-            "rad_y": 50,
-            "rad_z": 15,
-            "iline": 5583,
-            "xline": 2685
-          };
+          if(this.type_ava === 0)
+            param = {
+              "id_area": 1,
+              "gather_file_name": "10_TUN_CT3DTZ_19_KPSTM_GTHR_D_FINAL_ANGLE_SCALED_Big_Endian.segy",
+              "substack_file_name": "10_TUN_CT3DTZ_19_KPSTM_FAR_D_ELNWG_ZEROPHASED_Scaled.segy",
+              "type": "ilxl",
+              "cdp_z": 500,
+              "rad_x": 100,
+              "rad_y": 50,
+              "rad_z": 15,
+              "iline": 5583,
+              "xline": 2685
+            };
+          else
+            param = {
+              "id_area": 1,
+              "gather_file_name": "CT3D_gather_AVA",
+              "substack_file_name": "CT3D_substack_far",
+              "geobody_id": "220845",
+              "rad_x": 50,
+              "rad_y": 50,
+              "rad_z": 15
+            };
         }
         else {
           if (!this.bvalidate) return;
-          if (this.model_ava["gather_file_name"] === "")
+          if (this.model_ava_point["gather_file_name"] === "")
             return;
-          if (this.model_ava["substack_file_name"] === "")
+          if (this.model_ava_point["substack_file_name"] === "")
             return;
 
-          param = {
-            id_area: this.cur_area["id_area"],
-            gather_file_name: this.model_ava["gather_file_name"],
-            substack_file_name: this.model_ava["substack_file_name"],
-            radius: this.model_ava["radius"],
-            type: this.model_ava["type"],
-            xline: this.model_ava["xline"],
-            iline: this.model_ava["iline"],
-            cdp_z: this.model_ava["cdp_z"],
-            rad_x: this.model_ava["rad_x"],
-            rad_y: this.model_ava["rad_y"],
-            rad_z: this.model_ava["rad_z"],
-          };
+          if(this.type_ava === 0)
+            param = {
+              id_area: this.cur_area["id_area"],
+              gather_file_name: this.model_ava_point["gather_file_name"],
+              substack_file_name: this.model_ava_point["substack_file_name"],
+              radius: this.model_ava_point["radius"],
+              type: this.model_ava_point["type"],
+              xline: this.model_ava_point["xline"],
+              iline: this.model_ava_point["iline"],
+              cdp_z: this.model_ava_point["cdp_z"],
+              rad_x: this.model_ava_point["rad_x"],
+              rad_y: this.model_ava_point["rad_y"],
+              rad_z: this.model_ava_point["rad_z"],
+            };
+          else
+            param = {
+              id_area: this.cur_area["id_area"],
+              gather_file_name: this.model_ava_geobody["gather_file_name"],
+              substack_file_name: this.model_ava_geobody["substack_file_name"],
+              "geobody_id": "220845",
+              rad_x: this.model_ava_geobody["rad_x"],
+              rad_y: this.model_ava_geobody["rad_y"],
+              rad_z: this.model_ava_geobody["rad_z"],
+            };
         }
-
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/point/find-ava-data", param, this.event_http_list_ava]).then();
+        if(this.type_ava === 0)
+          this.$store.dispatch('http_post', ["/api/point/find-ava-data", param, this.event_http_list_ava]).then();
+        else
+          this.$store.dispatch('http_post', ["/api/geobody/find-ava-data", param, this.event_http_list_ava]).then();
 
         this.$refs.avaDialog.hideModal();
       },
 
-      openProbDialog()
-      {
-        // -------- DEMO ------------
-        // if(this.bdemo) {
-        //   this.table_datas = createProbDemoData();
-        //   this.table_headers = createTableProbHeaderV0();
-        //   this.$store.dispatch('actionSaveAvaList', this.table_datas); //set selected project
-        //   return;
-        // }
-
+      openProbDialog() {
         this.$refs.probDialog.showModal();
       },
       probDialogBtn1Click() {
         this.$refs.probDialog.hideModal();
       },
       probDialogBtn2Click() {
-        if (!this.bvalidate) return;
-        if (this.model_prob["label_name"] === "")
-          return;
-
-        let tmp_table_datas = [];
-        for(let i=0; i<this.table_ava.length; i++)
+        let param = {};
+        if (appDemoMode() === true)
         {
-          let m = this.table_ava[i];
-          if (("check" in m))
-          {
-              if(m["check"] === true) {
+          param = {
+            "id_area": 1,
+            "mlmodel_label_name": "CT3D_v30_m01_sm30_05_auc_0885",
+            "data": [
+              {
+                "iline": 5579.0,
+                "xline": 2681.0,
+                "cdp_x": 563000.0,
+                "cdp_y": 9899038.0,
+                "cdp_z": 484.576
+              },
+              {
+                "iline": 5579.0,
+                "xline": 2681.0,
+                "cdp_x": 563000.0,
+                "cdp_y": 9899038.0,
+                "cdp_z": 487.764
+              }
+            ]
+          }
+        }
+        else {
+          if (!this.bvalidate) return;
+          if (this.model_prob["label_name"] === "")
+            return;
+
+          let tmp_table_datas = [];
+          for (let i = 0; i < this.table_ava.length; i++) {
+            let m = this.table_ava[i];
+            if (("check" in m)) {
+              if (m["check"] === true) {
                 delete m["check"];
                 tmp_table_datas.push(m);
               }
+            }
           }
+          param = {
+            id_area: this.cur_area["id_area"],
+            mlmodel_label_name: this.model_prob["label_name"],
+            data: tmp_table_datas
+          };
         }
-        let param = {
-          id_area: this.cur_area["id_area"],
-          mlmodel_label_name: this.model_prob["label_name"],
-          data: tmp_table_datas
-        };
 
-        console.log(JSON.stringify(param));
         this.showLoader = true;
         this.$store.dispatch('http_post', ["/api/point/calc-prob", param, this.event_http_list_prob]).then();
 
@@ -538,6 +748,27 @@
         this.currentPage = 1;
       },
 
+      // --------------------------------
+      showPerPageProb(selected_per_page) {
+        if (selected_per_page === "All" || selected_per_page === "Semua")
+          this.perPageProb = this.table_prob.length;
+        else
+          this.perPageProb = selected_per_page;
+        this.perPageViewProb = selected_per_page;
+      },
+      computeTotalRowProb() {
+        try {
+          return (this.table_prob.length);
+        } catch (e) {
+          return (0);
+        }
+      },
+      onFilteredProb(filteredItems) {
+        // Trigger pagination to update the number of buttons/pages due to filtering
+        this.totalRowsProb = filteredItems.length;
+        this.currentPageProb = 1;
+      },
+
       onValidated(isValid, errors) {
         this.bvalidate = isValid;
       },
@@ -558,8 +789,8 @@
             name: msg["data"][i]["label_name"]
           });
         }
-        this.schema_ava.fields[0].values = list_segy;
-        this.schema_ava.fields[1].values = list_segy;
+        this.schema_ava_point.fields[0].values = list_segy;
+        this.schema_ava_point.fields[1].values = list_segy;
 
         let tmp_data_type = [
           {
@@ -571,7 +802,7 @@
             name: "XYZ"
           },
         ];
-        this.schema_ava.fields[2].values = tmp_data_type;
+        this.schema_ava_point.fields[2].values = tmp_data_type;
         this.getMlModelFile();
       });
       EventBus.$on(this.event_http_list_sgy.fail, (msg) => {
@@ -606,20 +837,22 @@
       EventBus.$on(this.event_http_list_ava.success, (msg) => {
         this.table_ava = msg["data"];
         this.ndata = this.table_ava.length;
-        if(this.ndata <= 0)
-        {
+        if (this.ndata <= 0) {
           this.retStatus["mesg"] = msg["mesg"];
           this.$refs.dialogMessage.showModal();
           this.showLoader = false;
           return;
         }
 
-        let segy_file_id = this.model_ava["gather_file_name"];
+        let segy_file_id = "";
+        if(this.type_ava==0)
+          segy_file_id = this.model_ava_point["gather_file_name"];
+        else
+          segy_file_id = this.model_ava_geobody["gather_file_name"];
         for (let i = 0; i < this.table_ava.length; i++) {
           this.table_ava[i]["gather_file_name"] = segy_file_id;
         }
 
-        this.table_headers = createTableAvaHeaderV0();
         this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
         this.showLoader = false;
       });
@@ -632,15 +865,13 @@
 
       //-------------- LIST PROB -------------------
       EventBus.$on(this.event_http_list_prob.success, (msg) => {
-        // this.table_ava = createProbDemoData();
-        this.table_ava = msg["data"];
-
-        this.table_headers = createTableProbHeaderV0();
-        this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
+        this.table_prob = msg["data"];
+        this.ndata_prob = this.table_prob.length;
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list_prob.fail, (msg) => {
         this.showLoader = false;
+        this.table_prob = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });

@@ -1,9 +1,11 @@
 import axios from "axios";
-import {globalVar} from "../../config";
+import {getConfigMapUrl, globalVar} from "../../config";
 
 const DEBUG_MODE = true;
 const DEBUG_SERVER = true;
 const SERVER_DEVEL = 2;
+const DEMO_MODE = true;
+
 // const DEBUG_MODE = false;
 // const DEBUG_SERVER = false;
 
@@ -12,6 +14,12 @@ export function appDebugMode() {
 }
 export function appDebugServer() {
   return (DEBUG_SERVER);
+}
+export function appDemoMode() {
+  return (DEMO_MODE);
+}
+export function getLocalMapServer() {
+  return (getConfigMapUrl());
 }
 
 export function url_http_post(userData) {
