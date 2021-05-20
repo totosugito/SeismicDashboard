@@ -107,7 +107,7 @@
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTabProcessIcon, createTabProcessText} from '../../libs/libSeismicUi';
+  import {createTabProcessTextV0, createTabProcessIconV0} from '../../libs/libSeismicUi';
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
@@ -245,11 +245,11 @@
 
       getTabIcon()
       {
-        return(createTabProcessIcon())
+        return(createTabProcessIconV0(0))
       },
       getTabText()
       {
-        return(createTabProcessText())
+        return(createTabProcessTextV0(0))
       },
       wizardButtonClicked(str_router) {
         return(this.varRouter.getRoute(str_router, 1))

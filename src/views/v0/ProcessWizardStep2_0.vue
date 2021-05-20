@@ -52,7 +52,7 @@
 <!--              <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>-->
 <!--              <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>-->
 <!--            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)" class="mr-2">Section</b-link>-->
-            <b-link :href="openDataUrl3_3(row.item)" @click="openData3_3(row.item)">Prob</b-link>
+            <b-link @click="openData2_1(row.item)">Prob</b-link>
           </template>
 
           <!-- X -->
@@ -85,8 +85,8 @@
                    :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
               <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"></l-tile-layer>
 <!--              <l-marker :lat-lng="marker" :icon="defaultIcon"/>-->
-              <template v-for="(item, idx_poly) in map_var.polygon">
-                <l-polygon :lat-lngs="map_var.polygon[idx_poly]" :color="map_var.poly_color[idx_poly]"/>
+              <template v-for="(item, idx_poly) in map_polygon">
+                <l-polygon :lat-lngs="item.polygon" :color="item.color"/>
               </template>
             </l-map>
           </template>
@@ -131,7 +131,7 @@
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTabProcessIcon, createTabProcessText} from '../../libs/libSeismicUi';
+  import {createTabProcessIconV0, createTabProcessTextV0} from '../../libs/libSeismicUi';
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
@@ -142,6 +142,7 @@
   import {appDemoMode} from "../../_constant/http_api";
   import {createAreaLeafletDemoData, createGeobodyDemoData} from "../../libs/demo_data";
   import {
+    createLeafletAreaPolygon,
     fillLeafletAreaVariable
   } from "../../libs/simpleLib";
 
@@ -157,7 +158,7 @@
   });
 
   export default {
-    name: "ProcessWizardStep2",
+    name: "ProcessWizardStep2_0",
     components: {
       ViewBottomWizardButton,
       ViewProcessWizardButton,
@@ -188,6 +189,7 @@
         retStatus: {status: 0, title: "", message: "", data: []},
 
         map_var: {},
+        map_polygon: [],
 
         cur_area: {},
         cur_tab: 0,
@@ -232,13 +234,16 @@
     beforeMount: function ()
     {
       this.cur_area = this.$store.getters.readSelectedArea;
-      if (appDemoMode() === true)
-      {
-        this.table_datas = createGeobodyDemoData();
-        this.map_var = createAreaLeafletDemoData();
-        this.map_var = fillLeafletAreaVariable(this.map_var, this.cur_area["coordinate"], 0);
+      this.map_var = createAreaLeafletDemoData();
+      this.map_var = fillLeafletAreaVariable(this.map_var, this.cur_area["coordinate"], 0);
 
-      }
+      this.map_polygon = [];
+      let item = this.cur_area;
+      item.poly = createLeafletAreaPolygon(item["coordinate"], 0);
+      this.map_polygon.push(item.poly);
+
+      if (appDemoMode() === true)
+        this.table_datas = createGeobodyDemoData();
       else
         this.getListGeobody();
     },
@@ -295,11 +300,11 @@
 
       getTabIcon()
       {
-        return (createTabProcessIcon())
+        return (createTabProcessIconV0(0))
       },
       getTabText()
       {
-        return (createTabProcessText())
+        return (createTabProcessTextV0(0))
       },
       wizardButtonClicked(str_router)
       {
@@ -362,16 +367,19 @@
       {
         // return("#/process-wizard3-2?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
       },
-      openData3_3(item)
+      openData2_1(item)
       {
+        this.$store.dispatch('actionSaveSelectedGeobody', item); //set selected project
+        // console.log(JSON.stringify(item))
         this.$router.push({
-          path: "process-wizard3-3",
-          // query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"], cls: item['cls']}
+          path: "process-wizard2-1",
+          query: { mode:0 }
         });
       },
-      openDataUrl3_3(item)
+      openDataUrl2_1(item)
       {
-        // return("#/process-wizard3-3?geobody_file_id=" + item["file_id"]["$oid"] + "&geobody_id=" + item["geobody_id"] + "&cls=" + item["cls"]);
+        this.$store.dispatch('actionSaveSelectedGeobody', item); //set selected project
+        return("#/process-wizard2-1?mode=0");
       },
 
       radiusDialogBtn1Click() {

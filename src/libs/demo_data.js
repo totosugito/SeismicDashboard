@@ -2171,8 +2171,8 @@ export function createAreaLeafletDemoData() {
   let data = {
     "zoom": 10,
     "minZoom": 7,
-    "maxZoom": 12,
-    "mapMaxResolution": 38.21851414,
+    "maxZoom": 16,
+    "mapMaxResolution": 2.38865713,
     "url": getLocalMapServer() + "/{z}/{x}/{y}.png",
     "attribution": '',
     "tileExtent": [-20037508.34278924, -20037508.34278924, 20037508.34278924, 20037508.34278924],
@@ -2180,4 +2180,57 @@ export function createAreaLeafletDemoData() {
     "poly_color": []
   };
   return(data);
+}
+
+export function createDemoAvaGeobodyParam() {
+  let param = {
+    "id_area": 1,
+    "gather_file_name": "CT3D_gather_AVA",
+    "substack_file_name": "CT3D_substack_far",
+    "geobody_id": "220845",
+    "rad_x": 50,
+    "rad_y": 50,
+    "rad_z": 15
+  };
+  return(param);
+}
+
+export function createDemoAvaPointParam() {
+  let param = {
+    "id_area": 1,
+    "gather_file_name": "10_TUN_CT3DTZ_19_KPSTM_GTHR_D_FINAL_ANGLE_SCALED_Big_Endian.segy",
+    "substack_file_name": "10_TUN_CT3DTZ_19_KPSTM_FAR_D_ELNWG_ZEROPHASED_Scaled.segy",
+    "type": "ilxl",
+    "cdp_z": 500,
+    "rad_x": 100,
+    "rad_y": 50,
+    "rad_z": 15,
+    "iline": 5583,
+    "xline": 2685
+  };
+  return(param);
+}
+
+export function createDemoProbParam() {
+  let param = {
+    "id_area": 1,
+    "mlmodel_label_name": "CT3D_v30_m01_sm30_05_auc_0885",
+    "data": [
+      {
+        "iline": 5579.0,
+        "xline": 2681.0,
+        "cdp_x": 563000.0,
+        "cdp_y": 9899038.0,
+        "cdp_z": 484.576
+      },
+      {
+        "iline": 5579.0,
+        "xline": 2681.0,
+        "cdp_x": 563000.0,
+        "cdp_y": 9899038.0,
+        "cdp_z": 487.764
+      }
+    ]
+  };
+  return(param);
 }

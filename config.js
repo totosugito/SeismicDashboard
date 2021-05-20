@@ -10,5 +10,5 @@ export function globalVar()
 
 export function getConfigMapUrl()
 {
-  return('http://localhost/map');
+  return('http://localhost/map16');
 }

@@ -13,3 +13,21 @@ export function createTabProcessText()
   // let tabtitle = ["Area List", "Geobody List", "Probability"];
   return(tabtitle);
 }
+
+export function createTabProcessIconV0(imode)
+{
+  // imode : 1=point, 0=geobody
+  let tabicon = ["fa fa-list", "fa fa-renren", "fa fa-line-chart", "fa fa-pie-chart"];
+  if(imode === 1)
+    tabicon = ["fa fa-list", "fa fa-line-chart", "fa fa-pie-chart"];
+  return(tabicon);
+}
+
+export function createTabProcessTextV0(imode)
+{
+  // imode : 1=point, 0=geobody
+  let tabtitle = ["Area List", "Geobody List", "Probability", "Recomendation"];
+  if(imode === 1)
+    tabtitle = ["Area List", "Probability", "Recomendation"];
+  return(tabtitle);
+}

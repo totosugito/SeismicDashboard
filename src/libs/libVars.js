@@ -531,3 +531,185 @@ export function createTableProbHeaderV0()
   ];
   return (table_headers);
 }
+
+export function createAvaPointModel()
+{
+  let model_ava_point = {
+    id_area: 0,
+      gather_file_name: "",
+      substack_file_name: "",
+      xline: 0,
+      iline: 0,
+      cdp_z: 500,
+      type: 'ilxl',
+      rad_x: 100,
+      rad_y: 50,
+      rad_z: 15,
+  };
+  return(model_ava_point);
+}
+
+export function createAvaPointSchema()
+{
+  let schema_ava_point = {
+    fields: [
+      {
+        type: 'select',
+        label: 'Select Gather File',
+        model: 'gather_file_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+      {
+        type: 'select',
+        label: 'Select SubStack File',
+        model: 'substack_file_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+      {
+        type: 'select',
+        label: 'Select Data Type',
+        model: 'type',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'XLine/X',
+        model: 'xline',
+        placeholder: 'Set XLine',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'ILine/Y',
+        model: 'iline',
+        placeholder: 'Set ILine',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'CDP Z',
+        model: 'cdp_z',
+        placeholder: 'Set CDP Z',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Radius X',
+        model: 'rad_x',
+        placeholder: 'Set Radius X',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Radius Y',
+        model: 'rad_y',
+        placeholder: 'Set Radius Y',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Radius Z',
+        model: 'rad_z',
+        placeholder: 'Set Radius Z',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_ava_point);
+}
+
+export function createAvaGeobodyModel()
+{
+  let model_ava_geobody = {
+    id_area: 0,
+    gather_file_name: "",
+    substack_file_name: "",
+    geobody_id: "",
+    rad_x: 50,
+    rad_y: 50,
+    rad_z: 15
+  };
+  return(model_ava_geobody);
+}
+export function createAvaGeobodySchema()
+{
+  let schema_ava_geobody = {
+    fields: [
+      {
+        type: 'select',
+        label: 'Select Gather File',
+        model: 'gather_file_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+      {
+        type: 'select',
+        label: 'Select SubStack File',
+        model: 'substack_file_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Radius X',
+        model: 'rad_x',
+        placeholder: 'Set Radius X',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Radius Y',
+        model: 'rad_y',
+        placeholder: 'Set Radius Y',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Radius Z',
+        model: 'rad_z',
+        placeholder: 'Set Radius Z',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_ava_geobody);
+}
+
+export function createProbModel()
+{
+  let model_prob = {
+      label_name: "",
+    };
+  return(model_prob);
+}
+
+export function createProbSchema()
+{
+  let schema_prob = {
+    fields: [
+      {
+        type: 'select',
+        label: 'Select File',
+        model: 'label_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+    ]
+  };
+  return(schema_prob);
+}

@@ -51,7 +51,7 @@
         chart.getDefaultAxisZ().setTitle('CDP Y');
 
         // let ava_list = this.$store.getters.readProbList;
-        let ava_list = this.$store.getters.readAvaList;
+        let ava_list = this.$store.getters.readProbList;
         let cur_colormap = colormapYellowRedHsv();
         let idx_cm = 0;
 

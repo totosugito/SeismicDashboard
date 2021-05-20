@@ -108,7 +108,7 @@
   import ViewProcessWizardButton from "../components/viewProcessWizardButton";
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTabProcessIcon, createTabProcessText} from '../../libs/libSeismicUi';
+  import {createTabProcessIconV0, createTabProcessTextV0} from '../../libs/libSeismicUi';
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
@@ -255,7 +255,8 @@
         this.selected_data["view_mode"] = 0;
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
-          path: "process-wizard2",
+          path: "process-wizard2-0",
+          // query: {mode:0}
         });
       },
       openXYZPage(item) {
@@ -264,14 +265,15 @@
         this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
         this.$router.push({
           path: "process-wizard2-1",
+          query: {mode:1}
         });
       },
 
       getTabIcon() {
-        return (createTabProcessIcon())
+        return (createTabProcessIconV0(0))
       },
       getTabText() {
-        return (createTabProcessText())
+        return (createTabProcessTextV0(0))
       },
       wizardButtonClicked(str_router) {
         return (this.varRouter.getRoute(str_router, 1))

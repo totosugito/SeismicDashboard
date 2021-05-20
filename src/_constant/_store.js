@@ -302,7 +302,7 @@ const mutations = {
   },
   actionSaveSelectedGeobody(state, value){
     localStorage.setItem(key_geobody, JSON.stringify(value)); //save data
-    state.selectedWell = value;
+    state.selectedGeobody = value;
   },
   actionSaveSelectedInline(state, value){
     localStorage.setItem(key_location, JSON.stringify(value)); //save data

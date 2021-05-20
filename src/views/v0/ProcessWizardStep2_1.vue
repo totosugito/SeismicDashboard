@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="1" :textsize="190" class="mb-3"/>
+    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="tabIndex" :textsize="190" class="mb-3"/>
     <vue-element-loading
       :spinner="spinLoader.spinner"
       :color="spinLoader.color"
@@ -13,16 +13,22 @@
           <div slot="header">
             <div><span class="mr-2" style="color: #0d47a1"><strong>Probability <i
               class="fa fa-hand-o-right"></i></strong>
-            </span> Area : <strong>{{cur_area.name}}</strong>
+            </span>
+              Area : <strong>{{cur_area.name}}</strong>
+              <template v-if="pageMode===0">
+                &nbsp;&nbsp;&rarr;&nbsp;&nbsp;Geobody ID : <strong>{{cur_geobody.geobody_id}}</strong>
+              </template>
             </div>
           </div>
           <div>
             <b-row>
               <b-col md="6">
-                <b-dropdown right variant="success" text="AVA Data" class="mr-1">
-                  <b-dropdown-item @click="openAvaDialog(0)">Point</b-dropdown-item>
-                  <b-dropdown-item @click="openAvaDialog(1)">Geobody</b-dropdown-item>
-                </b-dropdown>
+                <template v-if="pageMode===0">
+                  <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA Geobody</b-btn>
+                </template>
+                <template v-else>
+                  <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA xyz</b-btn>
+                </template>
 
                 <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>
                 <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()">Calculate Prob
@@ -221,8 +227,15 @@
         </b-card>
       </b-col>
     </b-row>
-    <view-bottom-wizard-button class="mt-0" index="1" :left_clicked="wizardButtonClicked('processwizard1')"
+
+    <template v-if="pageMode===0">
+      <view-bottom-wizard-button class="mt-0" index="1" :left_clicked="wizardButtonClicked('processwizard2-0')"
                                :right_clicked="wizardButtonClicked('processwizard3')"/>
+    </template>
+    <template v-else>
+      <view-bottom-wizard-button class="mt-0" index="1" :left_clicked="wizardButtonClicked('processwizard1')"
+                                 :right_clicked="wizardButtonClicked('processwizard3')"/>
+    </template>
 
     <vue-form-dialog
       ref="avaDialog"
@@ -249,7 +262,7 @@
 
       <!-- body slot -->
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
-              <vue-form-generator :schema="schema_prob" :model="model_prob" :options="formOptions"
+              <vue-form-generator :schema="prob_schema" :model="prob_model" :options="formOptions"
                                   @validated="onValidated"/>
             </span>
     </vue-form-dialog>
@@ -275,19 +288,26 @@
   import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
   import {
+    createAvaPointModel, createAvaPointSchema,
+    createAvaGeobodyModel, createAvaGeobodySchema,
     createTableAvaHeaderV0,
-    createTableProbHeaderV0,
+    createTableProbHeaderV0, createProbModel, createProbSchema
   } from "../../libs/libVars";
-  import {createTabProcessIcon, createTabProcessText} from "../../libs/libSeismicUi";
+  import {createTabProcessIconV0, createTabProcessTextV0} from "../../libs/libSeismicUi";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
 
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-  import {createAvaDemoData, createProbDemoData} from "../../libs/demo_data";
+  import {
+    createAvaDemoData,
+    createDemoAvaGeobodyParam,
+    createDemoAvaPointParam, createDemoProbParam,
+    createProbDemoData
+  } from "../../libs/demo_data";
   import {appDemoMode} from "../../_constant/http_api";
 
   export default {
-    name: "ProcessWizardStep3_3",
+    name: "ProcessWizardStep2_1",
 
     components: {
       ViewProcessWizardButton,
@@ -307,188 +327,40 @@
     data() {
       return {
         proc_completed: false,
-        proc_plot_ava: false,
         showLoader: false,
-        bCheckAll: false,
-        bCheckAllProb: false,
-        retStatus: {status: 0, title: "Info", mesg: "", data: []},
-        perPageView: 10,
-        perPageViewProb: 10,
-        perPage: 10,
-        perPageProb: 10,
-        pageOptions: [5, 10, 15, 25, 50, 100, "All"],
-        currentPage: 1,
-        currentPageProb: 1,
-        totalRows: 0,
-        totalRowsProb: 0,
-        filter: null,
-        filterProb: null,
-        ndata: 0,
-        ndata_prob: 0,
 
-        table_headers: createTableAvaHeaderV0(),
-        table_headers_prob: createTableProbHeaderV0(),
-        table_ava: [],
-        table_prob: [],
+        pageMode: 0,
+        tabIndex: 1,
         cur_area: {},
-        selected_check_ava: [],
+        cur_geobody :{},
+        retStatus: {status: 0, title: "Info", mesg: "", data: []},
 
+        selected_check_ava: [],
+        bCheckAll: false,
+        perPageView: 10,
+        perPage: 10,
+        currentPage: 1,
+        totalRows: 0,
+        filter: null,
+        ndata: 0,
+        table_headers: createTableAvaHeaderV0(),
+        table_ava: [],
         schema_ava: {},
         model_ava: {},
-        type_ava: 0,
-        model_ava_geobody: {
-          id_area: 0,
-          gather_file_name: "",
-          substack_file_name: "",
-          geobody_id: "",
-          rad_x: 50,
-          rad_y: 50,
-          rad_z: 15
-        },
-        schema_ava_geobody: {
-          fields: [
-            {
-              type: 'select',
-              label: 'Select Gather File',
-              model: 'gather_file_name',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-            {
-              type: 'select',
-              label: 'Select SubStack File',
-              model: 'substack_file_name',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Radius X',
-              model: 'rad_x',
-              placeholder: 'Set Radius X',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Radius Y',
-              model: 'rad_y',
-              placeholder: 'Set Radius Y',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Radius Z',
-              model: 'rad_z',
-              placeholder: 'Set Radius Z',
-              featured: true,
-              required: true
-            },
-          ]
-        },
-        model_ava_point: {
-          id_area: 0,
-          gather_file_name: "",
-          substack_file_name: "",
-          xline: 0,
-          iline: 0,
-          cdp_z: 500,
-          type: 'ilxl',
-          rad_x: 100,
-          rad_y: 50,
-          rad_z: 15,
-        },
-        schema_ava_point: {
-          fields: [
-            {
-              type: 'select',
-              label: 'Select Gather File',
-              model: 'gather_file_name',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-            {
-              type: 'select',
-              label: 'Select SubStack File',
-              model: 'substack_file_name',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-            {
-              type: 'select',
-              label: 'Select Data Type',
-              model: 'type',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'XLine/X',
-              model: 'xline',
-              placeholder: 'Set XLine',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'ILine/Y',
-              model: 'iline',
-              placeholder: 'Set ILine',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'CDP Z',
-              model: 'cdp_z',
-              placeholder: 'Set CDP Z',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Radius X',
-              model: 'rad_x',
-              placeholder: 'Set Radius X',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Radius Y',
-              model: 'rad_y',
-              placeholder: 'Set Radius Y',
-              featured: true,
-              required: true
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Radius Z',
-              model: 'rad_z',
-              placeholder: 'Set Radius Z',
-              featured: true,
-              required: true
-            },
-          ]
-        },
-        model_prob: {
-          label_name: "",
-        },
-        schema_prob: {
-          fields: [
-            {
-              type: 'select',
-              label: 'Select File',
-              model: 'label_name',
-              selectOptions: {hideNoneSelectedText: true}
-            },
-          ]
-        },
+
+        bCheckAllProb: false,
+        perPageViewProb: 10,
+        perPageProb: 10,
+        currentPageProb: 1,
+        totalRowsProb: 0,
+        filterProb: null,
+        ndata_prob: 0,
+        table_headers_prob: createTableProbHeaderV0(),
+        table_prob: [],
+        prob_model: createProbModel(),
+        prob_schema: createProbSchema(),
+
+        pageOptions: [5, 10, 15, 25, 50, 100, "All"],
         formOptions: {
           validateAfterLoad: true,
           validateAfterChanged: true,
@@ -504,13 +376,26 @@
 
     beforeMount: function () {
       this.cur_area = this.$store.getters.readSelectedArea;
-      this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
+
+      this.pageMode = this.$route.query.mode*1;
+      if(this.pageMode===0)
+      {
+        this.tabIndex = 2;
+        this.cur_geobody = this.$store.getters.readSelectedGeobody;
+      }
+      else this.tabIndex = 1;
+
+      this.initSchemaAndModelData();
+
       if (appDemoMode() === true)
       {
         this.table_ava = createAvaDemoData();
         this.table_prob = createProbDemoData();
+
+        this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
+        this.$store.dispatch('actionSaveProbList', this.table_prob); //set selected project
       }
-      else
+      // else
         this.getListSegy();
     },
 
@@ -550,19 +435,21 @@
         window.open('#/prob3dview?type=' + str_type, '_blank');
       },
 
-      //------------------------- ava dialog ----------------------------
-      openAvaDialog(ava_type_) {
-        this.type_ava = ava_type_;
-        if (ava_type_===0)
+      initSchemaAndModelData()
+      {
+        if (this.pageMode === 0)
         {
-          this.schema_ava = this.schema_ava_point;
-          this.model_ava = this.model_ava_point;
+          this.schema_ava = createAvaGeobodySchema();
+          this.model_ava = createAvaGeobodyModel();
         }
         else
         {
-          this.schema_ava = this.schema_ava_geobody;
-          this.model_ava = this.model_ava_geobody;
+          this.schema_ava = createAvaPointSchema();
+          this.model_ava = createAvaPointModel();
         }
+      },
+      //------------------------- ava dialog ----------------------------
+      openAvaDialog() {
         this.$refs.avaDialog.showModal();
       },
       avaDialogBtn1Click() {
@@ -572,67 +459,48 @@
         let param = {};
         if (appDemoMode() === true)
         {
-          if(this.type_ava === 0)
-            param = {
-              "id_area": 1,
-              "gather_file_name": "10_TUN_CT3DTZ_19_KPSTM_GTHR_D_FINAL_ANGLE_SCALED_Big_Endian.segy",
-              "substack_file_name": "10_TUN_CT3DTZ_19_KPSTM_FAR_D_ELNWG_ZEROPHASED_Scaled.segy",
-              "type": "ilxl",
-              "cdp_z": 500,
-              "rad_x": 100,
-              "rad_y": 50,
-              "rad_z": 15,
-              "iline": 5583,
-              "xline": 2685
-            };
+          if (this.pageMode === 0)
+            param = createDemoAvaGeobodyParam();
           else
-            param = {
-              "id_area": 1,
-              "gather_file_name": "CT3D_gather_AVA",
-              "substack_file_name": "CT3D_substack_far",
-              "geobody_id": "220845",
-              "rad_x": 50,
-              "rad_y": 50,
-              "rad_z": 15
-            };
+            param = createDemoAvaPointParam();
         }
         else {
           if (!this.bvalidate) return;
-          if (this.model_ava_point["gather_file_name"] === "")
+          if (this.model_ava["gather_file_name"] === "")
             return;
-          if (this.model_ava_point["substack_file_name"] === "")
+          if (this.model_ava["substack_file_name"] === "")
             return;
 
-          if(this.type_ava === 0)
+          if (this.pageMode === 0)
             param = {
               id_area: this.cur_area["id_area"],
-              gather_file_name: this.model_ava_point["gather_file_name"],
-              substack_file_name: this.model_ava_point["substack_file_name"],
-              radius: this.model_ava_point["radius"],
-              type: this.model_ava_point["type"],
-              xline: this.model_ava_point["xline"],
-              iline: this.model_ava_point["iline"],
-              cdp_z: this.model_ava_point["cdp_z"],
-              rad_x: this.model_ava_point["rad_x"],
-              rad_y: this.model_ava_point["rad_y"],
-              rad_z: this.model_ava_point["rad_z"],
+              gather_file_name: this.model_ava["gather_file_name"],
+              substack_file_name: this.model_ava["substack_file_name"],
+              geobody_id: this.cur_geobody["geobody_id"],
+              rad_x: this.model_ava["rad_x"],
+              rad_y: this.model_ava["rad_y"],
+              rad_z: this.model_ava["rad_z"],
             };
           else
             param = {
               id_area: this.cur_area["id_area"],
-              gather_file_name: this.model_ava_geobody["gather_file_name"],
-              substack_file_name: this.model_ava_geobody["substack_file_name"],
-              "geobody_id": "220845",
-              rad_x: this.model_ava_geobody["rad_x"],
-              rad_y: this.model_ava_geobody["rad_y"],
-              rad_z: this.model_ava_geobody["rad_z"],
+              gather_file_name: this.model_ava["gather_file_name"],
+              substack_file_name: this.model_ava["substack_file_name"],
+              radius: this.model_ava["radius"],
+              type: this.model_ava["type"],
+              xline: this.model_ava["xline"],
+              iline: this.model_ava["iline"],
+              cdp_z: this.model_ava["cdp_z"],
+              rad_x: this.model_ava["rad_x"],
+              rad_y: this.model_ava["rad_y"],
+              rad_z: this.model_ava["rad_z"],
             };
         }
         this.showLoader = true;
-        if(this.type_ava === 0)
-          this.$store.dispatch('http_post', ["/api/point/find-ava-data", param, this.event_http_list_ava]).then();
-        else
+        if (this.pageMode === 0)
           this.$store.dispatch('http_post', ["/api/geobody/find-ava-data", param, this.event_http_list_ava]).then();
+        else
+          this.$store.dispatch('http_post', ["/api/point/find-ava-data", param, this.event_http_list_ava]).then();
 
         this.$refs.avaDialog.hideModal();
       },
@@ -647,30 +515,11 @@
         let param = {};
         if (appDemoMode() === true)
         {
-          param = {
-            "id_area": 1,
-            "mlmodel_label_name": "CT3D_v30_m01_sm30_05_auc_0885",
-            "data": [
-              {
-                "iline": 5579.0,
-                "xline": 2681.0,
-                "cdp_x": 563000.0,
-                "cdp_y": 9899038.0,
-                "cdp_z": 484.576
-              },
-              {
-                "iline": 5579.0,
-                "xline": 2681.0,
-                "cdp_x": 563000.0,
-                "cdp_y": 9899038.0,
-                "cdp_z": 487.764
-              }
-            ]
-          }
+          createDemoProbParam();
         }
         else {
           if (!this.bvalidate) return;
-          if (this.model_prob["label_name"] === "")
+          if (this.prob_model["label_name"] === "")
             return;
 
           let tmp_table_datas = [];
@@ -678,14 +527,14 @@
             let m = this.table_ava[i];
             if (("check" in m)) {
               if (m["check"] === true) {
-                delete m["check"];
+                // delete m["check"];
                 tmp_table_datas.push(m);
               }
             }
           }
           param = {
             id_area: this.cur_area["id_area"],
-            mlmodel_label_name: this.model_prob["label_name"],
+            mlmodel_label_name: this.prob_model["label_name"],
             data: tmp_table_datas
           };
         }
@@ -717,11 +566,10 @@
       },
 
       getTabIcon() {
-        return (createTabProcessIcon())
+        return (createTabProcessIconV0(this.pageMode))
       },
       getTabText() {
-        let tab_text = createTabProcessText();
-        tab_text[1] = "Probability List";
+        let tab_text = createTabProcessTextV0(this.pageMode);
         return (tab_text)
       },
 
@@ -783,14 +631,14 @@
         let list_segy = [];
         for (let i = 0; i < msg["data"].length; i++) {
           list_segy.push({
-            value: msg["data"][i]["file_name"],
+            value: msg["data"][i]["label_name"],
             text: msg["data"][i]["label_name"],
-            id: msg["data"][i]["file_name"],
+            id: msg["data"][i]["label_name"],
             name: msg["data"][i]["label_name"]
           });
         }
-        this.schema_ava_point.fields[0].values = list_segy;
-        this.schema_ava_point.fields[1].values = list_segy;
+        this.schema_ava.fields[0].values = list_segy;
+        this.schema_ava.fields[1].values = list_segy;
 
         let tmp_data_type = [
           {
@@ -802,7 +650,7 @@
             name: "XYZ"
           },
         ];
-        this.schema_ava_point.fields[2].values = tmp_data_type;
+        this.schema_ava.fields[2].values = tmp_data_type;
         this.getMlModelFile();
       });
       EventBus.$on(this.event_http_list_sgy.fail, (msg) => {
@@ -823,7 +671,7 @@
             name: msg["data"][i]["label_name"]
           });
         }
-        this.schema_prob.fields[0].values = list_mlmodel;
+        this.prob_schema.fields[0].values = list_mlmodel;
         this.showLoader = false;
       });
 
@@ -844,11 +692,7 @@
           return;
         }
 
-        let segy_file_id = "";
-        if(this.type_ava==0)
-          segy_file_id = this.model_ava_point["gather_file_name"];
-        else
-          segy_file_id = this.model_ava_geobody["gather_file_name"];
+        let segy_file_id = this.model_ava["gather_file_name"];
         for (let i = 0; i < this.table_ava.length; i++) {
           this.table_ava[i]["gather_file_name"] = segy_file_id;
         }
@@ -866,7 +710,11 @@
       //-------------- LIST PROB -------------------
       EventBus.$on(this.event_http_list_prob.success, (msg) => {
         this.table_prob = msg["data"];
+        for (let i = 0; i < this.table_prob.length; i++)
+          this.table_prob[i]["check"] = false;
+
         this.ndata_prob = this.table_prob.length;
+        this.$store.dispatch('actionSaveProbList', this.table_prob); //set selected project
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list_prob.fail, (msg) => {
