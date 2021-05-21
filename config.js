@@ -11,4 +11,5 @@ export function globalVar()
 export function getConfigMapUrl()
 {
   return('http://localhost/map16');
+  // return('http://jasdig.com:5151/static/map16');
 }

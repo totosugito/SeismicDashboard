@@ -80,7 +80,9 @@
                    :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
               <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"></l-tile-layer>
               <template v-for="(item, idx_poly) in map_polygon">
-                <l-polygon :lat-lngs="item.polygon" :color="item.color"/>
+                <l-polygon :lat-lngs="item.polygon" :color="item.color">
+                <l-popup content="Polygon" />
+                </l-polygon>
               </template>
             </l-map>
           </template>
@@ -123,7 +125,7 @@
   import {createAreaLeafletDemoData} from "../../libs/demo_data";
 
   import * as L from "leaflet";
-  import {LMap, LTileLayer, LMarker, LPolygon} from 'vue2-leaflet'
+  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip} from 'vue2-leaflet'
   import {CRS} from "leaflet";
   import 'leaflet/dist/leaflet.css'
 
@@ -146,7 +148,9 @@
       LMap,
       LTileLayer,
       LMarker,
-      LPolygon
+      LPolygon,
+      LPopup,
+      LTooltip
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -296,6 +300,15 @@
       },
     },
     mounted() {
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'))
+      }, 250);
+
+      // // DO
+      // this.$nextTick(() => {
+      //   this.map = this.$refs.map.mapObject; // work as expected
+      // });
+
       //-------------- LIST LOKASI -------------------
       EventBus.$on(this.event_http_list.success, (msg) => {
         this.table_datas = msg.data; //fill table contents
