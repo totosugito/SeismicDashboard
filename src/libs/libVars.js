@@ -531,6 +531,32 @@ export function createTableProbHeaderV0()
   ];
   return (table_headers);
 }
+export function createTableSegyListAdmin()
+{
+  let table_headers = [
+    {
+      key: 'label_name',
+      label: 'Label',
+      sortable: true
+    },
+    {
+      key: 'file_loc',
+      label: 'Location',
+      sortable: true
+    },
+    {
+      key: 'note',
+      label: 'Note',
+      sortable: true
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
 
 export function createAvaPointModel()
 {

@@ -1,19 +1,34 @@
 <template>
   <div>
-    <ApexChartLine class="lc_seismic_chart" :chartOptions="chartOptions" :series="chartSeries"/>
+<!--    <ApexChartLine class="lc_seismic_chart" :chartOptions="chartOptions" :series="chartSeries"/>-->
+    <VJsoneditor v-model="json" :options="options" :plus="false" height="400px" @error="onError"/>
   </div>
 </template>
 
 <script>
   import ApexChartLine from "../components/ApexChartLine";
+  import VJsoneditor from 'v-jsoneditor'
   export default {
     name: "testApexChart",
 
     components: {
-      ApexChartLine
+      ApexChartLine,
+      VJsoneditor
+    },
+    methods: {
+      onError() {
+        console.log('error')
+      }
     },
     data() {
       return {
+        options: {
+          "mode": "code",
+          "search": false,
+        },
+        json: {
+          "hello": "vue"
+        },
         chartOptions: {
           chart: {
             type: 'bar',

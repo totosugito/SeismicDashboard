@@ -199,9 +199,10 @@ export function fillLeafletAreaVariable(m, coordinate, idx_color)
   return(m);
 }
 
-export function createLeafletAreaPolygon(coordinate, idx_color)
+export function createLeafletAreaPolygon(poly_name, coordinate, idx_color)
 {
   let pp = {
+    "name": poly_name,
     "polygon" : [
       [coordinate["p1"]["y"], coordinate["p1"]["x"]],
       [coordinate["p2"]["y"], coordinate["p2"]["x"]],

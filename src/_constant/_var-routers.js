@@ -46,7 +46,15 @@ export default class VarRouter {
   };
 
   httptype = {
-    "area-list": "/api/area/list"
+    "area-list": "/api/area/list",
+    "area-register": "/api/area/register",
+    "area-delete": "/api/area/delete",
+    "area-update": "/api/area/update",
+
+    "segy-list": "/api/segy/file-list",
+    "segy-register": "/api/segy/file-register",
+    "segy-delete": "/api/segy/file-delete",
+    "segy-update": "/api/segy/file-update",
   };
 
   schematype = {

@@ -81,7 +81,7 @@
               <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"></l-tile-layer>
               <template v-for="(item, idx_poly) in map_polygon">
                 <l-polygon :lat-lngs="item.polygon" :color="item.color">
-                <l-popup content="Polygon" />
+                <l-popup :content="item.name" />
                 </l-polygon>
               </template>
             </l-map>
@@ -317,7 +317,7 @@
         for (let i = 0; i < this.table_datas.length; i++) {
           let item = this.table_datas[i];
           this.map_var = fillLeafletAreaVariable(this.map_var, item["coordinate"], i);
-          item.poly = createLeafletAreaPolygon(item["coordinate"], i);
+          item.poly = createLeafletAreaPolygon(item["name"], item["coordinate"], i);
           item.plot = true;
 
           this.map_polygon.push(item.poly);

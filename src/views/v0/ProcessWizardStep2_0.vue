@@ -239,7 +239,7 @@
 
       this.map_polygon = [];
       let item = this.cur_area;
-      item.poly = createLeafletAreaPolygon(item["coordinate"], 0);
+      item.poly = createLeafletAreaPolygon(this.cur_area["name"], item["coordinate"], 0);
       this.map_polygon.push(item.poly);
 
       if (appDemoMode() === true)
@@ -407,7 +407,7 @@
 
       // DO
       this.$nextTick(() => {
-        this.map = this.$refs.map.mapObject; // work as expected
+        // this.map = this.$refs.map.mapObject; // work as expected
       });
 
       //-------------- LIST GEOBODY -------------------

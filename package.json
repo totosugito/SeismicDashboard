@@ -31,6 +31,7 @@
     "register-service-worker": "^1.6.2",
     "sass-loader": "^7.1.0",
     "splitpanes": "^2.2.1",
+    "v-jsoneditor": "^1.4.4",
     "vue": "^2.5.22",
     "vue-apexcharts": "^1.5.3",
     "vue-bootstrap-slider": "^2.1.8",
