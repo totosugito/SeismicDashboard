@@ -19,9 +19,15 @@
         <!-- table header -->
         <div class="group-header">
           <b-row>
-            <b-col md="2" class="my-1">
+            <b-col md="4" class="my-1">
+              <button type="button" class="btn-sm btn-warning" @click="removeAllMarker()"
+                      style="margin: 3px"><i class="fa fa-map-o"></i> Clear
+              </button>
+              <button type="button" class="btn-sm btn-warning" @click="showMarkerDrag()"
+                      style="margin: 3px"><i class="fa fa-map-marker"></i> Marker
+              </button>
             </b-col>
-            <b-col md="10" class="my-1">
+            <b-col md="8" class="my-1">
               <b-form-group  label-cols-lg="4" label-cols-md="3" label-cols-sm="6"  class="mb-0">
                 <b-input-group prepend="Filter : ">
                   <b-form-input v-model="filter" placeholder="Search"/>
@@ -87,11 +93,21 @@
           <template v-if="showLoader===false">
             <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
                    :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
+
+              <template v-if="show_marker_drag===true">
+                <l-marker :lat-lng="marker_drag" :draggable="true" :icon="defaultIcon" @drag="dragMarkerCoordinates">
+                  <l-popup>X : <b>{{marker_drag.lng.toFixed(2)}}</b><br>Y : <b>{{marker_drag.lat.toFixed(2)}}</b></l-popup>
+                </l-marker>
+              </template>
+
               <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
               <template v-for="item in markers">
+                <l-polygon :lat-lngs="item.polygon" :color="item.color">
+                  <l-popup>ID : <b>{{item.id}}</b><br>X : {{item.polygon[0][1].toFixed(2)}}, {{item.polygon[2][1].toFixed(2)}}<br>Y : {{item.polygon[0][0].toFixed(2)}}, {{item.polygon[2][0].toFixed(2)}}</l-popup>
+                </l-polygon>
                 <l-marker :lat-lng="item.pos">
-                  <l-popup>ID : <b>{{item.id}}</b><br>Lat : <b>{{item.lat}}</b><br>Lon : <b>{{item.lon}}</b></l-popup>
+                  <l-popup>ID : <b>{{item.id}}</b><br>X : <b>{{item.pos.lng.toFixed(2)}}</b><br>Y : <b>{{item.pos.lat.toFixed(2)}}</b></l-popup>
                 </l-marker>
               </template>
 
@@ -199,12 +215,20 @@
         showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
 
+        show_marker_drag: false,
+        marker_drag: {lat:0, lng:0},
+
         map_var: {},
         map_polygon: [],
 
         cur_area: {},
         cur_tab: 0,
         markers: [],
+        defaultIcon: L.icon({
+          iconUrl: getMapPinMarker(),
+          iconSize: [32, 36],
+          iconAnchor: [16, 36]
+        }),
         // icon: icon({
         //   iconUrl: //"https://storage.googleapis.com/public-datas/pin_location.png",
         //   iconSize: [32, 37],
@@ -342,17 +366,24 @@
         for(let i=0; i<this.table_datas.length; i++)
         {
           let item = this.table_datas[i];
-          let xc = (item["edge"]["x"]["max"] + item["edge"]["x"]["min"])/2.0;
-          let yc = (item["edge"]["y"]["max"] + item["edge"]["y"]["min"])/2.0;
+          let ymax = item["edge"]["y"]["max"];
+          let ymin = item["edge"]["y"]["min"];
+          let xmax = item["edge"]["x"]["max"];
+          let xmin = item["edge"]["x"]["min"];
+          let xc = (xmax + xmin)/2.0;
+          let yc = (ymax + ymin)/2.0;
           let marker = {
             "plot": false,
+            "polygon": [[ymin, xmin], [ymin, xmax], [ymax, xmax], [ymax, xmin]],
+            "color": "#FF00FF",
             "pos": L.latLng(yc, xc),
             "id": item["geobody_id"],
-            "lat": yc.toFixed(2),
-            "lon": xc.toFixed(2)
           };
           this.table_datas[i]["marker"] = marker;
         }
+
+        if(this.table_datas.length >0)
+          this.marker_drag = this.table_datas[0]["marker"]["pos"];
         return(this.table_datas);
       },
 
@@ -366,6 +397,26 @@
           "color:" + fg_color + "; " +
           "font-size:150%;";
         return (strstyle);
+      },
+      showMarkerDrag()
+      {
+        this.show_marker_drag = !this.show_marker_drag;
+      },
+      dragMarkerCoordinates(location)
+      {
+        this.marker_drag = location.latlng;
+        // console.log(JSON.stringify(this.marker_drag));
+      },
+
+      removeAllMarker()
+      {
+        for(let i=this.markers.length-1; i>=0; i--)
+        {
+          let item = _.find(this.table_datas, {geobody_id: this.markers[i]["id"]});
+          item["marker"]["plot"] = false;
+          this.markers.splice(i, 1);
+          //console.log(JSON.stringify(item));
+        }
       },
       eventUpdateMarkerInMap(item)
       {
