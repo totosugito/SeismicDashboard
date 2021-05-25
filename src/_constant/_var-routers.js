@@ -25,7 +25,7 @@ export default class VarRouter {
     "admin-dashboard": ["admin-dashboard", "/admin-dashboard", "Admin Dashboard"],
     "admin-area-list": ["admin-area-list", "/admin-area-list", "Admin Area"],
     "admin-segy-list": ["admin-segy-list", "/admin-segy-list", "Admin SEGY"],
-    "admin-geobody-list": ["admin-geobody-list", "/admin-geobody-list", "Admin Geobody"],
+    "admin-mlmodel-list": ["admin-mlmodel-list", "/admin-mlmodel-list", "Admin Model"],
 
     "segy-list": ["segy-list", "/segy-list", "SEGY List"],
     "processwizard": ["process-wizard", "/process-wizard", "Process Wizard"],
@@ -55,6 +55,17 @@ export default class VarRouter {
     "segy-register": "/api/segy/file-register",
     "segy-delete": "/api/segy/file-delete",
     "segy-update": "/api/segy/file-update",
+
+    "mlmodel-list": "/api/mlmodel/file-list",
+    "mlmodel-register": "/api/mlmodel/file-register",
+    "mlmodel-delete": "/api/mlmodel/file-delete",
+    "mlmodel-update": "/api/mlmodel/file-update",
+
+    "geobody-list": "/api/geobody/info-list",
+    "geobody-ava-list": "/api/geobody/find-ava-data",
+
+    "point-ava-list": "/api/point/find-ava-data",
+    "point-calc-prob": "/api/point/calc-prob",
   };
 
   schematype = {

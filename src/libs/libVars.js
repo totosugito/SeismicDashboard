@@ -163,17 +163,27 @@ export function createTableGeobodyListHeaderV0()
     {
       key: 'cls',
       label: 'Class',
-      sortable: true
+      sortable: true,
+      // thClass: 'text-center',
     },
     {
       key: 'nop',
       label: 'NPoints',
-      sortable: true
+      sortable: true,
+      // thClass: 'text-center',
     },
     {
       key: 'action',
       label: 'Action',
       sortable: false,
+      // thClass: 'text-center',
+    },
+    {
+      key: 'show_marker',
+      label: 'Show',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center'
     },
   ];
   return (table_headers);

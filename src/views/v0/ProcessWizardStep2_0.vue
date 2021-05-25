@@ -55,6 +55,10 @@
             <b-link @click="openData2_1(row.item)">Prob</b-link>
           </template>
 
+          <template v-slot:cell(show_marker)="row">
+            <span class="-align-right"><i class="fa fa-map-marker" :style="createStyleFromIndex(row.item)" @click="eventUpdateMarkerInMap(row.item)"></i></span>
+          </template>
+
           <!-- X -->
           <template v-slot:cell(xcoord)="row">
 <!--            <strong>Min : </strong> {{row.item.x_min.toFixed(4)}}<br><strong>Max : </strong> {{row.item.x_max.toFixed(4)}}-->
@@ -83,8 +87,14 @@
           <template v-if="showLoader===false">
             <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
                    :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
-              <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"></l-tile-layer>
-<!--              <l-marker :lat-lng="marker" :icon="defaultIcon"/>-->
+              <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
+
+              <template v-for="item in markers">
+                <l-marker :lat-lng="item.pos">
+                  <l-popup>ID : <b>{{item.id}}</b><br>Lat : <b>{{item.lat}}</b><br>Lon : <b>{{item.lon}}</b></l-popup>
+                </l-marker>
+              </template>
+
               <template v-for="(item, idx_poly) in map_polygon">
                 <l-polygon :lat-lngs="item.polygon" :color="item.color"/>
               </template>
@@ -139,7 +149,7 @@
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-  import {appDemoMode} from "../../_constant/http_api";
+  import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
   import {createAreaLeafletDemoData, createGeobodyDemoData} from "../../libs/demo_data";
   import {
     createLeafletAreaPolygon,
@@ -147,8 +157,8 @@
   } from "../../libs/simpleLib";
 
   import * as L from "leaflet";
-  import {LMap, LTileLayer, LMarker, LPolygon} from 'vue2-leaflet'
-  import { CRS } from "leaflet";
+  import {LMap, LTileLayer, LMarker, LPolygon, LPopup} from 'vue2-leaflet'
+  import { CRS, icon } from "leaflet";
   import 'leaflet/dist/leaflet.css'
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -171,7 +181,8 @@
       LMap,
       LTileLayer,
       LMarker,
-      LPolygon
+      LPolygon,
+      LPopup
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -193,8 +204,13 @@
 
         cur_area: {},
         cur_tab: 0,
-        center: L.latLng(-6.90389, 107.61861),
         markers: [],
+        // icon: icon({
+        //   iconUrl: //"https://storage.googleapis.com/public-datas/pin_location.png",
+        //   iconSize: [32, 37],
+        //   iconAnchor: [16, 37]
+        // }),
+
         perPageView: 10,
         perPage: 10,
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
@@ -242,8 +258,10 @@
       item.poly = createLeafletAreaPolygon(this.cur_area["name"], item["coordinate"], 0);
       this.map_polygon.push(item.poly);
 
-      if (appDemoMode() === true)
+      if (appDemoMode() === true) {
         this.table_datas = createGeobodyDemoData();
+        this.table_datas = this.addMarkerVariable();
+      }
       else
         this.getListGeobody();
     },
@@ -311,24 +329,68 @@
         return (this.varRouter.getRoute(str_router, 1))
       },
 
+      createCustomMarkerPopup(title, yc, xc)
+      {
+        let sstr = 'Geobody ID : <b>' + title + '</b><br>';
+        sstr = sstr + 'Lat : <b>' + yc + '</b><br>';
+        sstr = sstr + 'Lon : <b>' + xc + '</b>';
+        return (sstr);
+      },
+
+      addMarkerVariable()
+      {
+        for(let i=0; i<this.table_datas.length; i++)
+        {
+          let item = this.table_datas[i];
+          let xc = (item["edge"]["x"]["max"] + item["edge"]["x"]["min"])/2.0;
+          let yc = (item["edge"]["y"]["max"] + item["edge"]["y"]["min"])/2.0;
+          let marker = {
+            "plot": false,
+            "pos": L.latLng(yc, xc),
+            "id": item["geobody_id"],
+            "lat": yc.toFixed(2),
+            "lon": xc.toFixed(2)
+          };
+          this.table_datas[i]["marker"] = marker;
+        }
+        return(this.table_datas);
+      },
+
+      createStyleFromIndex(item) {
+        let status = item["marker"]["plot"];
+        let fg_color = "#FF4500";
+        if(status===false)
+          fg_color = "#696969";
+
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:150%;";
+        return (strstyle);
+      },
+      eventUpdateMarkerInMap(item)
+      {
+        let status = item["marker"]["plot"];
+        item["marker"]["plot"] = !status;
+        if(status === true) {
+          this.markers.splice(_.findKey(this.markers, function(e) {
+            return e.id === item["geobody_id"];
+          }), 1);
+        }
+        else
+          this.markers.push(item["marker"]);
+      },
+
       getListGeobody()
       {
-        this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
+        // this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
 
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/geobody/info-list", this.cur_area, this.event_http_list_geobody]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("geobody-list"), this.cur_area, this.event_http_list_geobody]).then();
       },
 
       createDemoCss(cc)
       {
         return ('<span class="map-marker3" style="background-color:' + cc + '"/>');
-      },
-      createCustomMarkerPopup(item)
-      {
-        let sstr = 'Area : <b>' + item.area + '</b><br>';
-        sstr = sstr + 'Lat : <b>' + item.lat + '</b><br>';
-        sstr = sstr + 'Lon : <b>' + item.lon + '</b>';
-        return (sstr);
       },
 
       openData3(item)
@@ -414,6 +476,7 @@
       EventBus.$on(this.event_http_list_geobody.success, (msg) =>
       {
         this.table_datas = msg.data; //fill table contents
+        this.table_datas = this.addMarkerVariable();
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_list_geobody.fail, (msg) =>

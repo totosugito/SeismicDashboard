@@ -20,8 +20,8 @@
           <div class="group-header">
             <b-row>
               <b-col md="2" class="my-1">
-                <button type="button" class="btn-sm btn-success" @click="eventAddSegy()"
-                        style="margin: 3px">Add Segy
+                <button type="button" class="btn-sm btn-success" @click="eventAddData()"
+                        style="margin: 3px">Add Model
                 </button>
               </b-col>
               <b-col md="10" class="my-1">
@@ -52,10 +52,10 @@
             :items="table_datas">
 
             <template v-slot:cell(action)="row">
-              <button type="button" class="btn-sm btn-primary" @click="eventEditSegy(row.item)"
+              <button type="button" class="btn-sm btn-primary" @click="eventEditData(row.item)"
                       style="margin: 3px">Edit
               </button>
-              <button type="button" class="btn-sm btn-danger" @click="eventDeleteArea(row.item)"
+              <button type="button" class="btn-sm btn-danger" @click="eventDeleteData(row.item)"
                       style="margin: 3px">Delete
               </button>
             </template>
@@ -135,7 +135,7 @@
             :btn1_style="dialogModel.variant1" :btn2_style="dialogModel.variant2"
             @btn1Click="EventDeleteBtn1Click()" @btn2Click="EventDeleteBtn2Click()">
               <span slot="slot-body">
-                <h5>Delete Segy <span
+                <h5>Delete model <span
                   style="color: blue">'{{selected_data.label_name}}'</span> ?</h5>
               </span>
           </vue-simple-dialog>
@@ -158,7 +158,7 @@
   import VJsoneditor from 'v-jsoneditor'
 
   export default {
-    name: "admin-segy",
+    name: "admin-model",
 
     components: {
       ViewBottomWizardButton,
@@ -307,7 +307,7 @@
         }
         else
         {
-          this.getListSegy();
+          this.getListModel();
         }
       },
       dialogSelectAreaBtn1Click() {
@@ -317,28 +317,28 @@
         if (!this.bvalidate) return;
         this.cur_area["id_area"] = this.model_area["id_area"];
         this.$router.push({
-          path: "admin-segy-list",
+          path: "admin-mlmodel-list",
           query: {id_area: this.cur_area["id_area"]}
         });
-        this.getListSegy();
+        this.getListModel();
         this.$refs.dialogSelectArea.hideModal();
       },
 
-      getListSegy() {
+      getListModel() {
         this.showLoader = true;
         let param = {
           "data": {
             "id_area": this.cur_area["id_area"]
           }
         };
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-list"), param, this.event_http_list]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("mlmodel-list"), param, this.event_http_list]).then();
       },
 
       // ---------------- ADD ---------------------
-      eventAddSegy() {
+      eventAddData() {
         this.dialogModel = {
           type: "primary",
-          title: "New Segy",
+          title: "New Model",
           text1: "Close",
           text2: "Submit",
           variant1: "danger",
@@ -354,12 +354,12 @@
       EventAddBtn2Click()
       {
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-register"), this.json_model, this.event_http_add]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("mlmodel-register"), this.json_model, this.event_http_add]).then();
         this.$refs.dialogAdd.hideModal();
       },
 
       // ---------------- EDIT ---------------------
-      eventEditSegy(item) {
+      eventEditData(item) {
         this.json_model = {
           "label_name": item["label_name"],
           "data": item
@@ -367,7 +367,7 @@
 
         this.dialogModel = {
           type: "primary",
-          title: "Edit Segy",
+          title: "Edit Model",
           text1: "Close",
           text2: "Submit",
           variant1: "danger",
@@ -382,16 +382,16 @@
       EventEditBtn2Click()
       {
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-update"), this.json_model, this.event_http_edit]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("mlmodel-update"), this.json_model, this.event_http_edit]).then();
         this.$refs.dialogEdit.hideModal();
       },
 
       // ---------------- DELETE ---------------------
-      eventDeleteArea(item) {
+      eventDeleteData(item) {
         this.selected_data = item;
         this.dialogModel = {
           type: "primary",
-          title: "Delete Segy",
+          title: "Delete Model",
           text1: "Close",
           text2: "Submit",
           variant1: "danger",
@@ -409,7 +409,7 @@
           {
             "data": this.selected_data
           };
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-delete"), param, this.event_http_del]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("mlmodel-delete"), param, this.event_http_del]).then();
         this.$refs.dialogDelete.hideModal();
       },
     },
@@ -442,7 +442,7 @@
           this.$refs.dialogMessage.showModal();
         }
         else
-          this.getListSegy();
+          this.getListModel();
       });
 
       EventBus.$on(this.event_http_add.fail, (msg) => {
@@ -461,7 +461,7 @@
           this.$refs.dialogMessage.showModal();
         }
         else
-          this.getListSegy();
+          this.getListModel();
       });
 
       EventBus.$on(this.event_http_edit.fail, (msg) => {
@@ -481,7 +481,7 @@
           this.$refs.dialogMessage.showModal();
         }
         else
-          this.getListSegy();
+          this.getListModel();
       });
 
       EventBus.$on(this.event_http_del.fail, (msg) => {

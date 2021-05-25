@@ -498,9 +498,9 @@
         }
         this.showLoader = true;
         if (this.pageMode === 0)
-          this.$store.dispatch('http_post', ["/api/geobody/find-ava-data", param, this.event_http_list_ava]).then();
+          this.$store.dispatch('http_post', [this.varRouter.getHttpType("geobody-ava-list"), param, this.event_http_list_ava]).then();
         else
-          this.$store.dispatch('http_post', ["/api/point/find-ava-data", param, this.event_http_list_ava]).then();
+          this.$store.dispatch('http_post', [this.varRouter.getHttpType("point-ava-list"), param, this.event_http_list_ava]).then();
 
         this.$refs.avaDialog.hideModal();
       },
@@ -540,7 +540,7 @@
         }
 
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/point/calc-prob", param, this.event_http_list_prob]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("point-calc-prob"), param, this.event_http_list_prob]).then();
 
         this.$refs.probDialog.hideModal();
       },
@@ -558,11 +558,14 @@
 
       getListSegy() {
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/segy/file-list", this.cur_area, this.event_http_list_sgy]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-list"), this.cur_area, this.event_http_list_sgy]).then();
       },
       getMlModelFile() {
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/mlmodel/file-list", this.cur_area, this.event_http_list_mlmodel]).then();
+        let param = {
+          "data": this.cur_area
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("mlmodel-list"), param, this.event_http_list_mlmodel]).then();
       },
 
       getTabIcon() {

@@ -31,9 +31,10 @@ export function getDefaultUserIcon()
   return(getAssetServer() + "general/user_default.svg");
 }
 
-export function getApronPinMarker()
+export function getMapPinMarker()
 {
-  return(getAssetServer() + "general/pin_location.png");
+  //return(getAssetServer() + "general/pin_location.png");
+  return(globalVar()["SERVER_ADDRESS"] + "/static/red-marker.png")
 }
 
 export function getMarkerColor(item, statusSetting)
