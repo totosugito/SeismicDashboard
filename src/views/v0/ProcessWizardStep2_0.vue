@@ -23,7 +23,7 @@
               <button type="button" class="btn-sm btn-warning" @click="removeAllMarker()"
                       style="margin: 3px"><i class="fa fa-map-o"></i> Clear
               </button>
-              <button type="button" class="btn-sm btn-warning" @click="showMarkerDrag()"
+              <button type="button" class="btn-sm btn-danger" @click="showMarkerDrag()"
                       style="margin: 3px"><i class="fa fa-map-marker"></i> Marker
               </button>
             </b-col>
@@ -278,9 +278,11 @@
       this.map_var = fillLeafletAreaVariable(this.map_var, this.cur_area["coordinate"], 0);
 
       this.map_polygon = [];
-      let item = this.cur_area;
+      let item = JSON.parse(JSON.stringify(this.cur_area));
       item.poly = createLeafletAreaPolygon(this.cur_area["name"], item["coordinate"], 0);
       this.map_polygon.push(item.poly);
+
+      this.marker_drag = {lat: item["coordinate"]["p1"]["y"], lng: item["coordinate"]["p1"]["x"]};
 
       if (appDemoMode() === true) {
         this.table_datas = createGeobodyDemoData();
@@ -382,14 +384,12 @@
           this.table_datas[i]["marker"] = marker;
         }
 
-        if(this.table_datas.length >0)
-          this.marker_drag = this.table_datas[0]["marker"]["pos"];
         return(this.table_datas);
       },
 
       createStyleFromIndex(item) {
         let status = item["marker"]["plot"];
-        let fg_color = "#FF4500";
+        let fg_color = "#2A81CB";
         if(status===false)
           fg_color = "#696969";
 

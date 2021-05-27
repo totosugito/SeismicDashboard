@@ -1,6 +1,7 @@
 <template>
   <div>
-    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="tabIndex" :textsize="190" class="mb-3"/>
+    <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="tabIndex" :textsize="190"
+                                class="mb-3"/>
     <vue-element-loading
       :spinner="spinLoader.spinner"
       :color="spinLoader.color"
@@ -214,7 +215,8 @@
               <!-- table footer -->
               <b-row>
                 <b-col md="8" class="my-1">
-                  <b-pagination :total-rows="computeTotalRowProb()" :per-page="perPageProb" v-model="currentPageProb" class="my-0"/>
+                  <b-pagination :total-rows="computeTotalRowProb()" :per-page="perPageProb" v-model="currentPageProb"
+                                class="my-0"/>
                 </b-col>
                 <b-col md="4" class="my-1">
                   <b-input-group prepend="Per Page : ">
@@ -230,7 +232,7 @@
 
     <template v-if="pageMode===0">
       <view-bottom-wizard-button class="mt-0" index="1" :left_clicked="wizardButtonClicked('processwizard2-0')"
-                               :right_clicked="wizardButtonClicked('processwizard3')"/>
+                                 :right_clicked="wizardButtonClicked('processwizard3')"/>
     </template>
     <template v-else>
       <view-bottom-wizard-button class="mt-0" index="1" :left_clicked="wizardButtonClicked('processwizard1')"
@@ -249,6 +251,10 @@
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
               <vue-form-generator :schema="schema_ava" :model="model_ava" :options="formOptions"
                                   @validated="onValidated"/>
+        <template v-if="pageMode === 1">
+                <vue-leaflet-single-marker-map :map_var="map_var" :marker="marker"
+                                               @updateMarkerPosition="updateMarkerPosition" style="height: 300px"/>
+          </template>
             </span>
     </vue-form-dialog>
 
@@ -295,16 +301,19 @@
   } from "../../libs/libVars";
   import {createTabProcessIconV0, createTabProcessTextV0} from "../../libs/libSeismicUi";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
+  import VueLeafletSingleMarkerMap from '../components/vue-leaflet-single-marker-map'
 
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
   import {
+    createAreaLeafletDemoData,
     createAvaDemoData,
     createDemoAvaGeobodyParam,
     createDemoAvaPointParam, createDemoProbParam,
     createProbDemoData
   } from "../../libs/demo_data";
   import {appDemoMode} from "../../_constant/http_api";
+  import {fillLeafletAreaVariable} from "../../libs/simpleLib";
 
   export default {
     name: "ProcessWizardStep2_1",
@@ -315,6 +324,7 @@
       VueSimpleDialog,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
+      VueLeafletSingleMarkerMap
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -329,10 +339,13 @@
         proc_completed: false,
         showLoader: false,
 
+        marker: {lat: 0, lng: 0},
+        map_var: {},
+
         pageMode: 0,
         tabIndex: 1,
         cur_area: {},
-        cur_geobody :{},
+        cur_geobody: {},
         retStatus: {status: 0, title: "Info", mesg: "", data: []},
 
         selected_check_ava: [],
@@ -376,19 +389,19 @@
 
     beforeMount: function () {
       this.cur_area = this.$store.getters.readSelectedArea;
+      this.map_var = createAreaLeafletDemoData();
+      this.map_var = fillLeafletAreaVariable(this.map_var, this.cur_area["coordinate"], 0);
+      this.marker = this.map_var["center"];
 
-      this.pageMode = this.$route.query.mode*1;
-      if(this.pageMode===0)
-      {
+      this.pageMode = this.$route.query.mode * 1;
+      if (this.pageMode === 0) {
         this.tabIndex = 2;
         this.cur_geobody = this.$store.getters.readSelectedGeobody;
-      }
-      else this.tabIndex = 1;
+      } else this.tabIndex = 1;
 
       this.initSchemaAndModelData();
 
-      if (appDemoMode() === true)
-      {
+      if (appDemoMode() === true) {
         this.table_ava = createAvaDemoData();
         this.table_prob = createProbDemoData();
 
@@ -396,10 +409,15 @@
         this.$store.dispatch('actionSaveProbList', this.table_prob); //set selected project
       }
       // else
-        this.getListSegy();
+      this.getListSegy();
     },
 
     methods: {
+      updateMarkerPosition(v) {
+        this.marker = v;
+        this.model_ava["xline"] = this.marker["lng"];
+        this.model_ava["iline"] = this.marker["lat"];
+      },
       updateSelectedRow(m) {
       },
 
@@ -435,17 +453,15 @@
         window.open('#/prob3dview?type=' + str_type, '_blank');
       },
 
-      initSchemaAndModelData()
-      {
-        if (this.pageMode === 0)
-        {
+      initSchemaAndModelData() {
+        if (this.pageMode === 0) {
           this.schema_ava = createAvaGeobodySchema();
           this.model_ava = createAvaGeobodyModel();
-        }
-        else
-        {
+        } else {
           this.schema_ava = createAvaPointSchema();
           this.model_ava = createAvaPointModel();
+          this.model_ava["xline"] = this.marker["lng"];
+          this.model_ava["iline"] = this.marker["lat"];
         }
       },
       //------------------------- ava dialog ----------------------------
@@ -457,14 +473,12 @@
       },
       avaDialogBtn2Click() {
         let param = {};
-        if (appDemoMode() === true)
-        {
+        if (appDemoMode() === true) {
           if (this.pageMode === 0)
             param = createDemoAvaGeobodyParam();
           else
             param = createDemoAvaPointParam();
-        }
-        else {
+        } else {
           if (!this.bvalidate) return;
           if (this.model_ava["gather_file_name"] === "")
             return;
@@ -513,11 +527,9 @@
       },
       probDialogBtn2Click() {
         let param = {};
-        if (appDemoMode() === true)
-        {
+        if (appDemoMode() === true) {
           createDemoProbParam();
-        }
-        else {
+        } else {
           if (!this.bvalidate) return;
           if (this.prob_model["label_name"] === "")
             return;
@@ -743,8 +755,4 @@
 </script>
 
 <style scoped>
-  .lc_seismic_chart {
-    width: 100%;
-    height: 50vh;
-  }
 </style>

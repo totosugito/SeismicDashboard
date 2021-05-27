@@ -610,33 +610,6 @@ export function createAvaPointSchema()
       {
         type: 'input',
         inputType: 'number',
-        label: 'XLine/X',
-        model: 'xline',
-        placeholder: 'Set XLine',
-        featured: true,
-        required: true
-      },
-      {
-        type: 'input',
-        inputType: 'number',
-        label: 'ILine/Y',
-        model: 'iline',
-        placeholder: 'Set ILine',
-        featured: true,
-        required: true
-      },
-      {
-        type: 'input',
-        inputType: 'number',
-        label: 'CDP Z',
-        model: 'cdp_z',
-        placeholder: 'Set CDP Z',
-        featured: true,
-        required: true
-      },
-      {
-        type: 'input',
-        inputType: 'number',
         label: 'Radius X',
         model: 'rad_x',
         placeholder: 'Set Radius X',
@@ -658,6 +631,33 @@ export function createAvaPointSchema()
         label: 'Radius Z',
         model: 'rad_z',
         placeholder: 'Set Radius Z',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'CDP Z',
+        model: 'cdp_z',
+        placeholder: 'Set CDP Z',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'XLine/X',
+        model: 'xline',
+        placeholder: 'Set XLine',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'ILine/Y',
+        model: 'iline',
+        placeholder: 'Set ILine',
         featured: true,
         required: true
       },
