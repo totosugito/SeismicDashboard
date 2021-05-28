@@ -66,6 +66,9 @@ export default class VarRouter {
 
     "point-ava-list": "/api/point/find-ava-data",
     "point-calc-prob": "/api/point/calc-prob",
+
+    "well-info-list": "/api/well/info-list",
+    "well-find-rad": "/api/well/find-rad",
   };
 
   schematype = {

@@ -19,15 +19,18 @@
         <!-- table header -->
         <div class="group-header">
           <b-row>
-            <b-col md="4" class="my-1">
+            <b-col md="5" class="my-1">
               <button type="button" class="btn-sm btn-warning" @click="removeAllMarker()"
                       style="margin: 3px"><i class="fa fa-map-o"></i> Clear
               </button>
               <button type="button" class="btn-sm btn-danger" @click="showMarkerDrag()"
                       style="margin: 3px"><i class="fa fa-map-marker"></i> Marker
               </button>
+              <button type="button" class="btn-sm btn-danger" @click="showMarkerWell()"
+                      style="margin: 3px"><i class="fa fa-map-marker"></i> Well
+              </button>
             </b-col>
-            <b-col md="8" class="my-1">
+            <b-col md="7" class="my-1">
               <b-form-group  label-cols-lg="4" label-cols-md="3" label-cols-sm="6"  class="mb-0">
                 <b-input-group prepend="Filter : ">
                   <b-form-input v-model="filter" placeholder="Search"/>
@@ -58,6 +61,7 @@
 <!--              <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>-->
 <!--              <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>-->
 <!--            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)" class="mr-2">Section</b-link>-->
+            <b-link @click="showWellInRadius(row.item)" class="mr-3">Well</b-link>
             <b-link @click="openData2_1(row.item)">Prob</b-link>
           </template>
 
@@ -90,10 +94,12 @@
       </pane>
       <pane class="pl-2 pt-2 pb-2 pr-0">
         <div class="col p-0" style="height: 100%; width: 100%">
+          <template v-if="show_marker_drag===true">
+            <span><b>x</b> : {{marker_drag.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag.lat.toFixed(2)}}</span>
+          </template>
           <template v-if="showLoader===false">
             <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
                    :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom">
-
               <template v-if="show_marker_drag===true">
                 <l-marker :lat-lng="marker_drag" :draggable="true" :icon="defaultIcon" @drag="dragMarkerCoordinates">
                   <l-popup>X : <b>{{marker_drag.lng.toFixed(2)}}</b><br>Y : <b>{{marker_drag.lat.toFixed(2)}}</b></l-popup>
@@ -101,6 +107,14 @@
               </template>
 
               <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
+
+              <template v-if="show_marker_well">
+              <template v-for="item in data_wells">
+                <l-marker :lat-lng="{lat: item.ymd, lng: item.xmd}" :icon="wellIcon">
+                  <l-popup>Well ID : <b>{{item.well_id}}</b><br>X : <b>{{item.xmd.toFixed(2)}}</b><br>Y : <b>{{item.ymd.toFixed(2)}}</b></l-popup>
+                </l-marker>
+              </template>
+              </template>
 
               <template v-for="item in markers">
                 <l-polygon :lat-lngs="item.polygon" :color="item.color">
@@ -161,12 +175,16 @@
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
-  import {createTableGeobodyListHeader, createTableGeobodyListHeaderV0} from "../../libs/libVars";
+  import {
+    createTableGeobodyListHeader,
+    createTableGeobodyListHeaderV0,
+    createWellInGeobodyModel, createWellInGeobodySchema
+  } from "../../libs/libVars";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-  import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
-  import {createAreaLeafletDemoData, createGeobodyDemoData} from "../../libs/demo_data";
+  import {appDemoMode, getMapPinMarker, getWellPinMarker} from "../../_constant/http_api";
+  import {createAreaLeafletDemoData, createDemoWellInRadius, createGeobodyDemoData} from "../../libs/demo_data";
   import {
     createLeafletAreaPolygon,
     fillLeafletAreaVariable
@@ -215,6 +233,7 @@
         showLoader: false,
         retStatus: {status: 0, title: "", message: "", data: []},
 
+        show_marker_well: true,
         show_marker_drag: false,
         marker_drag: {lat:0, lng:0},
 
@@ -226,6 +245,11 @@
         markers: [],
         defaultIcon: L.icon({
           iconUrl: getMapPinMarker(),
+          iconSize: [32, 36],
+          iconAnchor: [16, 36]
+        }),
+        wellIcon: L.icon({
+          iconUrl: getWellPinMarker(),
           iconSize: [32, 36],
           iconAnchor: [16, 36]
         }),
@@ -244,30 +268,18 @@
 
         table_headers: createTableGeobodyListHeaderV0(),
         table_datas: [],
+        data_wells: [],
 
         resizeevent: false,
-        model: {
-          radius: 0,
-        },
-        schema: {
-          fields: [
-            {
-              type: 'input',
-              inputType: 'text',
-              label: 'Radius',
-              model: 'radius',
-              placeholder: 'Set Radius',
-              featured: true,
-              required: true
-            },
-          ]
-        },
+        model: createWellInGeobodyModel(),
+        schema: createWellInGeobodySchema(),
         formOptions: {
           validateAfterLoad: true,
           validateAfterChanged: true,
         },
 
         event_http_list_geobody: {success: "successListGeobody", fail: "failListGeobody"},
+        event_http_find_rad: {success: "successListFindRad", fail: "failListFindRad"},
       }
     },
 
@@ -287,6 +299,7 @@
       if (appDemoMode() === true) {
         this.table_datas = createGeobodyDemoData();
         this.table_datas = this.addMarkerVariable();
+        this.data_wells = createDemoWellInRadius();
       }
       else
         this.getListGeobody();
@@ -398,6 +411,10 @@
           "font-size:150%;";
         return (strstyle);
       },
+      showMarkerWell()
+      {
+        this.show_marker_well = !this.show_marker_well;
+      },
       showMarkerDrag()
       {
         this.show_marker_drag = !this.show_marker_drag;
@@ -495,20 +512,25 @@
         return("#/process-wizard2-1?mode=0");
       },
 
+      showWellInRadius(item)
+      {
+        this.model["id_area"] = this.cur_area["id_area"];
+        this.model["x"] = item["marker"]["pos"]["lng"];
+        this.model["y"] = item["marker"]["pos"]["lat"];
+        this.$refs.radiusDialog.showModal();
+      },
+
       radiusDialogBtn1Click() {
         this.$refs.radiusDialog.hideModal();
       },
       radiusDialogBtn2Click() {
         if (!this.bvalidate) return;
-        // this.selected_data["radius"] = this.model["radius"];
-        // this.selected_data["file_id"] = this.model["file_id"];
-        //console.log(JSON.stringify(this.selected_data))
-        // this.wizardButtonClicked('processwizard3');
-        // this.$store.dispatch('actionSaveSelectedWell', this.selected_data); //set selected project
-        this.$router.push({
-          path: this.varRouter.getRoute("processwizard3", 1),
-        });
 
+        this.showLoader = true;
+        let param = {
+          "data": this.model
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("well-find-rad"), param, this.event_http_find_rad]).then();
         this.$refs.radiusDialog.hideModal();
       },
     },
@@ -537,12 +559,28 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      EventBus.$on(this.event_http_find_rad.success, (msg) =>
+      {
+        // console.log(JSON.stringify(msg.data));
+        this.data_wells = msg.data; //fill table contents
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_find_rad.fail, (msg) =>
+      {
+        this.showLoader = false;
+        this.data_wells = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy()
     {
       EventBus.$off(this.event_http_list_geobody.success);
       EventBus.$off(this.event_http_list_geobody.fail);
+      EventBus.$off(this.event_http_find_rad.success);
+      EventBus.$off(this.event_http_find_rad.fail);
       this.showLoader = false;
     },
   }

@@ -8,7 +8,7 @@
         <l-popup>X : <b>{{cur_marker.lng.toFixed(2)}}</b><br>Y : <b>{{cur_marker.lat.toFixed(2)}}</b></l-popup>
       </l-marker>
 
-      <l-polygon :lat-lngs="map_var.polygon" :color="map_var.poly_color">
+      <l-polygon :lat-lngs="map_var.polygon" :color="map_var.poly_color[0]">
       </l-polygon>
     </l-map>
 

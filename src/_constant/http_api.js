@@ -4,7 +4,7 @@ import {getConfigMapUrl, globalVar} from "../../config";
 const DEBUG_MODE = true;
 const DEBUG_SERVER = true;
 const SERVER_DEVEL = 2;
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 // const DEBUG_MODE = false;
 // const DEBUG_SERVER = false;
@@ -35,6 +35,12 @@ export function getMapPinMarker()
 {
   //return(getAssetServer() + "general/pin_location.png");
   return(globalVar()["SERVER_ADDRESS"] + "/static/red-marker.png")
+}
+
+export function getWellPinMarker()
+{
+  //return(getAssetServer() + "general/pin_location.png");
+  return(globalVar()["SERVER_ADDRESS"] + "/static/marker-well.png")
 }
 
 export function getMarkerColor(item, statusSetting)

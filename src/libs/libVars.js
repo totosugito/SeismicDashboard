@@ -749,3 +749,49 @@ export function createProbSchema()
   };
   return(schema_prob);
 }
+
+export function createWellInGeobodyModel() {
+  let model = {
+    id_area: 0,
+    x: 0,
+    y: 0,
+    rad: 100
+  };
+  return(model);
+}
+
+export function createWellInGeobodySchema()
+{
+  let schema_prob = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'X Location',
+        model: 'x',
+        placeholder: 'Set X location',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Y Location',
+        model: 'y',
+        placeholder: 'Set Y location',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Radius',
+        model: 'rad',
+        placeholder: 'Set Radius',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_prob);
+}
