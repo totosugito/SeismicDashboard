@@ -125,12 +125,15 @@ export default {
     },
     authenticate (user_name, user_password) {
       this.showLoader = true;
-      this.$store.dispatch('login', [
-        "/api/admin/login",
-        {
+      let param = {
+        data: {
           admin_name: user_name,
           admin_password: user_password
         },
+      };
+      this.$store.dispatch('login', [
+        "/api/admin/login",
+        param,
         this.event_http]).then()
     },
   },

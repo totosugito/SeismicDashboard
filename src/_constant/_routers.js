@@ -164,9 +164,19 @@ export default new Router({
               component: () => import('../views/v0/AdminSegyList')
             },
             {
+              path: varRouter.getRoute("admin-geobody-list", 1),
+              name: varRouter.getRoute("admin-geobody-list", 2),
+              component: () => import('../views/v0/AdminGeobodyList')
+            },
+            {
               path: varRouter.getRoute("admin-mlmodel-list", 1),
               name: varRouter.getRoute("admin-mlmodel-list", 2),
               component: () => import('../views/v0/AdminModelList')
+            },
+            {
+              path: varRouter.getRoute("admin-well-list", 1),
+              name: varRouter.getRoute("admin-well-list", 2),
+              component: () => import('../views/v0/AdminWellList')
             },
 
             // ---------------------------------------------------------

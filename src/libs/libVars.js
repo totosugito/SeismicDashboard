@@ -36,6 +36,45 @@ export function createTableWellHeader()
   return (table_headers);
 }
 
+export function createTableWellHeaderV0()
+{
+  let table_headers = [
+    {
+      key: 'well_id',
+      label: 'Well ID',
+      sortable: true,
+    },
+    {
+      key: 'xmd',
+      label: 'X Coord',
+      sortable: false,
+    },
+    {
+      key: 'ymd',
+      label: 'Y Coord',
+      sortable: false,
+    },
+    {
+      key: 'zmd',
+      label: 'Z Coord',
+      sortable: false,
+    },
+    {
+      key: 'show_marker',
+      label: 'Show',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    // {
+    //   key: 'action',
+    //   label: 'Action',
+    //   sortable: false,
+    // },
+  ];
+  return (table_headers);
+}
+
 // export function createTableGeobodyListHeader()
 // {
 //   let table_headers = [
@@ -153,6 +192,42 @@ export function createTableGeobodyListHeader()
   return (table_headers);
 }
 export function createTableGeobodyListHeaderV0()
+{
+  let table_headers = [
+    {
+      key: 'geobody_id',
+      label: 'Geobody ID',
+      sortable: true
+    },
+    {
+      key: 'cls',
+      label: 'Class',
+      sortable: true,
+      // thClass: 'text-center',
+    },
+    {
+      key: 'nop',
+      label: 'NPoints',
+      sortable: true,
+      // thClass: 'text-center',
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+      // thClass: 'text-center',
+    },
+    {
+      key: 'show_marker',
+      label: 'Show',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+  ];
+  return (table_headers);
+}
+export function createTableGeobodyListHeaderV1()
 {
   let table_headers = [
     {
@@ -503,19 +578,19 @@ export function createTableProbHeaderV0()
     //   label: 'Count',
     //   sortable: true
     // },
+    // {
+    //   key: 'prob1',
+    //   label: 'Prob1',
+    //   sortable: true
+    // },
+    // {
+    //   key: 'prob2',
+    //   label: 'Prob2',
+    //   sortable: true
+    // },
     {
-      key: 'prob1',
-      label: 'Prob1',
-      sortable: true
-    },
-    {
-      key: 'prob2',
-      label: 'Prob2',
-      sortable: true
-    },
-    {
-      key: 'cal_prob',
-      label: 'Calc. Prob',
+      key: 'prob',
+      label: 'Prob',
       sortable: true
     },
     // {
@@ -742,6 +817,28 @@ export function createProbSchema()
       {
         type: 'select',
         label: 'Select File',
+        model: 'label_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+    ]
+  };
+  return(schema_prob);
+}
+
+export function createAvaPlotModel()
+{
+  let model_prob = {
+    label_name: "",
+  };
+  return(model_prob);
+}
+export function createAvaPlotSchema()
+{
+  let schema_prob = {
+    fields: [
+      {
+        type: 'select',
+        label: 'Select Gather File',
         model: 'label_name',
         selectOptions: {hideNoneSelectedText: true}
       },

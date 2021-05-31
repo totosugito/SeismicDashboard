@@ -450,10 +450,11 @@
 
       getListGeobody()
       {
-        // this.center = L.latLng(this.cur_area.lat, this.cur_area.lon);
-
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("geobody-list"), this.cur_area, this.event_http_list_geobody]).then();
+        let param = {
+          data: this.cur_area
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("geobody-list"), param, this.event_http_list_geobody]).then();
       },
 
       createDemoCss(cc)

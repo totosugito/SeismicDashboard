@@ -30,15 +30,18 @@
                 <template v-else>
                   <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA xyz</b-btn>
                 </template>
+                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAvaPlotDialog()">Plot AVA</b-btn>
 
                 <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>
                 <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()">Calculate Prob
                 </b-btn>
-                <b-dropdown right variant="warning" text="Prob 3D Chart">
-                  <b-dropdown-item @click="openAva3dProbChart('prob1')">Prob 1</b-dropdown-item>
-                  <b-dropdown-item @click="openAva3dProbChart('prob2')">Prob 2</b-dropdown-item>
-                  <b-dropdown-item @click="openAva3dProbChart('cal_prob')">Calc. Prob</b-dropdown-item>
-                </b-dropdown>
+                <b-btn class="btn btn-md" variant="warning" @click="openAva3dProbChart('prob')">Prob 3D Chart
+                </b-btn>
+<!--                <b-dropdown right variant="warning" text="Prob 3D Chart">-->
+<!--                  <b-dropdown-item @click="openAva3dProbChart('prob1')">Prob 1</b-dropdown-item>-->
+<!--                  <b-dropdown-item @click="openAva3dProbChart('prob2')">Prob 2</b-dropdown-item>-->
+<!--                  <b-dropdown-item @click="openAva3dProbChart('cal_prob')">Calc. Prob</b-dropdown-item>-->
+<!--                </b-dropdown>-->
               </b-col>
             </b-row>
             <b-row class="text-right">
@@ -202,8 +205,8 @@
                 <template v-slot:cell(prob2)="row">
                   {{parseProbabilityNumber(row.item.prob2)}}
                 </template>
-                <template v-slot:cell(cal_prob)="row">
-                  {{parseProbabilityNumber(row.item.cal_prob)}}
+                <template v-slot:cell(prob)="row">
+                  {{parseProbabilityNumber(row.item.prob)}}
                 </template>
 
                 <!-- action status -->
@@ -224,6 +227,39 @@
                   </b-input-group>
                 </b-col>
               </b-row>
+            </b-tab>
+            <b-tab title="Plot AVA">
+              <template v-slot:title>
+                <i class="fa fa-file-image-o"/> Plot AVA
+              </template>
+              <template v-if="proc_plot_ava">
+                <ApexChartLine class="lc_seismic_chart" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
+              </template>
+            </b-tab>
+
+            <b-tab title="Probability Map">
+              <template v-slot:title>
+                <i class="fa fa-image"/> Probability Map
+              </template>
+              <template v-if="proc_completed">
+                <ApexChartLine class="lc_seismic_chart" :chartOptions="probMapOptions" :series="probMapSeries"/>
+              </template>
+            </b-tab>
+            <b-tab title="Probability Distribution">
+              <template v-slot:title>
+                <i class="fa fa-bar-chart"/> Probability Distribution
+              </template>
+              <template v-if="proc_completed">
+                <ApexChartLine class="lc_seismic_chart" :chartOptions="avgProbOptions" :series="avgProbSeries"/>
+              </template>
+            </b-tab>
+            <b-tab title="Cumulative Distribution">
+              <template v-slot:title>
+                <i class="fa fa-line-chart"/> Cumulative Distribution
+              </template>
+              <template v-if="proc_completed">
+                <ApexChartLine class="lc_seismic_chart" :chartOptions="ecdfOptions" :series="ecdfSeries"/>
+              </template>
             </b-tab>
           </b-tabs>
         </b-card>
@@ -252,10 +288,12 @@
               <vue-form-generator :schema="schema_ava" :model="model_ava" :options="formOptions"
                                   @validated="onValidated"/>
         <template v-if="pageMode === 1">
-                <vue-leaflet-single-marker-map :map_var="map_var" :marker="marker"
+          <template v-if="model_ava.type!=='ilxl'">
+          <vue-leaflet-single-marker-map :map_var="map_var" :marker="marker"
                                                @updateMarkerPosition="updateMarkerPosition" style="height: 300px"/>
-          </template>
-            </span>
+                        </template>
+        </template>
+      </span>
     </vue-form-dialog>
 
     <vue-form-dialog
@@ -269,6 +307,21 @@
       <!-- body slot -->
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
               <vue-form-generator :schema="prob_schema" :model="prob_model" :options="formOptions"
+                                  @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
+
+    <vue-form-dialog
+      ref="avaPlotDialog"
+      type="default"
+      header="Parameters" body="Body"
+      btn1_text="Close" btn2_text="Process"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="avaPlotDialogBtn1Click()" @btn2Click="avaPlotDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="ava_plot_schema" :model="ava_plot_model" :options="formOptions"
                                   @validated="onValidated"/>
             </span>
     </vue-form-dialog>
@@ -297,7 +350,7 @@
     createAvaPointModel, createAvaPointSchema,
     createAvaGeobodyModel, createAvaGeobodySchema,
     createTableAvaHeaderV0,
-    createTableProbHeaderV0, createProbModel, createProbSchema
+    createTableProbHeaderV0, createProbModel, createProbSchema, createAvaPlotSchema, createAvaPlotModel
   } from "../../libs/libVars";
   import {createTabProcessIconV0, createTabProcessTextV0} from "../../libs/libSeismicUi";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
@@ -313,7 +366,15 @@
     createProbDemoData
   } from "../../libs/demo_data";
   import {appDemoMode} from "../../_constant/http_api";
-  import {fillLeafletAreaVariable} from "../../libs/simpleLib";
+  import {fillLeafletAreaVariable, getColormapColorv2} from "../../libs/simpleLib";
+  import ApexChartLine from "../components/ApexChartLine";
+  import {colormapSpectral} from "../../libs/var_colormaps";
+  import {
+    apexChartSimpleProperties,
+    createAvgProbChartOptions,
+    createEcdfChartOptions,
+    createProbMapParam
+  } from "../../libs/defApexChartLine";
 
   export default {
     name: "ProcessWizardStep2_1",
@@ -324,7 +385,8 @@
       VueSimpleDialog,
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
-      VueLeafletSingleMarkerMap
+      VueLeafletSingleMarkerMap,
+      ApexChartLine
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -373,6 +435,22 @@
         prob_model: createProbModel(),
         prob_schema: createProbSchema(),
 
+        ava_plot_model: createAvaPlotModel(),
+        ava_plot_schema: createAvaPlotSchema(),
+
+        proc_plot_ava: false,
+        avaPlotSeries: [],
+        avaPlotOptions: {},
+
+        avgProbOptions: {},
+        avgProbSeries: [],
+
+        ecdfOptions: {},
+        ecdfSeries: [],
+
+        probMapOptions: {},
+        probMapSeries: [],
+
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
         formOptions: {
           validateAfterLoad: true,
@@ -403,7 +481,7 @@
 
       if (appDemoMode() === true) {
         this.table_ava = createAvaDemoData();
-        this.table_prob = createProbDemoData();
+        this.parseProbData(createProbDemoData());
 
         this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
         this.$store.dispatch('actionSaveProbList', this.table_prob); //set selected project
@@ -446,6 +524,30 @@
           return (v.toFixed(6));
       },
 
+      plotAvaChart() {
+        this.proc_plot_ava = false;
+        let selected_data = [];
+        for (let i = 0; i < this.table_ava.length; i++) {
+          if (this.table_ava[i]["check"] === true)
+            selected_data.push(this.table_ava[i])
+        }
+
+        if (selected_data.length === 0) {
+          this.retStatus = {status: 0, title: "Information", mesg: "Please Select data from table ...", data: []};
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+
+        let param = {
+          "data": {
+            "id_area": this.cur_area["id_area"],
+            "gather_label_name": this.ava_plot_model["label_name"],
+            "data": selected_data
+          }
+        };
+        this.showLoader = true;
+        this.$store.dispatch('http_post', ["/api/segy/view-list-ava", param, this.event_http_ava_plot]).then();
+      },
       openAva3dChart() {
         window.open('#/ava3dview', '_blank');
       },
@@ -464,6 +566,71 @@
           this.model_ava["iline"] = this.marker["lat"];
         }
       },
+      parseProbData(msg)
+      {
+        this.table_prob = msg["data"];
+
+        // create colormap
+        let density_colormap = colormapSpectral();
+
+        //average probability
+        let avg_prob = msg["avg_prob"];
+        this.avgProbSeries = [];
+        this.avgProbOptions = createAvgProbChartOptions();
+        this.avgProbOptions["title"]["text"] = "Probability Distributions";
+        this.avgProbOptions["xaxis"]["categories"] = avg_prob["x"].map(function (e) {
+          return e.toFixed(2).toString()
+        });
+        this.avgProbSeries.push({data: avg_prob["y"]});
+        let prob_map_color = [];
+        for(let i=0; i<avg_prob["x"].length; i++) {
+          prob_map_color.push(getColormapColorv2(density_colormap, avg_prob["x"][i], false));
+        }
+        this.avgProbOptions["colors"] = prob_map_color;
+
+        //ecdf
+        let ecdf_ = msg["ecdf"];
+        this.ecdfSeries = [];
+        this.ecdfOptions = createEcdfChartOptions();
+        this.ecdfOptions["title"]["text"] = "Cumulative Distributions";
+        this.ecdfOptions["xaxis"]["title"]["text"] = "Probability";
+        this.ecdfOptions["yaxis"]["title"]["text"] = "ECDF";
+        let tmp = [];
+        let tmp_line = [];
+        let nx = ecdf_["x"].length;
+
+        tmp_line.push([ecdf_["x"][0], 0.0]); //add first point
+        for(let i=0; i<nx; i++) {
+          tmp.push([ecdf_["x"][i], ecdf_["y"][i]]);
+
+          if( (i>0) )
+            tmp_line.push([ecdf_["x"][i], ecdf_["y"][i-1]]);
+          tmp_line.push([ecdf_["x"][i], ecdf_["y"][i]]);
+        }
+        tmp_line.push([ecdf_["x"][nx-1]+0.02, ecdf_["y"][nx-1]]); //add last point
+        this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
+        this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
+
+        // prob map series
+        this.probMapSeries = [];
+        let prob_map = msg["prob_map"];
+        this.probMapOptions = createProbMapParam();
+        this.probMapOptions["title"]["text"] = "Gas Probability Map";
+        this.probMapOptions["xaxis"]["title"]["text"] = "iline";
+        this.probMapOptions["yaxis"]["title"]["text"] = "xline";
+        let n_prob_map = prob_map["x"].length;
+        let probability_map_color = [];
+        for(let i=0; i<n_prob_map; i++) {
+          probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], false));
+          this.probMapSeries.push({
+            type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
+          });
+        }
+        this.probMapOptions["colors"] = probability_map_color;
+
+        this.proc_completed = true;
+      },
+
       //------------------------- ava dialog ----------------------------
       openAvaDialog() {
         this.$refs.avaDialog.showModal();
@@ -487,27 +654,31 @@
 
           if (this.pageMode === 0)
             param = {
-              id_area: this.cur_area["id_area"],
-              gather_file_name: this.model_ava["gather_file_name"],
-              substack_file_name: this.model_ava["substack_file_name"],
-              geobody_id: this.cur_geobody["geobody_id"],
-              rad_x: this.model_ava["rad_x"],
-              rad_y: this.model_ava["rad_y"],
-              rad_z: this.model_ava["rad_z"],
+              data: {
+                id_area: this.cur_area["id_area"],
+                gather_label_name: this.model_ava["gather_file_name"],
+                stack_label_name: this.model_ava["substack_file_name"],
+                geobody_id: this.cur_geobody["geobody_id"],
+                rad_x: this.model_ava["rad_x"],
+                rad_y: this.model_ava["rad_y"],
+                rad_z: this.model_ava["rad_z"],
+              }
             };
           else
             param = {
-              id_area: this.cur_area["id_area"],
-              gather_file_name: this.model_ava["gather_file_name"],
-              substack_file_name: this.model_ava["substack_file_name"],
-              radius: this.model_ava["radius"],
-              type: this.model_ava["type"],
-              xline: this.model_ava["xline"],
-              iline: this.model_ava["iline"],
-              cdp_z: this.model_ava["cdp_z"],
-              rad_x: this.model_ava["rad_x"],
-              rad_y: this.model_ava["rad_y"],
-              rad_z: this.model_ava["rad_z"],
+              data: {
+                id_area: this.cur_area["id_area"],
+                gather_label_name: this.model_ava["gather_file_name"],
+                stack_label_name: this.model_ava["substack_file_name"],
+                radius: this.model_ava["radius"],
+                type: this.model_ava["type"],
+                xline: this.model_ava["xline"],
+                iline: this.model_ava["iline"],
+                cdp_z: this.model_ava["cdp_z"],
+                rad_x: this.model_ava["rad_x"],
+                rad_y: this.model_ava["rad_y"],
+                rad_z: this.model_ava["rad_z"],
+              }
             };
         }
         this.showLoader = true;
@@ -545,16 +716,29 @@
             }
           }
           param = {
-            id_area: this.cur_area["id_area"],
-            mlmodel_label_name: this.prob_model["label_name"],
-            data: tmp_table_datas
-          };
+            data: {
+              id_area: this.cur_area["id_area"],
+              mlmodel_label_name: this.prob_model["label_name"],
+              data: tmp_table_datas
+            }
+          }
         }
 
         this.showLoader = true;
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("point-calc-prob"), param, this.event_http_list_prob]).then();
 
         this.$refs.probDialog.hideModal();
+      },
+
+      openAvaPlotDialog() {
+        this.$refs.avaPlotDialog.showModal();
+      },
+      avaPlotDialogBtn1Click() {
+        this.$refs.avaPlotDialog.hideModal();
+      },
+      avaPlotDialogBtn2Click() {
+        this.plotAvaChart();
+        this.$refs.avaPlotDialog.hideModal();
       },
 
       openData(item) {
@@ -570,7 +754,10 @@
 
       getListSegy() {
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-list"), this.cur_area, this.event_http_list_sgy]).then();
+        let param = {
+          data: this.cur_area
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-list"), param, this.event_http_list_sgy]).then();
       },
       getMlModelFile() {
         this.showLoader = true;
@@ -654,6 +841,7 @@
         }
         this.schema_ava.fields[0].values = list_segy;
         this.schema_ava.fields[1].values = list_segy;
+        this.ava_plot_schema.fields[0].values = list_segy;
 
         let tmp_data_type = [
           {
@@ -724,7 +912,8 @@
 
       //-------------- LIST PROB -------------------
       EventBus.$on(this.event_http_list_prob.success, (msg) => {
-        this.table_prob = msg["data"];
+        this.parseProbData(msg["data"]);
+        // this.table_prob = msg["data"];
         for (let i = 0; i < this.table_prob.length; i++)
           this.table_prob[i]["check"] = false;
 
@@ -738,6 +927,41 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-------------- LIST AVA PLOT -------------------
+      EventBus.$on(this.event_http_ava_plot.success, (msg) => {
+        let ndata = msg["data"].length;
+        if (ndata <= 0) {
+          this.retStatus["mesg"] = msg["mesg"];
+          this.$refs.dialogMessage.showModal();
+          this.showLoader = false;
+          return;
+        }
+
+        this.avaPlotSeries = [];
+        for (let i = 0; i < msg["data"].length; i++) {
+          let m = msg["data"][i];
+          let line_title = m["iline"] + "/" + m["xline"] + "(" + m["cdp_z"].toFixed(2) + ")";
+          this.avaPlotSeries.push({
+            type: 'line',
+            name: line_title,
+            data: m["ava"]
+          });
+        }
+        this.avaPlotOptions = apexChartSimpleProperties();
+        this.avaPlotOptions["xaxis"]["categories"] = msg["data"][0]["header"];
+        this.avaPlotOptions["legend"]["position"] = "bottom";
+        this.avaPlotOptions["markers"] = 4;
+
+        this.proc_plot_ava = true;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_ava_plot.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.proc_plot_ava = false;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy() {
@@ -749,10 +973,16 @@
       EventBus.$off(this.event_http_list_ava.fail);
       EventBus.$off(this.event_http_list_prob.success);
       EventBus.$off(this.event_http_list_prob.fail);
+      EventBus.$off(this.event_http_ava_plot.success);
+      EventBus.$off(this.event_http_ava_plot.fail);
       this.showLoader = false;
     },
   }
 </script>
 
 <style scoped>
+  .lc_seismic_chart {
+    width: 100%;
+    height: 50vh;
+  }
 </style>

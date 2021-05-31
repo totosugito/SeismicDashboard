@@ -31,10 +31,22 @@ export default {
       icon: 'fa fa-hdd-o'
     },
     {
+      name: 'Geobody',
+      url: '/admin-geobody-list',
+      router: 'admin-geobody-list',
+      icon: 'fa fa-cubes'
+    },
+    {
       name: 'Model',
       url: '/admin-mlmodel-list',
       router: 'admin-mlmodel-list',
       icon: 'fa fa-cube'
+    },
+    {
+      name: 'Well',
+      url: '/admin-well-list',
+      router: 'admin-well-list',
+      icon: 'fa fa-hashtag'
     },
 
     {

@@ -64,7 +64,7 @@
           else if(plot_type === "prob2")
             idx_cm = Math.round(m["prob2"] * 255.0);
           else
-            idx_cm = Math.round(m["cal_prob"] * 255.0);
+            idx_cm = Math.round(m["prob"] * 255.0);
 
           // convert value to colormap
           let cur_m = cur_colormap[idx_cm];

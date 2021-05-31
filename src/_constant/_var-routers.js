@@ -25,7 +25,9 @@ export default class VarRouter {
     "admin-dashboard": ["admin-dashboard", "/admin-dashboard", "Admin Dashboard"],
     "admin-area-list": ["admin-area-list", "/admin-area-list", "Admin Area"],
     "admin-segy-list": ["admin-segy-list", "/admin-segy-list", "Admin SEGY"],
+    "admin-geobody-list": ["admin-geobody-list", "/admin-geobody-list", "Admin Geobody"],
     "admin-mlmodel-list": ["admin-mlmodel-list", "/admin-mlmodel-list", "Admin Model"],
+    "admin-well-list": ["admin-well-list", "/admin-well-list", "Admin Well"],
 
     "segy-list": ["segy-list", "/segy-list", "SEGY List"],
     "processwizard": ["process-wizard", "/process-wizard", "Process Wizard"],
@@ -50,6 +52,7 @@ export default class VarRouter {
     "area-register": "/api/area/register",
     "area-delete": "/api/area/delete",
     "area-update": "/api/area/update",
+    "area-info": "/api/area/info",
 
     "segy-list": "/api/segy/file-list",
     "segy-register": "/api/segy/file-register",
@@ -63,6 +66,8 @@ export default class VarRouter {
 
     "geobody-list": "/api/geobody/info-list",
     "geobody-ava-list": "/api/geobody/find-ava-data",
+    "geobody-register": "/api/geobody/file-register",
+    "geobody-delete": "/api/geobody/file-delete",
 
     "point-ava-list": "/api/point/find-ava-data",
     "point-calc-prob": "/api/point/calc-prob",
