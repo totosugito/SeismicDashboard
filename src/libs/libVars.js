@@ -535,6 +535,11 @@ export function createTableAvaHeaderV0()
       label: 'CDP Z',
       sortable: true
     },
+    // {
+    //   key: 'action',
+    //   label: 'Action',
+    //   sortable: false,
+    // },
   ];
   return (table_headers);
 }

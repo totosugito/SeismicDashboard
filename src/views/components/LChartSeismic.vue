@@ -68,7 +68,7 @@
         this.grColor = createColorObject(this.defColor);
 
         // Create chartXY
-        this.chart = lightningChart().ChartXY({containerId: `${this.chartId}`})
+        this.chart = lightningChart().ChartXY({container: `${this.chartId}`})
           .setTitleFillStyle(this.grColor.default)
           .setBackgroundFillStyle(this.grColor.background)
           .setChartBackgroundFillStyle(this.grColor.background);
@@ -98,15 +98,15 @@
         let resolutionY = this.ntrc;
         let customX = this.chart.addAxisX(true)
           .setTitleFillStyle(this.grColor.default)
-          .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
+          // .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
           .setInterval(0, this.ntrc)
           .setTitle(this.xaxis["label"]);
         let customY = this.chart.addAxisY(false)
           .setTitleFillStyle(this.grColor.default)
-          .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
+          // .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
-          .setInterval(start_time, end_time)
+          .setInterval(end_time, start_time)
           .setTitle(this.yaxis["label"]);
         this.chart.addHeatmapSeries({
           rows: resolutionX,

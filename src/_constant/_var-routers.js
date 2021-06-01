@@ -58,6 +58,8 @@ export default class VarRouter {
     "segy-register": "/api/segy/file-register",
     "segy-delete": "/api/segy/file-delete",
     "segy-update": "/api/segy/file-update",
+    "segy-view-list-ava": "/api/segy/view-list-ava",
+    "segy-view-gather": "/api/segy/view-list-gather",
 
     "mlmodel-list": "/api/mlmodel/file-list",
     "mlmodel-register": "/api/mlmodel/file-register",

@@ -2,6 +2,69 @@
   <div>
     <view-process-wizard-button :icon="getTabIcon()" :title="getTabText()" :index="tabIndex" :textsize="190"
                                 class="mb-3"/>
+
+    <Overlay :opened="opened" :visible="visible" @closed="overlayClosed()">
+      <div>
+        <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
+          <b-btn class="mr-2" variant="primary" @click="refreshMultiSeismicChart()"><i class="fa fa-refresh"></i> Refresh</b-btn>
+          <b-dropdown size="sm" class="mr-0">
+            <template slot="button-content" class="pr-1" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span
+              class="pl-1">{{fgetColormapName(colormap.id)}}</span>
+            </template>
+
+            <b-dropdown-item @click="setColormap(0)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(0)"/> {{fgetColormapName(0)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(1)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(1)"/> {{fgetColormapName(1)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(2)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(2)"/> {{fgetColormapName(2)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(3)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(3)"/> {{fgetColormapName(3)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(4)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(4)"/> {{fgetColormapName(4)}}
+            </b-dropdown-item>
+            <b-dropdown-item @click="setColormap(5)" size="sm">
+              <img class="colormapImageDropdown" :src="fgetColormapAsset(5)"/> {{fgetColormapName(5)}}
+            </b-dropdown-item>
+          </b-dropdown>
+          <!--        <b-form-checkbox v-model="reverseColormap" class="mr-1">Rev</b-form-checkbox>-->
+          <!--          <enhanced-check label="Rev" style="height: 20px;" v-model="reverseColormap" class="mr-2"></enhanced-check>-->
+
+          <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+            <b-input-group-prepend class="mr-1">
+              <span style="color: white">Min ({{cmin}})</span>
+            </b-input-group-prepend>
+            <b-form-slider style="height:20px;" v-model="tmp_cmin" @slide-stop="slideStopMin" :min="0" :max="99"></b-form-slider>
+          </b-input-group>
+          <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
+            <b-input-group-prepend class="mr-1">
+              <span style="color: white">Max ({{cmax}})</span>
+            </b-input-group-prepend>
+            <b-form-slider style="height:20px;" v-model="tmp_cmax" @slide-stop="slideStopMax" :min="0" :max="99"></b-form-slider>
+          </b-input-group>
+        </b-button-toolbar>
+      </div>
+
+      <template v-if="bdraw===true">
+        <b-container fluid>
+          <b-row>
+            <template v-for="i in parseInt(npic)">
+              <b-col>
+                <LChartSeismic class="lc_seismic_view" :colormap="colormap" :points="getSeismicDataPoints(i-1)"
+                               :xaxis="getSeismicDataX(i-1)" :yaxis="getSeismicDataY(i-1)" :cmin="cmin" :cmax="cmax"
+                               :title="getSeismicTitle(i-1)"></LChartSeismic>
+              </b-col>
+            </template>
+          </b-row>
+        </b-container>
+      </template>
+    </Overlay>
+
     <vue-element-loading
       :spinner="spinLoader.spinner"
       :color="spinLoader.color"
@@ -23,16 +86,22 @@
           </div>
           <div>
             <b-row>
-              <b-col md="6">
+              <b-col md="12">
                 <template v-if="pageMode===0">
                   <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA Geobody</b-btn>
                 </template>
                 <template v-else>
                   <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA xyz</b-btn>
                 </template>
-                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAvaPlotDialog()">Plot AVA</b-btn>
 
-                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>
+                <b-dropdown right variant="warning" text="AVA">
+                  <b-dropdown-item @click="openAvaPlotDialog()">Plot AVA</b-dropdown-item>
+                  <b-dropdown-item @click="openAva3dChart()">AVA 3D Chart</b-dropdown-item>
+                  <b-dropdown-item @click="openGatherPlotDialog()">Gather View</b-dropdown-item>
+                </b-dropdown>
+
+<!--                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAvaPlotDialog()">Plot AVA</b-btn>-->
+<!--                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>-->
                 <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()">Calculate Prob
                 </b-btn>
                 <b-btn class="btn btn-md" variant="warning" @click="openAva3dProbChart('prob')">Prob 3D Chart
@@ -123,7 +192,7 @@
 
                 <!-- action status -->
                 <template v-slot:cell(action)="row">
-                  <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
+                  <b-link @click="openGatherData(row.item)">Gather</b-link>
                 </template>
               </b-table>
 
@@ -326,6 +395,21 @@
             </span>
     </vue-form-dialog>
 
+    <vue-form-dialog
+      ref="gatherPlotDialog"
+      type="default"
+      header="Parameters" body="Body"
+      btn1_text="Close" btn2_text="Process"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="gatherPlotDialogBtn1Click()" @btn2Click="gatherPlotDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="ava_plot_schema" :model="ava_plot_model" :options="formOptions"
+                                  @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
+
     <!-- show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
@@ -375,6 +459,13 @@
     createEcdfChartOptions,
     createProbMapParam
   } from "../../libs/defApexChartLine";
+  import Overlay from "../components/Overlay";
+  import {getColormapAsset, getColormapName} from "../../libs/colormap";
+  import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
+  import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
+  import 'bootstrap-slider/dist/css/bootstrap-slider.css';
+  import LChartSeismic from "../components/LChartSeismic";
+  import {createDemoGather} from "../../libs/data";
 
   export default {
     name: "ProcessWizardStep2_1",
@@ -386,7 +477,11 @@
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
       VueLeafletSingleMarkerMap,
-      ApexChartLine
+      ApexChartLine,
+      Overlay,
+      EnhancedCheck,
+      bFormSlider,
+      LChartSeismic
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -400,6 +495,22 @@
       return {
         proc_completed: false,
         showLoader: false,
+
+        opened: false,
+        visible: false,
+        bdraw: false,
+
+        npic: 2,
+        points: [],
+        colormap: {id: 3, reverse: false},
+        reverseColormap: false,
+        cmin: 20,
+        cmax: 20,
+        tmp_cmin: 20,
+        tmp_cmax: 20,
+        XAxis: {},
+        YAxis: {},
+        dataTitle: "",
 
         marker: {lat: 0, lng: 0},
         map_var: {},
@@ -462,6 +573,8 @@
         event_http_list_ava: {success: "successListAva", fail: "failListAva"},
         event_http_list_prob: {success: "successListProb", fail: "failListProb"},
         event_http_ava_plot: {success: "successListAvaPlot", fail: "failListAvaPlot"},
+        event_http_view_gather: {success: "successListGatherPlot", fail: "failListGatherPlot"},
+
       }
     },
 
@@ -485,12 +598,119 @@
 
         this.$store.dispatch('actionSaveAvaList', this.table_ava); //set selected project
         this.$store.dispatch('actionSaveProbList', this.table_prob); //set selected project
+
+        this.points = createDemoGather();
+        this.opened = true;
+        this.visible = true;
+        this.bdraw = true;
       }
       // else
       this.getListSegy();
+
     },
 
     methods: {
+      fgetColormapName(ii)
+      {
+        return (getColormapName(ii))
+      },
+      setColormap(ii)
+      {
+        this.colormap = {id: ii, reverse: this.reverseColormap};
+      },
+
+      fgetColormapAsset(ii)
+      {
+        return (getColormapAsset(ii))
+      },
+      slideStopMin()
+      {
+        this.cmin = this.tmp_cmin;
+      },
+      slideStopMax()
+      {
+        this.cmax = this.tmp_cmax;
+      },
+      overlayClosed()
+      {
+        this.bdraw = false;
+        this.opened = false;
+        this.visible = false;
+      },
+      refreshMultiSeismicChart()
+      {
+        this.setColormap(3);
+      },
+      getSeismicDataPoints(ii)
+      {
+        let sgy_points = [];
+
+        let tmp = this.points[ii]["cdp_data"];
+        let ns = tmp[0].length;
+        let ntrc = tmp.length;
+        for (let i = ns - 1; i >= 0; i--)
+        {
+          let tmp0 = [];
+          // for (let j = 0; j < ntrc; j++)
+          for (let j = ntrc-1; j >=0; j--)
+            tmp0.push(tmp[j][i]);
+          sgy_points.push(tmp0);
+        }
+        return(sgy_points);
+      },
+      getSeismicDataX(ii)
+      {
+        let xx = this.points[ii]["x"];
+        xx["data"] = this.points[ii]["cdp_header"];
+        // let xxx = [];
+        // for(let i=0; i<this.points[ii]["cdp_header"].length; i++)
+        //   xxx.push(i);
+        // xx["data"] = xxx;
+        return(xx);
+      },
+      getSeismicDataY(ii)
+      {
+        return(this.points[ii]["y"]);
+      },
+      getSeismicTitle(ii)
+      {
+        return(this.points[ii]["title"] + this.points[ii]["cdp_no"]);
+      },
+      openGatherData() {
+        let selected_data = [];
+        for (let i = 0; i < this.table_ava.length; i++) {
+          if (this.table_ava[i]["check"] === true)
+            selected_data.push(this.table_ava[i])
+        }
+
+        if (selected_data.length === 0) {
+          this.retStatus = {status: 0, title: "Information", mesg: "Please Select data from table ...", data: []};
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+
+        let param = {
+          "data": {
+            "id_area": this.cur_area["id_area"],
+            "gather_label_name": this.ava_plot_model["label_name"],
+            "data": selected_data
+          }
+        };
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-view-gather"), param, this.event_http_view_gather]).then();
+      },
+      openGatherPlotDialog() {
+        this.$refs.gatherPlotDialog.showModal();
+      },
+      gatherPlotDialogBtn1Click() {
+        this.$refs.gatherPlotDialog.hideModal();
+      },
+      gatherPlotDialogBtn2Click() {
+        this.openGatherData();
+        this.$refs.gatherPlotDialog.hideModal();
+      },
+
+
       updateMarkerPosition(v) {
         this.marker = v;
         this.model_ava["xline"] = this.marker["lng"];
@@ -546,7 +766,7 @@
           }
         };
         this.showLoader = true;
-        this.$store.dispatch('http_post', ["/api/segy/view-list-ava", param, this.event_http_ava_plot]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-view-list-ava"), param, this.event_http_ava_plot]).then();
       },
       openAva3dChart() {
         window.open('#/ava3dview', '_blank');
@@ -739,13 +959,6 @@
       avaPlotDialogBtn2Click() {
         this.plotAvaChart();
         this.$refs.avaPlotDialog.hideModal();
-      },
-
-      openData(item) {
-        // this.$router.push({
-        //   path: "process-wizard3",
-        //   query: {geobody_file_id:item["file_id"]["$oid"], geobody_id: item["geobody_id"]}
-        // });
       },
       openDataUrl(item) {
         return ("");
@@ -962,6 +1175,23 @@
         this.proc_plot_ava = false;
         this.$refs.dialogMessage.showModal();
       });
+
+      EventBus.$on(this.event_http_view_gather.success, (msg) => {
+        this.points = msg["data"];
+        this.npic = this.points.length;
+
+        this.showLoader = false;
+        this.opened = true;
+        this.visible = true;
+        this.bdraw = true;
+      });
+      EventBus.$on(this.event_http_view_gather.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.points = [];
+        this.npic = 0;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy() {
@@ -975,6 +1205,9 @@
       EventBus.$off(this.event_http_list_prob.fail);
       EventBus.$off(this.event_http_ava_plot.success);
       EventBus.$off(this.event_http_ava_plot.fail);
+      EventBus.$off(this.event_http_view_gather.success);
+      EventBus.$off(this.event_http_view_gather.fail);
+
       this.showLoader = false;
     },
   }
@@ -984,5 +1217,8 @@
   .lc_seismic_chart {
     width: 100%;
     height: 50vh;
+  }
+  .lc_seismic_view {
+    height: 80vh;
   }
 </style>
