@@ -24,10 +24,11 @@
                       style="margin: 3px"><i class="fa fa-map-o"></i> Clear
               </button>
               <button type="button" class="btn-sm btn-danger" @click="showMarkerDrag()"
-                      style="margin: 3px"><i class="fa fa-map-marker"></i> Marker
+                      style="margin: 3px">
+                <template v-if="show_marker_drag"><i class="fa fa-map-marker"></i> </template> Marker
               </button>
               <button type="button" class="btn-sm btn-danger" @click="showMarkerWell()"
-                      style="margin: 3px"><i class="fa fa-map-marker"></i> Well
+                      style="margin: 3px"><template v-if="show_marker_well"><i class="fa fa-map-marker"></i> </template></i> Well
               </button>
             </b-col>
             <b-col md="7" class="my-1">
