@@ -6,7 +6,9 @@
     <Overlay :opened="opened" :visible="visible" @closed="overlayClosed()">
       <div>
         <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
-          <b-btn class="mr-2" variant="primary" @click="refreshMultiSeismicChart()"><i class="fa fa-refresh"></i> Refresh</b-btn>
+          <b-btn class="mr-2" variant="primary" @click="refreshMultiSeismicChart()"><i class="fa fa-refresh"></i>
+            Refresh
+          </b-btn>
           <b-dropdown size="sm" class="mr-0">
             <template slot="button-content" class="pr-1" size="sm">
               <img class="colormapImageDropdown" :src="fgetColormapAsset(colormap.id)" size="sm"/><span
@@ -39,13 +41,15 @@
             <b-input-group-prepend class="mr-1">
               <span style="color: white">Min ({{cmin}})</span>
             </b-input-group-prepend>
-            <b-form-slider style="height:20px;" v-model="tmp_cmin" @slide-stop="slideStopMin" :min="0" :max="99"></b-form-slider>
+            <b-form-slider style="height:20px;" v-model="tmp_cmin" @slide-stop="slideStopMin" :min="0"
+                           :max="99"></b-form-slider>
           </b-input-group>
           <b-input-group size="sm" style="background: #343a40" class="pl-1 pr-2">
             <b-input-group-prepend class="mr-1">
               <span style="color: white">Max ({{cmax}})</span>
             </b-input-group-prepend>
-            <b-form-slider style="height:20px;" v-model="tmp_cmax" @slide-stop="slideStopMax" :min="0" :max="99"></b-form-slider>
+            <b-form-slider style="height:20px;" v-model="tmp_cmax" @slide-stop="slideStopMax" :min="0"
+                           :max="99"></b-form-slider>
           </b-input-group>
         </b-button-toolbar>
       </div>
@@ -88,29 +92,31 @@
             <b-row>
               <b-col md="12">
                 <template v-if="pageMode===0">
-                  <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA Geobody</b-btn>
+                  <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">1. AVA Geobody</b-btn>
                 </template>
                 <template v-else>
-                  <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">AVA xyz</b-btn>
+                  <b-btn class="btn btn-md mr-1" variant="success" @click="openAvaDialog()">1. AVA xyz</b-btn>
                 </template>
 
-                <b-dropdown right variant="warning" text="AVA">
-                  <b-dropdown-item @click="openAvaPlotDialog()">Plot AVA</b-dropdown-item>
+                <b-dropdown right variant="warning" text="2. AVA" :disabled="ndata===0">
+                  <b-dropdown-item @click="openAvaPlotDialog()">2. Plot AVA</b-dropdown-item>
                   <b-dropdown-item @click="openAva3dChart()">AVA 3D Chart</b-dropdown-item>
                   <b-dropdown-item @click="openGatherPlotDialog()">Gather View</b-dropdown-item>
                 </b-dropdown>
 
-<!--                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAvaPlotDialog()">Plot AVA</b-btn>-->
-<!--                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>-->
-                <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()">Calculate Prob
+                <!--                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAvaPlotDialog()">Plot AVA</b-btn>-->
+                <!--                <b-btn class="btn btn-md mr-1" variant="warning" @click="openAva3dChart()">AVA 3D Chart</b-btn>-->
+                <b-btn class="btn btn-md ml-5 mr-1" variant="primary" @click="openProbDialog()" :disabled="proc_plot_ava!==true">3. Calculate Prob
                 </b-btn>
-                <b-btn class="btn btn-md" variant="warning" @click="openAva3dProbChart('prob')">Prob 3D Chart
+<!--                <template v-if="ndata_prob>0">-->
+                <b-btn class="btn btn-md" variant="warning" @click="openAva3dProbChart('prob')" :disabled="ndata_prob===0">4. Prob 3D Chart
                 </b-btn>
-<!--                <b-dropdown right variant="warning" text="Prob 3D Chart">-->
-<!--                  <b-dropdown-item @click="openAva3dProbChart('prob1')">Prob 1</b-dropdown-item>-->
-<!--                  <b-dropdown-item @click="openAva3dProbChart('prob2')">Prob 2</b-dropdown-item>-->
-<!--                  <b-dropdown-item @click="openAva3dProbChart('cal_prob')">Calc. Prob</b-dropdown-item>-->
-<!--                </b-dropdown>-->
+<!--                </template>-->
+                <!--                <b-dropdown right variant="warning" text="Prob 3D Chart">-->
+                <!--                  <b-dropdown-item @click="openAva3dProbChart('prob1')">Prob 1</b-dropdown-item>-->
+                <!--                  <b-dropdown-item @click="openAva3dProbChart('prob2')">Prob 2</b-dropdown-item>-->
+                <!--                  <b-dropdown-item @click="openAva3dProbChart('cal_prob')">Calc. Prob</b-dropdown-item>-->
+                <!--                </b-dropdown>-->
               </b-col>
             </b-row>
             <b-row class="text-right">
@@ -208,128 +214,134 @@
                 </b-col>
               </b-row>
             </b-tab>
-            <b-tab title="Probability" pills card>
-              <!-- -------------------------------------------- -->
-              <!-- TABLE PROBABILITY -->
-              <!-- -------------------------------------------- -->
-              <!-- table header -->
-              <div class="group-header">
+
+            <template v-if="proc_plot_ava===true">
+              <b-tab title="Plot AVA">
+                <template v-slot:title>
+                  <i class="fa fa-file-image-o"/> Plot AVA
+                </template>
+                <template v-if="proc_plot_ava">
+                  <ApexChartLine class="lc_seismic_chart" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
+                </template>
+              </b-tab>
+            </template>
+
+            <template v-if="ndata_prob>0">
+              <b-tab title="Probability" pills card>
+                <!-- -------------------------------------------- -->
+                <!-- TABLE PROBABILITY -->
+                <!-- -------------------------------------------- -->
+                <!-- table header -->
+                <div class="group-header">
+                  <b-row>
+                    <b-col md="3" class="my-1">
+                      <b-form-checkbox
+                        id="checkbox-2"
+                        v-model="bCheckAllProb"
+                        name="checkbox-2"
+                        @change="selectAllCheckedProb()">
+                        Check All
+                      </b-form-checkbox>
+                    </b-col>
+                    <b-col md="3" class="my-1">
+                      <strong>Total : {{ndata_prob}}</strong>
+                    </b-col>
+                    <b-col md="6" class="my-1">
+                      <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
+                        <b-input-group prepend="Filter : ">
+                          <b-form-input v-model="filterProb" placeholder="Search"/>
+                          <b-input-group-append>
+                            <b-btn :disabled="!filterProb" @click="filterProb = ''">Clear</b-btn>
+                          </b-input-group-append>
+                        </b-input-group>
+                      </b-form-group>
+                    </b-col>
+                  </b-row>
+                </div>
+
+                <!-- table contents -->
+                <b-table
+                  show-empty
+                  sticky-header="53vh"
+                  :small="true"
+                  :striped="true"
+                  :bordered="true"
+                  :outlined="true"
+                  :current-page="currentPageProb"
+                  :per-page="perPageProb"
+                  :filter="filterProb"
+                  @filtered="onFilteredProb"
+                  :fields="table_headers_prob"
+                  :items="table_prob">
+
+                  <template v-slot:cell(check)="row">
+                    <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+                  </template>
+
+                  <template v-slot:cell(cdp_x)="row">
+                    {{row.item.cdp_x.toFixed(3)}}
+                  </template>
+                  <template v-slot:cell(cdp_y)="row">
+                    {{row.item.cdp_y.toFixed(3)}}
+                  </template>
+                  <template v-slot:cell(cdp_z)="row">
+                    {{row.item.cdp_z.toFixed(3)}}
+                  </template>
+                  <template v-slot:cell(prob1)="row">
+                    {{parseProbabilityNumber(row.item.prob1)}}
+                  </template>
+                  <template v-slot:cell(prob2)="row">
+                    {{parseProbabilityNumber(row.item.prob2)}}
+                  </template>
+                  <template v-slot:cell(prob)="row">
+                    {{parseProbabilityNumber(row.item.prob)}}
+                  </template>
+
+                  <!-- action status -->
+                  <template v-slot:cell(action)="row">
+                    <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
+                  </template>
+                </b-table>
+
+                <!-- table footer -->
                 <b-row>
-                  <b-col md="3" class="my-1">
-                    <b-form-checkbox
-                      id="checkbox-2"
-                      v-model="bCheckAllProb"
-                      name="checkbox-2"
-                      @change="selectAllCheckedProb()">
-                      Check All
-                    </b-form-checkbox>
+                  <b-col md="8" class="my-1">
+                    <b-pagination :total-rows="computeTotalRowProb()" :per-page="perPageProb" v-model="currentPageProb"
+                                  class="my-0"/>
                   </b-col>
-                  <b-col md="3" class="my-1">
-                    <strong>Total : {{ndata_prob}}</strong>
-                  </b-col>
-                  <b-col md="6" class="my-1">
-                    <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
-                      <b-input-group prepend="Filter : ">
-                        <b-form-input v-model="filterProb" placeholder="Search"/>
-                        <b-input-group-append>
-                          <b-btn :disabled="!filterProb" @click="filterProb = ''">Clear</b-btn>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
+                  <b-col md="4" class="my-1">
+                    <b-input-group prepend="Per Page : ">
+                      <b-form-select :options="pageOptions" v-model="perPageViewProb" v-on:change="showPerPageProb"/>
+                    </b-input-group>
                   </b-col>
                 </b-row>
-              </div>
+              </b-tab>
 
-              <!-- table contents -->
-              <b-table
-                show-empty
-                sticky-header="53vh"
-                :small="true"
-                :striped="true"
-                :bordered="true"
-                :outlined="true"
-                :current-page="currentPageProb"
-                :per-page="perPageProb"
-                :filter="filterProb"
-                @filtered="onFilteredProb"
-                :fields="table_headers_prob"
-                :items="table_prob">
-
-                <template v-slot:cell(check)="row">
-                  <input type="checkbox" v-model="row.item.check" @click="updateSelectedRow(row.item)"/>
+              <b-tab title="Probability Map">
+                <template v-slot:title>
+                  <i class="fa fa-image"/> Probability Map
                 </template>
-
-                <template v-slot:cell(cdp_x)="row">
-                  {{row.item.cdp_x.toFixed(3)}}
+                <template v-if="proc_completed">
+                  <ApexChartLine class="lc_seismic_chart" :chartOptions="probMapOptions" :series="probMapSeries"/>
                 </template>
-                <template v-slot:cell(cdp_y)="row">
-                  {{row.item.cdp_y.toFixed(3)}}
+              </b-tab>
+              <b-tab title="Probability Distribution">
+                <template v-slot:title>
+                  <i class="fa fa-bar-chart"/> Probability Distribution
                 </template>
-                <template v-slot:cell(cdp_z)="row">
-                  {{row.item.cdp_z.toFixed(3)}}
+                <template v-if="proc_completed">
+                  <ApexChartLine class="lc_seismic_chart" :chartOptions="avgProbOptions" :series="avgProbSeries"/>
                 </template>
-                <template v-slot:cell(prob1)="row">
-                  {{parseProbabilityNumber(row.item.prob1)}}
+              </b-tab>
+              <b-tab title="Cumulative Distribution">
+                <template v-slot:title>
+                  <i class="fa fa-line-chart"/> Cumulative Distribution
                 </template>
-                <template v-slot:cell(prob2)="row">
-                  {{parseProbabilityNumber(row.item.prob2)}}
+                <template v-if="proc_completed">
+                  <ApexChartLine class="lc_seismic_chart" :chartOptions="ecdfOptions" :series="ecdfSeries"/>
                 </template>
-                <template v-slot:cell(prob)="row">
-                  {{parseProbabilityNumber(row.item.prob)}}
-                </template>
-
-                <!-- action status -->
-                <template v-slot:cell(action)="row">
-                  <b-link :href="openDataUrl(row.item)" @click="openData(row.item)">Open</b-link>
-                </template>
-              </b-table>
-
-              <!-- table footer -->
-              <b-row>
-                <b-col md="8" class="my-1">
-                  <b-pagination :total-rows="computeTotalRowProb()" :per-page="perPageProb" v-model="currentPageProb"
-                                class="my-0"/>
-                </b-col>
-                <b-col md="4" class="my-1">
-                  <b-input-group prepend="Per Page : ">
-                    <b-form-select :options="pageOptions" v-model="perPageViewProb" v-on:change="showPerPageProb"/>
-                  </b-input-group>
-                </b-col>
-              </b-row>
-            </b-tab>
-            <b-tab title="Plot AVA">
-              <template v-slot:title>
-                <i class="fa fa-file-image-o"/> Plot AVA
-              </template>
-              <template v-if="proc_plot_ava">
-                <ApexChartLine class="lc_seismic_chart" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
-              </template>
-            </b-tab>
-
-            <b-tab title="Probability Map">
-              <template v-slot:title>
-                <i class="fa fa-image"/> Probability Map
-              </template>
-              <template v-if="proc_completed">
-                <ApexChartLine class="lc_seismic_chart" :chartOptions="probMapOptions" :series="probMapSeries"/>
-              </template>
-            </b-tab>
-            <b-tab title="Probability Distribution">
-              <template v-slot:title>
-                <i class="fa fa-bar-chart"/> Probability Distribution
-              </template>
-              <template v-if="proc_completed">
-                <ApexChartLine class="lc_seismic_chart" :chartOptions="avgProbOptions" :series="avgProbSeries"/>
-              </template>
-            </b-tab>
-            <b-tab title="Cumulative Distribution">
-              <template v-slot:title>
-                <i class="fa fa-line-chart"/> Cumulative Distribution
-              </template>
-              <template v-if="proc_completed">
-                <ApexChartLine class="lc_seismic_chart" :chartOptions="ecdfOptions" :series="ecdfSeries"/>
-              </template>
-            </b-tab>
+              </b-tab>
+            </template>
           </b-tabs>
         </b-card>
       </b-col>
@@ -359,7 +371,7 @@
         <template v-if="pageMode === 1">
           <template v-if="model_ava.type!=='ilxl'">
           <vue-leaflet-single-marker-map :map_var="map_var" :marker="marker"
-                                               @updateMarkerPosition="updateMarkerPosition" style="height: 300px"/>
+                                         @updateMarkerPosition="updateMarkerPosition" style="height: 300px"/>
                         </template>
         </template>
       </span>
@@ -610,71 +622,59 @@
     },
 
     methods: {
-      fgetColormapName(ii)
-      {
+      fgetColormapName(ii) {
         return (getColormapName(ii))
       },
-      setColormap(ii)
-      {
+      setColormap(ii) {
         this.colormap = {id: ii, reverse: this.reverseColormap};
       },
 
-      fgetColormapAsset(ii)
-      {
+      fgetColormapAsset(ii) {
         return (getColormapAsset(ii))
       },
-      slideStopMin()
-      {
+      slideStopMin() {
         this.cmin = this.tmp_cmin;
       },
-      slideStopMax()
-      {
+      slideStopMax() {
         this.cmax = this.tmp_cmax;
       },
-      overlayClosed()
-      {
+      overlayClosed() {
         this.bdraw = false;
         this.opened = false;
         this.visible = false;
       },
-      refreshMultiSeismicChart()
-      {
+      refreshMultiSeismicChart() {
         this.setColormap(3);
       },
-      getSeismicDataPoints(ii)
-      {
+      getSeismicDataPoints(ii) {
         let sgy_points = [];
 
         let tmp = this.points[ii]["cdp_data"];
         let ns = tmp[0].length;
         let ntrc = tmp.length;
-        for (let i = ns - 1; i >= 0; i--)
-        {
+        for (let i = ns - 1; i >= 0; i--) {
           let tmp0 = [];
           // for (let j = 0; j < ntrc; j++)
-          for (let j = ntrc-1; j >=0; j--)
+          for (let j = ntrc - 1; j >= 0; j--)
             tmp0.push(tmp[j][i]);
           sgy_points.push(tmp0);
         }
-        return(sgy_points);
+        return (sgy_points);
       },
-      getSeismicDataX(ii)
-      {
+      getSeismicDataX(ii) {
         let xx = this.points[ii]["x"];
         xx["data"] = this.points[ii]["cdp_header"];
         // let xxx = [];
         // for(let i=0; i<this.points[ii]["cdp_header"].length; i++)
         //   xxx.push(i);
         // xx["data"] = xxx;
-        return(xx);
+        return (xx);
       },
-      getSeismicDataY(ii)
-      {
-        return(this.points[ii]["y"]);
+      getSeismicDataY(ii) {
+        return (this.points[ii]["y"]);
       },
-      getSeismicTitle(ii)
-      {
-        return(this.points[ii]["title"] + this.points[ii]["cdp_no"]);
+      getSeismicTitle(ii) {
+        return (this.points[ii]["title"] + this.points[ii]["cdp_no"]);
       },
       openGatherData() {
         let selected_data = [];
@@ -786,8 +786,7 @@
           this.model_ava["iline"] = this.marker["lat"];
         }
       },
-      parseProbData(msg)
-      {
+      parseProbData(msg) {
         this.table_prob = msg["data"];
 
         // create colormap
@@ -803,7 +802,7 @@
         });
         this.avgProbSeries.push({data: avg_prob["y"]});
         let prob_map_color = [];
-        for(let i=0; i<avg_prob["x"].length; i++) {
+        for (let i = 0; i < avg_prob["x"].length; i++) {
           prob_map_color.push(getColormapColorv2(density_colormap, avg_prob["x"][i], false));
         }
         this.avgProbOptions["colors"] = prob_map_color;
@@ -820,16 +819,16 @@
         let nx = ecdf_["x"].length;
 
         tmp_line.push([ecdf_["x"][0], 0.0]); //add first point
-        for(let i=0; i<nx; i++) {
+        for (let i = 0; i < nx; i++) {
           tmp.push([ecdf_["x"][i], ecdf_["y"][i]]);
 
-          if( (i>0) )
-            tmp_line.push([ecdf_["x"][i], ecdf_["y"][i-1]]);
+          if ((i > 0))
+            tmp_line.push([ecdf_["x"][i], ecdf_["y"][i - 1]]);
           tmp_line.push([ecdf_["x"][i], ecdf_["y"][i]]);
         }
-        tmp_line.push([ecdf_["x"][nx-1]+0.02, ecdf_["y"][nx-1]]); //add last point
-        this.ecdfSeries.push({type: 'scatter', name:'chart1', data: tmp});
-        this.ecdfSeries.push({type: 'line', name:'chart2', data: tmp_line});
+        tmp_line.push([ecdf_["x"][nx - 1] + 0.02, ecdf_["y"][nx - 1]]); //add last point
+        this.ecdfSeries.push({type: 'scatter', name: 'chart1', data: tmp});
+        this.ecdfSeries.push({type: 'line', name: 'chart2', data: tmp_line});
 
         // prob map series
         this.probMapSeries = [];
@@ -840,7 +839,7 @@
         this.probMapOptions["yaxis"]["title"]["text"] = "xline";
         let n_prob_map = prob_map["x"].length;
         let probability_map_color = [];
-        for(let i=0; i<n_prob_map; i++) {
+        for (let i = 0; i < n_prob_map; i++) {
           probability_map_color.push(getColormapColorv2(density_colormap, prob_map["z"][i], false));
           this.probMapSeries.push({
             type: 'scatter', name: prob_map["z"][i].toFixed(2).toString(), data: [[prob_map["x"][i], prob_map["y"][i]]]
@@ -1218,6 +1217,7 @@
     width: 100%;
     height: 50vh;
   }
+
   .lc_seismic_view {
     height: 80vh;
   }

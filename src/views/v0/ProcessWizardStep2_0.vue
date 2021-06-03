@@ -28,7 +28,7 @@
                 <template v-if="show_marker_drag"><i class="fa fa-map-marker"></i> </template> Marker
               </button>
               <button type="button" class="btn-sm btn-danger" @click="showMarkerWell()"
-                      style="margin: 3px"><template v-if="show_marker_well"><i class="fa fa-map-marker"></i> </template></i> Well
+                      style="margin: 3px"><template v-if="show_marker_well"><i class="fa fa-map-marker"></i></template> Well
               </button>
             </b-col>
             <b-col md="7" class="my-1">
@@ -62,6 +62,7 @@
 <!--              <b-link :href="openDataUrl3(row.item)" @click="openData3(row.item)" class="mr-2">Well</b-link>-->
 <!--              <b-link :href="openDataUrl3_1(row.item)" @click="openData3_1(row.item)" class="mr-2">Gather</b-link>-->
 <!--            <b-link :href="openDataUrl3_2(row.item)" @click="openData3_2(row.item)" class="mr-2">Section</b-link>-->
+            <b-link @click="showViewSectionDialog(row.item)" class="mr-3">Section</b-link>
             <b-link @click="showWellInRadius(row.item)" class="mr-3">Well</b-link>
             <b-link @click="openData2_1(row.item)">Prob</b-link>
           </template>
@@ -151,6 +152,20 @@
             </span>
     </vue-form-dialog>
 
+    <vue-form-dialog
+      ref="viewSectionDialog"
+      type="default"
+      header="Parameters" body="Body"
+      btn1_text="Close" btn2_text="Process"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="viewSectionDialogBtn1Click()" @btn2Click="viewSectionDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="section_schema" :model="section_model" :options="formOptions" @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
+
     <!-- show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
@@ -177,6 +192,7 @@
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
   import {
+    createListSectionModel, createListSectionSchema,
     createTableGeobodyListHeader,
     createTableGeobodyListHeaderV0,
     createWellInGeobodyModel, createWellInGeobodySchema
@@ -270,6 +286,8 @@
         table_headers: createTableGeobodyListHeaderV0(),
         table_datas: [],
         data_wells: [],
+        section_model: createListSectionModel(),
+        section_schema: createListSectionSchema(),
 
         resizeevent: false,
         model: createWellInGeobodyModel(),
@@ -281,6 +299,8 @@
 
         event_http_list_geobody: {success: "successListGeobody", fail: "failListGeobody"},
         event_http_find_rad: {success: "successListFindRad", fail: "failListFindRad"},
+        event_http_list_sgy: {success: "successListSegy", fail: "failListSegy"},
+
       }
     },
 
@@ -449,6 +469,13 @@
           this.markers.push(item["marker"]);
       },
 
+      getListSegy() {
+        this.showLoader = true;
+        let param = {
+          data: this.cur_area
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-list"), param, this.event_http_list_sgy]).then();
+      },
       getListGeobody()
       {
         this.showLoader = true;
@@ -514,6 +541,27 @@
         return("#/process-wizard2-1?mode=0");
       },
 
+      showViewSectionDialog(item)
+      {
+        this.cur_geobody = item;
+        this.$refs.viewSectionDialog.showModal();
+      },
+
+      viewSectionDialogBtn1Click() {
+        this.$refs.viewSectionDialog.hideModal();
+      },
+      viewSectionDialogBtn2Click() {
+        if (!this.bvalidate) return;
+
+        this.$store.dispatch('actionSaveSelectedGeobody', this.cur_geobody); //set selected project
+        this.$router.push({
+          path: "process-wizard2-2",
+          query: { area: this.cur_area["id_area"], geobody_id: this.cur_geobody["geobody_id"],
+            stack_label_name: this.section_model["substack_file_name"], rad: this.section_model["rad"]}
+        });
+        this.$refs.viewSectionDialog.hideModal();
+      },
+
       showWellInRadius(item)
       {
         this.model["id_area"] = this.cur_area["id_area"];
@@ -553,6 +601,7 @@
         this.table_datas = msg.data; //fill table contents
         this.table_datas = this.addMarkerVariable();
         this.showLoader = false;
+        this.getListSegy();
       });
       EventBus.$on(this.event_http_list_geobody.fail, (msg) =>
       {
@@ -575,12 +624,34 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-------------- LIST SGY -------------------
+      EventBus.$on(this.event_http_list_sgy.success, (msg) => {
+        let list_segy = [];
+        for (let i = 0; i < msg["data"].length; i++) {
+          list_segy.push({
+            value: msg["data"][i]["label_name"],
+            text: msg["data"][i]["label_name"],
+            id: msg["data"][i]["label_name"],
+            name: msg["data"][i]["label_name"]
+          });
+        }
+        this.section_schema.fields[0].values = list_segy;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_list_sgy.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy()
     {
       EventBus.$off(this.event_http_list_geobody.success);
       EventBus.$off(this.event_http_list_geobody.fail);
+      EventBus.$off(this.event_http_list_sgy.success);
+      EventBus.$off(this.event_http_list_sgy.fail);
       EventBus.$off(this.event_http_find_rad.success);
       EventBus.$off(this.event_http_find_rad.fail);
       this.showLoader = false;

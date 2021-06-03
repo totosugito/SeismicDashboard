@@ -2364,4 +2364,102 @@ export function createDemoWellInRadius() {
   return(data);
 }
 
+export function createDemoGeobodySectionList() {
+  let data = [
+    {
+      "iline": 6206,
+      "num.trace": 2
+    },
+    {
+      "iline": 6207,
+      "num.trace": 8
+    },
+    {
+      "iline": 6208,
+      "num.trace": 13
+    },
+    {
+      "iline": 6209,
+      "num.trace": 18
+    },
+    {
+      "iline": 6210,
+      "num.trace": 24
+    },
+    {
+      "iline": 6211,
+      "num.trace": 29
+    },
+    {
+      "iline": 6212,
+      "num.trace": 35
+    },
+    {
+      "iline": 6213,
+      "num.trace": 40
+    },
+    {
+      "iline": 6214,
+      "num.trace": 45
+    },
+    {
+      "iline": 6215,
+      "num.trace": 50
+    },
+    {
+      "iline": 6216,
+      "num.trace": 53
+    },
+    {
+      "iline": 6217,
+      "num.trace": 53
+    },
+    {
+      "iline": 6218,
+      "num.trace": 53
+    },
+    {
+      "iline": 6219,
+      "num.trace": 53
+    },
+    {
+      "iline": 6220,
+      "num.trace": 53
+    },
+    {
+      "xline": 2203,
+      "num.trace": 55
+    },
+    {
+      "xline": 2204,
+      "num.trace": 55
+    },
+    {
+      "xline": 2205,
+      "num.trace": 55
+    },
+    {
+      "xline": 2206,
+      "num.trace": 55
+    },
+    {
+      "xline": 2207,
+      "num.trace": 55
+    },
+    {
+      "xline": 2208,
+      "num.trace": 55
+    },
+    {
+      "xline": 2209,
+      "num.trace": 55
+    },
+    {
+      "xline": 2210,
+      "num.trace": 55
+    }
+  ];
+  return (data);
+}
+
 

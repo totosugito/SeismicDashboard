@@ -35,7 +35,8 @@ export default class VarRouter {
     "processwizard2": ["process-wizard2", "/process-wizard2", "Process Wizard Step 2"],
     "processwizard2-0": ["process-wizard2-0", "/process-wizard2-0", "Process Wizard Step 2"],
     "processwizard2-1": ["process-wizard2-1", "/process-wizard2-1", "Process Wizard Step 2"],
-    "processwizard2-2": ["process-wizard2-2", "/process-wizard2-2", "Process Wizard Step 2"],
+    "processwizard2-2": ["process-wizard2-2", "/process-wizard2-2", "List Section"],
+
     "processwizard3": ["process-wizard3", "/process-wizard3", "Process Wizard Step 3"],
     "processwizard3-1": ["process-wizard3-1", "/process-wizard3-1", "Process Wizard Step 3"],
     "processwizard3-1-pick": ["process-wizard3-1-pick", "/process-wizard3-1-pick", "Process Wizard Step 3"],
@@ -60,6 +61,7 @@ export default class VarRouter {
     "segy-update": "/api/segy/file-update",
     "segy-view-list-ava": "/api/segy/view-list-ava",
     "segy-view-gather": "/api/segy/view-list-gather",
+    "segy-view-section": "/api/segy/view-list-section",
 
     "mlmodel-list": "/api/mlmodel/file-list",
     "mlmodel-register": "/api/mlmodel/file-register",
@@ -70,6 +72,7 @@ export default class VarRouter {
     "geobody-ava-list": "/api/geobody/find-ava-data",
     "geobody-register": "/api/geobody/file-register",
     "geobody-delete": "/api/geobody/file-delete",
+    "geobody-find-section": "/api/geobody/find-section",
 
     "point-ava-list": "/api/point/find-ava-data",
     "point-calc-prob": "/api/point/calc-prob",

@@ -501,6 +501,33 @@ export function createTableProbabilityHeader()
   return (table_headers);
 }
 
+export function createTableGeobodySectionHeaders() {
+  let table_headers = [
+    {
+      key: 'check',
+      label: '#',
+      sortable: true,
+      thStyle: { width: '40px'}
+    },
+    {
+      key: 'iline',
+      label: 'Inline',
+      sortable: true
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      sortable: true
+    },
+    {
+      key: 'num.trace',
+      label: 'ntrc',
+      sortable: true
+    },
+  ];
+  return (table_headers);
+}
+
 export function createTableAvaHeaderV0()
 {
   let table_headers = [
@@ -850,6 +877,36 @@ export function createAvaPlotSchema()
     ]
   };
   return(schema_prob);
+}
+
+export function createListSectionModel() {
+  let model = {
+    stack_label_name: 0,
+    rad: 100
+  };
+  return(model);
+}
+export function createListSectionSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'select',
+        label: 'Select SubStack File',
+        model: 'substack_file_name',
+        selectOptions: {hideNoneSelectedText: true}
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Radius',
+        model: 'rad',
+        placeholder: 'Set Radius',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_);
 }
 
 export function createWellInGeobodyModel() {
