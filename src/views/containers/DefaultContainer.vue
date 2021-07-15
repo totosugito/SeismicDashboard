@@ -23,20 +23,20 @@
         </b-navbar-nav>
       </AppHeader>
       <div class="app-body" >
-        <AppSidebar fixed>
-          <SidebarHeader/>
-          <SidebarForm/>
-          <template v-if="user.loginID==='admin'">
-            <SidebarNav :navItems="nav_admin" :appSkin="appSkin"></SidebarNav>
-          </template>
-          <template v-else>
-            <SidebarNav :navItems="nav" :appSkin="appSkin"></SidebarNav>
-          </template>
-          <SidebarFooter/>
-          <SidebarMinimizer :appSkin="appSkin"/>
-        </AppSidebar>
+<!--        <AppSidebar fixed>-->
+<!--          <SidebarHeader/>-->
+<!--          <SidebarForm/>-->
+<!--          <template v-if="user.loginID==='admin'">-->
+<!--            <SidebarNav :navItems="nav_admin" :appSkin="appSkin"></SidebarNav>-->
+<!--          </template>-->
+<!--          <template v-else>-->
+<!--            <SidebarNav :navItems="nav" :appSkin="appSkin"></SidebarNav>-->
+<!--          </template>-->
+<!--          <SidebarFooter/>-->
+<!--          <SidebarMinimizer :appSkin="appSkin"/>-->
+<!--        </AppSidebar>-->
         <main class="main">
-          <Breadcrumb :list="list"/>
+<!--          <Breadcrumb :list="list"/>-->
           <div class="container-fluid">
             <router-view></router-view>
           </div>

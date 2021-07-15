@@ -195,7 +195,7 @@ export default new Router({
             {
               path: varRouter.getRoute("processwizard1", 1),
               name: varRouter.getRoute("processwizard1", 2),
-              component: () => import('../views/v0/ProcessWizardStep1')
+              component: () => import('../views/v1/ProcessWizardStep1')
             },
             {
               path: varRouter.getRoute("processwizard2-0", 1),

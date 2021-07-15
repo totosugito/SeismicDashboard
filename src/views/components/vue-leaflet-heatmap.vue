@@ -11,7 +11,7 @@
 
 <script>
   import {LMap, LTileLayer, LMarker, LPopup} from 'vue2-leaflet'
-  import Vue2LeafletHeatmap from "vue2-leaflet-heatmap";
+  import Vue2LeafletHeatmap from "../components/Vue2LeafletHeatmap";
   import 'leaflet/dist/leaflet.css'
 
   import * as L from "leaflet";

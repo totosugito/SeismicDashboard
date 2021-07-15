@@ -954,3 +954,59 @@ export function createWellInGeobodySchema()
   };
   return(schema_prob);
 }
+
+export function createTableAreaListHeader_V1()
+{
+  let table_headers = [
+    {
+      thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
+      key: 'id_color',
+      label: '',
+      sortable: false
+    },
+    // {
+    //   key: 'id_area',
+    //   label: 'ID Area',
+    //   sortable: true
+    // },
+    {
+      key: 'name',
+      label: 'Area Name',
+      sortable: true
+    },
+    // {
+    //   key: 'coordinate',
+    //   label: 'Coordinate',
+    //   sortable: false
+    // },
+    // {
+    //   key: 'action',
+    //   label: 'Action',
+    //   sortable: false,
+    // },
+  ];
+  return (table_headers);
+}
+
+export function createTableAreaListHeader2_V1()
+{
+  let table_headers = [
+    {
+      key: 'survey_name',
+      label: 'Survey Name',
+      sortable: true
+    },
+  ];
+  return (table_headers);
+}
+export function createTableAreaListHeader3_V1()
+{
+  let table_headers = [
+    {
+      key: 'dataset_name',
+      label: 'Dataset Name',
+      sortable: true
+    },
+  ];
+  return (table_headers);
+}
