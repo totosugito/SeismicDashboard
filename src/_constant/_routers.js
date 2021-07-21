@@ -120,7 +120,8 @@ export default new Router({
         {
           path: '/',
           name: '',
-          component: () => import('../views/Dashboard') //Dashboard
+          component: () => import('../views/v1/ProcessWizardStep1')
+          // component: () => import('../views/Dashboard') //Dashboard
           // component: () => import('../views/pages/WellTable') //Dashboard
           // component: () => import('../views/pages/GeobodyTable') //Dashboard
           // component: () => import('../views/pages/AreaTable') //Dashboard

@@ -1,5 +1,5 @@
 <template>
-  <div style="display: none;">
+  <div style="display: none">
     <slot v-if="ready"></slot>
   </div>
 </template>
@@ -12,51 +12,53 @@
     latLngs: {
       type: Array,
       default: () => [],
-      custom: false
+      custom: false,
+    },
+    gradient: {
+      type: Object,
+      custom: true,
     },
     minOpacity: {
       type: Number,
       custom: true,
-      default: 0.05
     },
     maxZoom: {
       type: Number,
       custom: true,
-      default: 18
     },
     radius: {
       type: Number,
       custom: true,
-      default: 25
     },
     blur: {
       type: Number,
       custom: true,
-      default: 15
     },
     max: {
       type: Number,
       custom: true,
-      default: 1.0
     },
     visible: {
       type: Boolean,
       custom: true,
-      default: true
-    }
+      default: true,
+    },
   };
   export default {
     name: "LHeatmap",
     props,
     data() {
       return {
-        ready: false
+        ready: false,
       };
     },
     mounted() {
       const options = {};
       if (this.minOpacity) {
         options.minOpacity = this.minOpacity;
+      }
+      if (this.gradient) {
+        options.gradient = this.gradient;
       }
       if (this.maxZoom) {
         options.maxZoom = this.maxZoom;
@@ -84,6 +86,9 @@
       setMinOpacity(newVal, oldVal) {
         this.mapObject.setOptions({ minOpacity: newVal });
       },
+      setGradient(newVal, oldVal) {
+        this.mapObject.setOptions({ gradient: newVal });
+      },
       setMaxZoom(newVal, oldVal) {
         this.mapObject.setOptions({ maxZoom: newVal });
       },
@@ -106,10 +111,7 @@
       },
       addLatLng(value) {
         this.mapObject.addLatLng(value);
-      }
-    }
+      },
+    },
   };
 </script>
-
-<style>
-</style>
