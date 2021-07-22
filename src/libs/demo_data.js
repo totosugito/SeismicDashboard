@@ -1,5 +1,145 @@
 import {getLocalMapServer} from "../_constant/http_api";
 
+export function createAreaDemoData() {
+  let data = [
+    {
+      "id_area": 2,
+      "name": "TUNU95",
+      "geobody_loc": "TUNU95/geobody",
+      "coordinate": {
+        "p1": {
+          "x": 546966,
+          "y": 9884923
+        },
+        "p2": {
+          "x": 573765.500059278,
+          "y": 9911259.5086963
+        },
+        "p3": {
+          "x": 555436.500059046,
+          "y": 9929910.50869654
+        },
+        "p4": {
+          "x": 528636.999999768,
+          "y": 9903574.00000024
+        }
+      },
+      "well_loc": "TUNU95/well",
+      "well_list": "TUNU95_well_info_list.csv"
+    },
+    {
+      "id_area": 3,
+      "name": "NWT",
+      "geobody_loc": "NWT/geobody",
+      "coordinate": {
+        "p1": {
+          "x": 553057,
+          "y": 9921778
+        },
+        "p2": {
+          "x": 569315.000000058,
+          "y": 9918617.99999999
+        },
+        "p3": {
+          "x": 578261.000000058,
+          "y": 9964642.999999998
+        },
+        "p4": {
+          "x": 562003,
+          "y": 9967803
+        }
+      },
+      "well_loc": "NWT/well",
+      "well_list": "NWT_well_info_list.csv"
+    },
+    {
+      "id_area": 1,
+      "name": "CT3D",
+      "geobody_loc": "CT3D/geobody",
+      "well_loc": "CT3D/well",
+      "well_list": "CT3D_well_info_list.csv",
+      "coordinate": {
+        "p1": {
+          "x": 553903,
+          "y": 9896783
+        },
+        "p2": {
+          "x": 564971.187300455,
+          "y": 9894631.96359927
+        },
+        "p3": {
+          "x": 574337.187300455,
+          "y": 9942816.96359927
+        },
+        "p4": {
+          "x": 563269,
+          "y": 9944968
+        }
+      }
+    },
+    {
+      "id_area": 4,
+      "name": "area test",
+      "coordinate": {
+        "p1": {
+          "x": 553057,
+          "y": 9921778
+        },
+        "p2": {
+          "x": 569315.000000058,
+          "y": 9918617.99999999
+        },
+        "p3": {
+          "x": 578261.000000058,
+          "y": 9964642.999999998
+        },
+        "p4": {
+          "x": 562003,
+          "y": 9967803
+        }
+      }
+    }
+  ];
+  return (data);
+}
+
+export function createHeatmapDemoData() {
+  let datas = [
+    [9892410.38, 539783.02, 0],
+    [9892446.05, 539747.97, 0],
+    [9892481.71, 539712.93, 0],
+    [9892517.37, 539677.88, 0],
+    [9892553.03, 539642.84, 3.2232451],
+    [9892588.7, 539607.79, 2.6960244],
+    [9892624.36, 539572.74, 2.8892214],
+    [9892660.02, 539537.7, 6.013168],
+    [9892695.68, 539502.65, 8.598647],
+    [9892731.35, 539467.61, 4.267123],
+    [9892767.01, 539432.56, 4.951923],
+    [9892802.67, 539397.52, 6.1742716],
+    [9892838.33, 539362.47, 4.040646],
+    [9892874, 539327.43, 3.1925428],
+    [9892909.66, 539292.38, 3.4570131],
+    [9892945.32, 539257.34, 5.5708585],
+    [9892980.98, 539222.29, 6.6529746],
+    [9893016.65, 539187.24, 4.5757856],
+    [9893052.31, 539152.2, 6.0856733],
+    [9893087.97, 539117.15, 8.633948],
+    [9893123.63, 539082.11, 11.188945],
+    [9893159.3, 539047.06, 6.105748],
+    [9893194.96, 539012.02, 4.5932083],
+    [9893230.62, 538976.97, 7.542396],
+    [9893266.28, 538941.93, 10.600707],
+    [9893301.95, 538906.88, 12.510892],
+    [9893337.61, 538871.84, 16.875862],
+    [9893373.27, 538836.79, 13.403075],
+    [9893408.93, 538801.74, 9.13362],
+    [9893444.6, 538766.7, 10.224214],
+    [9893480.26, 538731.65, 11.208454],
+  ];
+  return (datas);
+}
+
 export function createAvaDemoData() {
   let ava_data = [
     {
@@ -57,7 +197,7 @@ export function createAvaDemoData() {
       "check": true
     }
   ];
-  return(ava_data);
+  return (ava_data);
 }
 
 export function createProbDemoData() {
@@ -1296,7 +1436,7 @@ export function createProbDemoData() {
       ]
     }
   };
-  return(prob_data);
+  return (prob_data);
 }
 
 export function createGeobodyDemoData() {
@@ -1921,7 +2061,7 @@ export function createGeobodyDemoData() {
         }
       }
     }];
-  return(data);
+  return (data);
 }
 
 export function createAreaLeafletDemoData() {
@@ -1936,7 +2076,7 @@ export function createAreaLeafletDemoData() {
     "polygon": [],
     "poly_color": []
   };
-  return(data);
+  return (data);
 }
 
 export function createDemoAvaGeobodyParam() {
@@ -1995,7 +2135,7 @@ export function createDemoProbParam() {
       ]
     }
   };
-  return(param);
+  return (param);
 }
 
 export function createDemoWellInRadius() {
@@ -2361,7 +2501,7 @@ export function createDemoWellInRadius() {
       "zen": 1001.17
     }
   ];
-  return(data);
+  return (data);
 }
 
 export function createDemoGeobodySectionList() {

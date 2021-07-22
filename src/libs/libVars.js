@@ -959,20 +959,24 @@ export function createTableAreaListHeader_V1()
 {
   let table_headers = [
     {
-      thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
-      key: 'id_color',
-      label: '',
-      sortable: false
+      key: 'id_area',
+      label: 'ID',
+      sortable: true,
+      thClass: 'text-center',
+      tdClass: 'text-center'
     },
-    // {
-    //   key: 'id_area',
-    //   label: 'ID Area',
-    //   sortable: true
-    // },
     {
       key: 'name',
       label: 'Area Name',
       sortable: true
+    },
+    {
+      thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
+      key: 'id_color',
+      label: 'Plot',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center'
     },
     // {
     //   key: 'coordinate',

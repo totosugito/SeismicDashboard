@@ -24,4 +24,5 @@
   // Import Main styles for this application
   @import '_assets/scss/style';
 
+  @import '_assets/scss/syncfusion.css';
 </style>
