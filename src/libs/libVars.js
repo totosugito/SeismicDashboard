@@ -968,7 +968,8 @@ export function createTableAreaListHeader_V1()
     {
       key: 'name',
       label: 'Area Name',
-      sortable: true
+      sortable: true,
+      thClass: 'text-center',
     },
     {
       thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
@@ -978,16 +979,26 @@ export function createTableAreaListHeader_V1()
       thClass: 'text-center',
       tdClass: 'text-center'
     },
-    // {
-    //   key: 'coordinate',
-    //   label: 'Coordinate',
-    //   sortable: false
-    // },
-    // {
-    //   key: 'action',
-    //   label: 'Action',
-    //   sortable: false,
-    // },
+  ];
+  return (table_headers);
+}
+export function createTableHeatmapLayerHeader()
+{
+  let table_headers = [
+    {
+      key: 'name',
+      label: 'Layer Name',
+      sortable: true,
+      thClass: 'text-center',
+    },
+    {
+      thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
+      key: 'show_layer',
+      label: 'Show',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
   ];
   return (table_headers);
 }
