@@ -37,9 +37,9 @@
 <!--        </AppSidebar>-->
         <main class="main">
 <!--          <Breadcrumb :list="list"/>-->
-          <div class="container-fluid">
+<!--          <div class="container-fluid">-->
             <router-view></router-view>
-          </div>
+<!--          </div>-->
         </main>
       </div>
       <TheFooter>

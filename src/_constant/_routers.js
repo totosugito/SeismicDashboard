@@ -151,6 +151,12 @@ export default new Router({
             }
           },
           children: [
+            {
+              path: varRouter.getRoute("seismic-viewer-by-xy", 1),
+              name: varRouter.getRoute("seismic-viewer-by-xy", 2),
+              component: () => import('../views/v1/SeismicViewerByXY')
+            },
+
             // ---------------------------------------------------------
             //                    ADMIN
             // ---------------------------------------------------------

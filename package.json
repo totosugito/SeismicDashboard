@@ -12,13 +12,13 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@geoman-io/leaflet-geoman-free": "^2.11.2",
     "@arction/lcjs": "^2.2.1",
     "@babel/polyfill": "^7.0.0-rc.1",
+    "@geoman-io/leaflet-geoman-free": "^2.11.2",
     "@syncfusion/ej2-base": "19.1.57",
     "@syncfusion/ej2-vue-buttons": "19.1.54",
-    "@syncfusion/ej2-vue-grids": "19.1.58",
-    "@syncfusion/ej2-vue-navigations": "19.1.58",
+    "@syncfusion/ej2-vue-grids": "^18.4.48",
+    "@syncfusion/ej2-vue-inputs": "18.4.47",
     "apexcharts": "^3.26.1",
     "axios": "^0.21.1",
     "babel-loader": "^8.0.5",

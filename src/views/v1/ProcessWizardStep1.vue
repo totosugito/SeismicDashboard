@@ -8,12 +8,12 @@
       :active="showLoader"/>
 
     <splitpanes class="default-theme" vertical style="height: 88vh" vertical>
-      <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
-        <b-tabs v-model="tabIndex">
-          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">Tab contents 1</b-tab>
-          <b-tab title="Data by WELL" :title-link-class="linkClass(1)">Tab contents 2</b-tab>
-          <b-tab title="Well Files" :title-link-class="linkClass(2)">Tab contents 3</b-tab>
-          <b-tab no-body title="Seismic Files" :title-link-class="linkClass(3)">
+      <pane class="p-2" min-size="20" max-size="80" style="background: white">
+<!--        <b-tabs v-model="tabIndex">-->
+<!--          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">Tab contents 1</b-tab>-->
+<!--          <b-tab title="Data by WELL" :title-link-class="linkClass(1)">Tab contents 2</b-tab>-->
+<!--          <b-tab title="Well Files" :title-link-class="linkClass(2)">Tab contents 3</b-tab>-->
+<!--          <b-tab no-body title="Seismic Files" :title-link-class="linkClass(3)">-->
 
             <b-row>
               <b-col md="6">
@@ -87,39 +87,40 @@
               <!--                </b-table>-->
               <!--              </b-col>-->
             </b-row>
-            <b-row>
-              <b-col md="12">
-                <b-table style="height: 45vh"
-                         show-empty
-                         sticky-header="80vh"
-                         :small="true"
-                         :striped="true"
-                         :bordered="true"
-                         :outlined="true"
-                         :current-page="currentPage"
-                         :per-page="perPage"
-                         :filter="filter"
-                         @filtered="onFiltered"
-                         :fields="table_headers4"
-                         :items="tmp_datas">
+<!--            <b-row>-->
+<!--              <b-col md="12">-->
+<!--                <b-table style="height: 45vh"-->
+<!--                         show-empty-->
+<!--                         sticky-header="80vh"-->
+<!--                         :small="true"-->
+<!--                         :striped="true"-->
+<!--                         :bordered="true"-->
+<!--                         :outlined="true"-->
+<!--                         :current-page="currentPage"-->
+<!--                         :per-page="perPage"-->
+<!--                         :filter="filter"-->
+<!--                         @filtered="onFiltered"-->
+<!--                         :fields="table_headers4"-->
+<!--                         :items="tmp_datas">-->
 
-                  <template v-slot:cell(id_color)="row">
-                      <span class="fa fa-circle" :style="createStyleFromIndex(row.item)"
-                            @click="eventSelectAreaClicked(row.index)"/>
-                  </template>
-                  <template v-slot:cell(action)="row">
-                    <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>
-                    <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>
-                  </template>
-                </b-table>
-              </b-col>
-            </b-row>
-          </b-tab>
-        </b-tabs>
+<!--                  <template v-slot:cell(id_color)="row">-->
+<!--                      <span class="fa fa-circle" :style="createStyleFromIndex(row.item)"-->
+<!--                            @click="eventSelectAreaClicked(row.index)"/>-->
+<!--                  </template>-->
+<!--                  <template v-slot:cell(action)="row">-->
+<!--                    <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>-->
+<!--                    <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>-->
+<!--                  </template>-->
+<!--                </b-table>-->
+<!--              </b-col>-->
+<!--            </b-row>-->
+<!--          </b-tab>-->
+<!--        </b-tabs>-->
       </pane>
-      <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
+      <pane class="p-2" min-size="20" max-size="80" style="background: white">
         <template v-if="showLoader===false">
           <div class="mb-1">
+            <!-- map button -->
             <ejs-button :cssClass='setMarkerDragStyle()' class="mr-1" v-on:click.native="updateMarkerDragValue()"><i
               class="fa fa-map-marker"/></ejs-button>
             <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i
@@ -129,9 +130,10 @@
             </template>
           </div>
 
+          <!-- layer map -->
           <l-map ref="map" style="width: 100%; height:96%;" :zoom="map_var.zoom" :center="map_var.center"
                  :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
-                 @ready="onMapReady">
+                 @ready="onMapReady" @click="onShowMarker">
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
             <template v-for="(item, idx_poly) in list_area_polygon">
@@ -153,10 +155,14 @@
             </template>
 
             <template v-if="show_marker_drag">
-              <l-marker :lat-lng="marker_drag_coord" :draggable="true" :icon="markerDragIcon"
-                        @drag="updateMarkerDragCoord">
-                <l-popup>X : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>Y :
-                  <b>{{marker_drag_coord.lat.toFixed(2)}}</b></l-popup>
+              <l-marker :lat-lng="marker_drag_coord" :draggable="false" :icon="markerDragIcon">
+                <l-popup>
+                  <div style="width: 100%">
+                  Lat (x) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
+                  Lon (y) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b>
+                  </div>
+                  <b-button class="btn btn-sm mt-1" variant="primary" @click="openSectionByCoord()">Section</b-button>
+                </l-popup>
               </l-marker>
             </template>
 
@@ -260,7 +266,7 @@
     },
     data() {
       return {
-        bdemo: false,
+        bdemo: true,
         showLoader: true,
         retStatus: {status: 0, title: "", message: "", data: []},
 
@@ -323,6 +329,10 @@
       } else
         this.httpListArea();
     },
+
+    watch:
+      {
+      },
 
     methods: {
       mapUpdated(event) {
@@ -418,6 +428,11 @@
         this.map.on('pm:create', this.mapUpdated);
         this.map.on('pm:remove', this.mapUpdated);
         this.map.on('pm:cut', this.mapUpdated);
+
+      },
+      onShowMarker(event)
+      {
+        this.marker_drag_coord = event.latlng;
       },
 
       linkClass(idx) {
@@ -453,9 +468,6 @@
       },
       updateMarkerDragValue() {
         this.show_marker_drag = !this.show_marker_drag;
-      },
-      updateMarkerDragCoord(location) {
-        this.marker_drag_coord = location.latlng;
       },
 
       // ------------------------------------------------
@@ -497,6 +509,16 @@
         let tmp = this.table_heatmap[idx]["show_layer"];
         this.table_heatmap[idx]["show_layer"] = !tmp;
       },
+
+      openSectionByCoord()
+      {
+        let routeData = this.$router.resolve({
+          path: "seismic-viewer-by-xy",
+          query: { lat:this.marker_drag_coord["lat"], lng: this.marker_drag_coord["lng"] }
+        });
+        window.open(routeData.href, '_blank');
+      },
+
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------

@@ -46,6 +46,8 @@ export default class VarRouter {
     "processwizard4": ["process-wizard4", "/process-wizard4", "Process Wizard Step 4"],
     "processwizard5": ["process-wizard5", "/process-wizard5", "Process Wizard Step 5"],
     "processwizard6": ["process-wizard6", "/process-wizard6", "Process Wizard Step 6"],
+
+    'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer"],
   };
 
   httptype = {

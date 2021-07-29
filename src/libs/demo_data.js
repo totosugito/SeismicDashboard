@@ -2080,10 +2080,25 @@ export function createGeobodyDemoData() {
   return (data);
 }
 
+// export function createAreaLeafletDemoData() {
+//   let data = {
+//     "zoom": 10,
+//     "minZoom": 7,
+//     "maxZoom": 16,
+//     "mapMaxResolution": 2.38865713,
+//     "url": getLocalMapServer() + "/{z}/{x}/{y}.png",
+//     "attribution": '',
+//     "tileExtent": [-20037508.34278924, -20037508.34278924, 20037508.34278924, 20037508.34278924],
+//     "polygon": [],
+//     "poly_color": []
+//   };
+//   return (data);
+// }
+
 export function createAreaLeafletDemoData() {
   let data = {
     "zoom": 10,
-    "minZoom": 7,
+    "minZoom": 8,
     "maxZoom": 16,
     "mapMaxResolution": 2.38865713,
     "url": getLocalMapServer() + "/{z}/{x}/{y}.png",
