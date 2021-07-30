@@ -2097,7 +2097,7 @@ export function createGeobodyDemoData() {
 
 export function createAreaLeafletDemoData() {
   let data = {
-    "zoom": 10,
+    "zoom": 11,
     "minZoom": 8,
     "maxZoom": 16,
     "mapMaxResolution": 2.38865713,

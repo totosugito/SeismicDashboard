@@ -963,7 +963,8 @@ export function createTableAreaListHeader_V1()
       label: 'ID',
       sortable: true,
       thClass: 'text-center',
-      tdClass: 'text-center'
+      tdClass: 'text-center',
+      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
     },
     {
       key: 'name',
@@ -972,12 +973,28 @@ export function createTableAreaListHeader_V1()
       thClass: 'text-center',
     },
     {
-      thStyle: '{width: 30px; min-width: 20px; max-width: 50px;}',
-      key: 'id_color',
-      label: 'Plot',
+      key: 'area_show',
+      label: 'Area',
       sortable: false,
       thClass: 'text-center',
-      tdClass: 'text-center'
+      tdClass: 'text-center',
+      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
+    },
+    {
+      key: 'heatmap_available',
+      label: 'Data',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
+    },
+    {
+      key: 'heatmap_show',
+      label: 'Layer',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
     },
   ];
   return (table_headers);

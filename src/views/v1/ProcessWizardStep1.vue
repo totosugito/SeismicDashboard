@@ -8,123 +8,116 @@
       :active="showLoader"/>
 
     <splitpanes class="default-theme" vertical style="height: 88vh" vertical>
-      <pane class="p-2" min-size="20" max-size="80" style="background: white">
-<!--        <b-tabs v-model="tabIndex">-->
-<!--          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">Tab contents 1</b-tab>-->
-<!--          <b-tab title="Data by WELL" :title-link-class="linkClass(1)">Tab contents 2</b-tab>-->
-<!--          <b-tab title="Well Files" :title-link-class="linkClass(2)">Tab contents 3</b-tab>-->
-<!--          <b-tab no-body title="Seismic Files" :title-link-class="linkClass(3)">-->
+      <pane class="p-2" min-size="20" max-size="30" style="background: white">
+        <!--        <b-tabs v-model="tabIndex">-->
+        <!--          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">Tab contents 1</b-tab>-->
+        <!--          <b-tab title="Data by WELL" :title-link-class="linkClass(1)">Tab contents 2</b-tab>-->
+        <!--          <b-tab title="Well Files" :title-link-class="linkClass(2)">Tab contents 3</b-tab>-->
+        <!--          <b-tab no-body title="Seismic Files" :title-link-class="linkClass(3)">-->
 
-            <b-row>
-              <b-col md="6">
-                <b-table style="height: 30vh"
-                         show-empty
-                         sticky-header="53vh"
-                         :small="true"
-                         :striped="true"
-                         :bordered="true"
-                         :outlined="true"
-                         :current-page="currentPage"
-                         :per-page="perPage"
-                         :filter="filter"
-                         @filtered="onFiltered"
-                         :fields="table_area_headers"
-                         :items="table_area">
+        <b-row>
+          <b-col md="12">
+            <b-table style="height: 30vh"
+                     show-empty
+                     sticky-header="53vh"
+                     :small="true"
+                     :striped="true"
+                     :bordered="true"
+                     :outlined="true"
+                     :current-page="currentPage"
+                     :per-page="perPage"
+                     :filter="filter"
+                     @filtered="onFiltered"
+                     :fields="table_area_headers"
+                     :items="table_area">
 
-                  <template v-slot:cell(id_color)="row">
-                      <span :style="createStyleFromIndex(row.item)"
-                            @click="eventSelectAreaClicked(row.index)">
-                        <i class="fa fa-map"/>
-                      </span>
-                  </template>
-                </b-table>
-              </b-col>
-              <b-col md="6">
-                <b-table style="height: 30vh"
-                         show-empty
-                         sticky-header="53vh"
-                         :small="true"
-                         :striped="true"
-                         :bordered="true"
-                         :outlined="true"
-                         :current-page="currentPage"
-                         :per-page="perPage"
-                         :filter="filter"
-                         @filtered="onFiltered"
-                         :fields="table_heatmap_headers"
-                         :items="table_heatmap">
-                  <template v-slot:cell(show_layer)="row">
-                      <span :style="createStyleFromHeatmapLayerIndex(row.item)"
-                            @click="eventSelectedHeatmapLayerClicked(row.index)">
-                        <i class="fa fa-image"/>
-                      </span>
-                  </template>
-                </b-table>
-              </b-col>
-              <!--              <b-col md="4">-->
-              <!--                <b-table style="height: 30vh"-->
-              <!--                         show-empty-->
-              <!--                         sticky-header="53vh"-->
-              <!--                         :small="true"-->
-              <!--                         :striped="true"-->
-              <!--                         :bordered="true"-->
-              <!--                         :outlined="true"-->
-              <!--                         :current-page="currentPage"-->
-              <!--                         :per-page="perPage"-->
-              <!--                         :filter="filter"-->
-              <!--                         @filtered="onFiltered"-->
-              <!--                         :fields="table_headers3"-->
-              <!--                         :items="tmp_datas">-->
+              <template v-slot:cell(area_show)="row">
+                <span :style="eventSelectedAreaCssStyle(row.item)"
+                      @click="eventSelectedAreaClicked(row.item)">
+                      <i class="fa fa-map"/>
+                </span>
+              </template>
+              <template v-slot:cell(heatmap_available)="row">
+                <span :style="eventDownloadHeatmapCssStyle(row.item)"
+                      @click="eventDownloadHeatmapClicked(row.index)">
+                      <i class="fa fa-download"/>
+                </span>
+              </template>
+              <template v-slot:cell(heatmap_show)="row">
+                <span :style="eventHeatmapShowLayerCssStyle(row.item)"
+                      @click="eventHeatmapShowLayerClicked(row.item)">
+                      <i class="fa fa-clone"/>
+                </span>
+              </template>
+            </b-table>
+          </b-col>
+          <!--          <b-col md="6">-->
+          <!--          </b-col>-->
+          <!--              <b-col md="4">-->
+          <!--                <b-table style="height: 30vh"-->
+          <!--                         show-empty-->
+          <!--                         sticky-header="53vh"-->
+          <!--                         :small="true"-->
+          <!--                         :striped="true"-->
+          <!--                         :bordered="true"-->
+          <!--                         :outlined="true"-->
+          <!--                         :current-page="currentPage"-->
+          <!--                         :per-page="perPage"-->
+          <!--                         :filter="filter"-->
+          <!--                         @filtered="onFiltered"-->
+          <!--                         :fields="table_headers3"-->
+          <!--                         :items="tmp_datas">-->
 
-              <!--                  <template v-slot:cell(id_color)="row">-->
-              <!--                      <span class="fa fa-circle" :style="createStyleFromIndex(row.item)"-->
-              <!--                            @click="eventSelectAreaClicked(row.index)"/>-->
-              <!--                  </template>-->
-              <!--                  <template v-slot:cell(action)="row">-->
-              <!--                    <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>-->
-              <!--                    <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>-->
-              <!--                  </template>-->
-              <!--                </b-table>-->
-              <!--              </b-col>-->
-            </b-row>
-<!--            <b-row>-->
-<!--              <b-col md="12">-->
-<!--                <b-table style="height: 45vh"-->
-<!--                         show-empty-->
-<!--                         sticky-header="80vh"-->
-<!--                         :small="true"-->
-<!--                         :striped="true"-->
-<!--                         :bordered="true"-->
-<!--                         :outlined="true"-->
-<!--                         :current-page="currentPage"-->
-<!--                         :per-page="perPage"-->
-<!--                         :filter="filter"-->
-<!--                         @filtered="onFiltered"-->
-<!--                         :fields="table_headers4"-->
-<!--                         :items="tmp_datas">-->
+          <!--                  <template v-slot:cell(id_color)="row">-->
+          <!--                      <span class="fa fa-circle" :style="createStyleFromIndex(row.item)"-->
+          <!--                            @click="eventSelectAreaClicked(row.index)"/>-->
+          <!--                  </template>-->
+          <!--                  <template v-slot:cell(action)="row">-->
+          <!--                    <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>-->
+          <!--                    <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>-->
+          <!--                  </template>-->
+          <!--                </b-table>-->
+          <!--              </b-col>-->
+        </b-row>
+        <!--            <b-row>-->
+        <!--              <b-col md="12">-->
+        <!--                <b-table style="height: 45vh"-->
+        <!--                         show-empty-->
+        <!--                         sticky-header="80vh"-->
+        <!--                         :small="true"-->
+        <!--                         :striped="true"-->
+        <!--                         :bordered="true"-->
+        <!--                         :outlined="true"-->
+        <!--                         :current-page="currentPage"-->
+        <!--                         :per-page="perPage"-->
+        <!--                         :filter="filter"-->
+        <!--                         @filtered="onFiltered"-->
+        <!--                         :fields="table_headers4"-->
+        <!--                         :items="tmp_datas">-->
 
-<!--                  <template v-slot:cell(id_color)="row">-->
-<!--                      <span class="fa fa-circle" :style="createStyleFromIndex(row.item)"-->
-<!--                            @click="eventSelectAreaClicked(row.index)"/>-->
-<!--                  </template>-->
-<!--                  <template v-slot:cell(action)="row">-->
-<!--                    <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>-->
-<!--                    <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>-->
-<!--                  </template>-->
-<!--                </b-table>-->
-<!--              </b-col>-->
-<!--            </b-row>-->
-<!--          </b-tab>-->
-<!--        </b-tabs>-->
+        <!--                  <template v-slot:cell(id_color)="row">-->
+        <!--                      <span class="fa fa-circle" :style="createStyleFromIndex(row.item)"-->
+        <!--                            @click="eventSelectAreaClicked(row.index)"/>-->
+        <!--                  </template>-->
+        <!--                  <template v-slot:cell(action)="row">-->
+        <!--                    <b-link class="mr-4" @click="openGeobodyPage(row.item)">Geobody Prob.</b-link>-->
+        <!--                    <b-link @click="openXYZPage(row.item)">XYZ Prob.</b-link>-->
+        <!--                  </template>-->
+        <!--                </b-table>-->
+        <!--              </b-col>-->
+        <!--            </b-row>-->
+        <!--          </b-tab>-->
+        <!--        </b-tabs>-->
       </pane>
-      <pane class="p-2" min-size="20" max-size="80" style="background: white">
+      <pane class="p-2" min-size="70" max-size="80" style="background: white">
         <template v-if="showLoader===false">
           <div class="mb-1">
             <!-- map button -->
-            <ejs-button :cssClass='setMarkerDragStyle()' class="mr-1" v-on:click.native="updateMarkerDragValue()"><i
+            <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
+                        v-on:click.native="markerLocationEventClick()"><i
               class="fa fa-map-marker"/></ejs-button>
-            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i
-              class="fa fa-download"/></ejs-button>
+<!--            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i-->
+<!--              class="fa fa-download"/></ejs-button>-->
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>
             </template>
@@ -133,23 +126,27 @@
           <!-- layer map -->
           <l-map ref="map" style="width: 100%; height:96%;" :zoom="map_var.zoom" :center="map_var.center"
                  :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
-                 @ready="onMapReady" @click="onShowMarker">
+                 @ready="onMapReady" @click="onMapClickEvent">
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
-            <template v-for="(item, idx_poly) in list_area_polygon">
-              <l-polygon :lat-lngs="item.polygon" :color="item.color">
-                <l-popup :content="item.name"/>
-              </l-polygon>
+            <template v-for="item in tmp_array_autoupdate">
             </template>
 
-            <template v-for="(item, idx_layer) in table_heatmap">
-              <template v-if="item.show_layer">
+            <template v-for="item in table_area">
+              <template v-if="item.area_show===true">
+                <l-polygon :lat-lngs="item.poly.polygon" :color="item.poly.color">
+                </l-polygon>
+              </template>
+            </template>
+
+            <template v-for="(item, idx_layer) in table_area">
+              <template v-if="item.heatmap_show">
                 <LHeatmap
-                  :latLngs="heatmap_full_data[idx_layer].heatmap"
+                  :latLngs="item.heatmap_data[0].heatmap"
                   :radius="20"
                   :blur="20"
                   :minOpacity="0.1"
-                  :max="heatmap_summary.max">
+                  :max="item.heatmap_data[0].sum.max">
                 </LHeatmap>
               </template>
             </template>
@@ -158,8 +155,8 @@
               <l-marker :lat-lng="marker_drag_coord" :draggable="false" :icon="markerDragIcon">
                 <l-popup>
                   <div style="width: 100%">
-                  Lat (x) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
-                  Lon (y) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b>
+                    Lat (x) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
+                    Lon (y) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b>
                   </div>
                   <b-button class="btn btn-sm mt-1" variant="primary" @click="openSectionByCoord()">Section</b-button>
                 </l-popup>
@@ -174,7 +171,7 @@
     <!-- show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
-      type="danger"
+      type="warning"
       :header="retStatus.title" body="Body"
       btn1_text="Tutup"
       btn1_style="success"
@@ -282,13 +279,11 @@
           iconAnchor: [16, 36]
         }),
 
-        list_area_polygon: [],
+        tmp_array_autoupdate: [],
+        selected_area: -1,
         table_area_headers: createTableAreaListHeader_V1(),
         table_area: [],
 
-        table_heatmap_headers: createTableHeatmapLayerHeader(),
-        table_heatmap: [],
-        heatmap_full_data: [],
         heatmap_summary: {min: 0, max: 0},
 
         tabIndex: 3,
@@ -320,10 +315,8 @@
       this.map_var = createAreaLeafletDemoData();
       if (this.bdemo) {
         this.table_area = createAreaDemoData();
-        this.heatmap_full_data = createHeatmapDemoData();
-        this.table_heatmap = createTableFromHeatmapFullData(this.heatmap_full_data);
-        this.heatmap_summary = getMaxHeatmapData(this.table_heatmap);
-        this.list_area_polygon = addPlotDataToTableArea(this.map_var, this.table_area);
+        this.table_area = addPlotDataToTableArea(this.map_var, this.table_area);
+
         this.marker_drag_coord = getAreaFirstCoordinate(this.table_area);
         this.showLoader = false;
       } else
@@ -331,8 +324,7 @@
     },
 
     watch:
-      {
-      },
+      {},
 
     methods: {
       mapUpdated(event) {
@@ -430,10 +422,6 @@
         this.map.on('pm:cut', this.mapUpdated);
 
       },
-      onShowMarker(event)
-      {
-        this.marker_drag_coord = event.latlng;
-      },
 
       linkClass(idx) {
         if (this.tabIndex === idx) {
@@ -460,61 +448,79 @@
       // ------------------------------------------------
       // marker drag
       // ------------------------------------------------
-      setMarkerDragStyle() {
+      onMapClickEvent(event) {
+        if (this.show_marker_drag)
+          this.marker_drag_coord = event.latlng;
+      },
+
+      markerLocationCssStyle() {
         if (this.show_marker_drag)
           return ("e-warning");
         else
           return ("e-outline");
       },
-      updateMarkerDragValue() {
+      markerLocationEventClick() {
         this.show_marker_drag = !this.show_marker_drag;
       },
 
       // ------------------------------------------------
       //
       // ------------------------------------------------
-
-      createStyleFromIndex(item) {
-        let fg_color = item["poly"]["color"];
-        if (item.plot === false)
-          fg_color = "#696969";
+      eventSelectedAreaCssStyle(item) {
+        let fg_color = "#DCDCDC";
+        if (item.area_show)
+          fg_color = item["poly"]["color"];
 
         let strstyle =
           "color:" + fg_color + "; " +
           "font-size:100%;";
         return (strstyle);
       },
-      eventSelectAreaClicked(idx) {
-        let status = !this.table_area[idx].plot;
-        this.table_area[idx].plot = status; // select/unselect
-
-        this.list_area_polygon = [];
-        for (let i = 0; i < this.table_area.length; i++) {
-          let item = this.table_area[i];
-          if (item.plot === true)
-            this.list_area_polygon.push(item.poly);
-        }
+      eventSelectedAreaClicked(item) {
+        this.tmp_array_autoupdate = [];
+        item.area_show = !item.area_show; // select/unselect
       },
-
-      createStyleFromHeatmapLayerIndex(item) {
-        let fg_color = "#4169E1";
-        if (item.show_layer === false)
-          fg_color = "#DCDCDC";
+      eventDownloadHeatmapCssStyle(item) {
+        let fg_color = "#DCDCDC";
+        if (item.heatmap_available)
+          fg_color = "#4169E1";
         let strstyle =
           "color:" + fg_color + "; " +
           "font-size:100%;";
         return (strstyle);
       },
-      eventSelectedHeatmapLayerClicked(idx) {
-        let tmp = this.table_heatmap[idx]["show_layer"];
-        this.table_heatmap[idx]["show_layer"] = !tmp;
-      },
-
-      openSectionByCoord()
+      eventDownloadHeatmapClicked(idx)
       {
+        this.selected_area = idx;
+        this.httpHeatmapDataByIdx();
+      },
+      eventHeatmapShowLayerCssStyle(item) {
+        let fg_color = "#DCDCDC";
+        if (item.heatmap_show)
+          fg_color = "#4169E1";
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:100%;";
+        return (strstyle);
+      },
+      eventHeatmapShowLayerClicked(item)
+      {
+        if(item.heatmap_available === false)
+        {
+          this.retStatus.title = "Informasi";
+          this.retStatus.status = 0;
+          this.retStatus.message = "Silahkan melakukan download data sebelum menampilkan di peta !";
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+        this.tmp_array_autoupdate = [];
+        item.heatmap_show = !item.heatmap_show;
+      },
+
+      openSectionByCoord() {
         let routeData = this.$router.resolve({
           path: "seismic-viewer-by-xy",
-          query: { lat:this.marker_drag_coord["lat"], lng: this.marker_drag_coord["lng"] }
+          query: {lat: this.marker_drag_coord["lat"], lng: this.marker_drag_coord["lng"]}
         });
         window.open(routeData.href, '_blank');
       },
@@ -575,6 +581,33 @@
         this.showLoader = true;
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_area_list]).then();
       },
+      httpHeatmapDataByIdx() {
+        if(this.selected_area < 0)
+          return;
+
+        this.showLoader = true;
+        let list_file = [
+          "heatmap_TUNU95_v30_cal_prob_0500_0600.csv",
+          "heatmap_TUNU95_v30_cal_prob_0600_0700.csv",
+          "heatmap_TUNU95_v30_cal_prob_0700_0800.csv",
+          "heatmap_TUNU95_v30_cal_prob_0800_0900.csv",
+          "heatmap_TUNU95_v30_cal_prob_0900_1000.csv"
+        ];
+
+        let param = {
+          "state": 0,
+          "type": "/api/heatmap/multi",
+          "mesg": "",
+          "data": {
+            "id_area": 2,
+            "file_loc": "TUNU95/08_heatmap",
+            "feature": "sum",
+            "file_name": [list_file[this.selected_area]]
+          }
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("demo-heatmap-multi"), param, this.event_http_heatmap_data]).then();
+      },
+
       httpHeatmapData() {
         this.showLoader = true;
         // let param = {
@@ -634,10 +667,10 @@
       // LIST AREA
       //-----------------------------------------------------------------
       EventBus.$on(this.event_http_area_list.success, (msg) => {
-        this.table_area = msg.data; //fill table contents
-
         this.map_var = createAreaLeafletDemoData();
-        this.list_area_polygon = addPlotDataToTableArea(this.map_var, this.table_area);
+        this.table_area = msg.data; //fill table contents
+        this.table_area = addPlotDataToTableArea(this.map_var, this.table_area);
+
         this.marker_drag_coord = getAreaFirstCoordinate(this.table_area);
         this.showLoader = false;
       });
@@ -652,15 +685,14 @@
       // HEATMAP DATA
       //-----------------------------------------------------------------
       EventBus.$on(this.event_http_heatmap_data.success, (msg) => {
-        this.heatmap_full_data = msg.data; //fill table contents
-        this.table_heatmap = createTableFromHeatmapFullData(this.heatmap_full_data);
-        this.heatmap_summary = getMaxHeatmapData(this.table_heatmap);
+        this.table_area[this.selected_area].heatmap_data = msg.data;
+        this.table_area[this.selected_area].heatmap_available = true;
         this.showLoader = false;
       });
       EventBus.$on(this.event_http_heatmap_data.fail, (msg) => {
+        this.table_area[this.selected_area].heatmap_data = [];
+        this.table_area[this.selected_area].heatmap_available = false;
         this.showLoader = false;
-        this.heatmap_full_data = [];
-        this.table_heatmap = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });

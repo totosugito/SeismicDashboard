@@ -3,17 +3,17 @@ import {createLeafletAreaPolygon, fillLeafletAreaVariable} from "./simpleLib";
 
 export function addPlotDataToTableArea(map_var, datas)
 {
-  let list_area_polygon = [];
   for (let i = 0; i < datas.length; i++)
   {
     let item = datas[i];
     map_var = fillLeafletAreaVariable(map_var, item["coordinate"], i);
     item.poly = createLeafletAreaPolygon(item["name"], item["coordinate"], i);
-    item.plot = false;
-    if(item.plot)
-      list_area_polygon.push(item.poly);
+    item.area_show = false;
+    item.heatmap_available = false;
+    item.heatmap_show = false;
+    item.heatmap_data = [];
   }
-  return(list_area_polygon);
+  return(datas);
 }
 
 export function getAreaFirstCoordinate(datas)

@@ -34,7 +34,7 @@ export function getDefaultUserIcon()
 export function getMapPinMarker()
 {
   //return(getAssetServer() + "general/pin_location.png");
-  return(globalVar()["SERVER_ADDRESS"] + "/static/red-marker.png")
+  return(globalVar()["SERVER_ADDRESS"] + "/static/marker_drag.png")
 }
 
 export function getWellPinMarker()
