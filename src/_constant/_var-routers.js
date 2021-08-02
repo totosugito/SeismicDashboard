@@ -83,7 +83,8 @@ export default class VarRouter {
     "well-find-rad": "/api/well/find-rad",
 
     "demo-heatmap": "/api/heatmap/data",
-    "demo-heatmap-multi": "/api/heatmap/multi"
+    "demo-heatmap-multi": "/api/heatmap/multi",
+    "get_section_data": "/api/heatmap/find-sandbox"
   };
 
   schematype = {

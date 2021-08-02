@@ -60,12 +60,22 @@
 
     <b-container fluid>
       <b-row>
-<!--        <template v-for="i in parseInt(npic)">-->
-<!--          <b-col>-->
-<!--            <LChartSeismic class="lc_seismic_chart" :colormap="colormap" :points="points" :xaxis="XAxis" :yaxis="YAxis" :cmin="cmin" :cmax="cmax"-->
-<!--                           :title="dataTitle"></LChartSeismic>-->
-<!--          </b-col>-->
-<!--        </template>-->
+        <template v-for="seismic in seismics">
+          <b-col>
+            <LChartSeismicAreaSelected
+              class="lc_seismic_chart"
+              :colormap="colormap"
+              :title="seismic.file_name"
+              :points="seismic.cdp_data"
+              :xaxis="seismic.x"
+              :yaxis="seismic.y"
+              :boundaryX="seismic.boundaryX"
+              :boundaryY="boundaryY"
+              :cmin="cmin"
+              :cmax="cmax"
+            />
+          </b-col>
+        </template>
       </b-row>
     </b-container>
       </pane>
@@ -77,8 +87,8 @@
   import Vue from 'vue';
   import {mapState} from "vuex";
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
-  import {getData} from "../../libs/data";
-  import LChartSeismic from "../components/LChartSeismic";
+  import {getData, getSectionData} from "../../libs/data";
+  import LChartSeismicAreaSelected from "../components/LChartSeismicAreaSelected";
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
@@ -88,13 +98,15 @@
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import DynamicInputForMap from "../myview/DynamicInputForMap";
+  import {appDemoMode} from "../../_constant/http_api";
+  import {rotate, rotate90} from "../../libs/2d-array-rotation";
 
   export default {
     name: "SeismicViewerByXY",
 
     components: {
       DynamicInputForMap,
-      LChartSeismic,
+      LChartSeismicAreaSelected,
       EnhancedCheck,
       bFormSlider,
 
@@ -109,15 +121,19 @@
     data: () =>
     {
       return {
+        bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: false,
+        lat: 0,
+        lng: 0,
 
-        npic: 2,
-        points: [],
+        datas: [],
+        seismics: [],
+        boundaryY: {
+          p1: 0,
+          p2: 0,
+        },
         colormap: {id: 3, reverse: false},
-        XAxis: {},
-        YAxis: {},
-        dataTitle: "",
         perc: 0,
         reverseColormap: false,
         cmin: 20,
@@ -125,7 +141,7 @@
         tmp_cmin: 20,
         tmp_cmax: 20,
 
-        event_http: {success: "success", fail: "fail"},
+        event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
       }
     },
     created()
@@ -135,8 +151,13 @@
 
     beforeMount: function ()
     {
-      this.npic = this.$route.query.n;
-      // this.getDemoData();
+      this.lat = this.$route.query.lat;
+      this.lng = this.$route.query.lng;
+      if (this.bdemo) {
+        this.fillDataVariable(getSectionData());
+        this.showLoader = false;
+      } else
+        this.httpGetSection();
     },
     methods: {
       dynamicInputOnClickRefreshSection(val)
@@ -170,39 +191,53 @@
         this.cmax = this.tmp_cmax;
       },
 
-      getDemoData()
-      {
-        this.XAxis = {
-          "label": "Offset (m)",
-          "sampling": 1,
-          "start": 0
+      httpGetSection() {
+        let param = {
+          "state": 0,
+          "type": "/api/heatmap/find-sandbox",
+          "mesg": "",
+          "data": {
+            "id_area": 2,
+            "x": this.lng,
+            "y": this.lat,
+            // "x": 550766.97,
+            // "y": 9912090.44
+          }
         };
-        this.YAxis = {
-          "label": "Depth (m)",
-          "sampling": 2,
-          "start": 50
-        };
-        this.points = getData();
-        let data = [];
-        for (let i = 0; i < this.points[0].length; i++)
-          data.push(i);
-        this.XAxis["data"] = data;
-        this.ns = this.points.length;
-        this.dt = this.YAxis["sampling"];
-
-        this.dataTitle = "CDP NO : 1";
-        this.showLoader = false;
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("get_section_data"), param, this.event_http_get_section]).then();
       },
+
+      fillDataVariable(tmp)
+      {
+        this.datas = tmp;
+        this.seismics = this.datas;
+        for(let i=0; i<this.datas.length; i++) {
+          this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
+          this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
+
+          let ntrc = this.seismics[i]["ntrace"];
+          this.seismics[i]["boundaryX"] = {
+            p1: this.seismics[i]["cdp_header"][0] + Math.round(ntrc/2),
+            p2: this.seismics[i]["cdp_header"][ntrc-1] - Math.round(ntrc/2)
+          };
+        }
+        this.boundaryY["p1"] = 200;
+        this.boundaryY["p2"] = 300;
+      }
     },
 
     mounted()
     {
-      EventBus.$on(this.event_http.success, (msg) =>
+      EventBus.$on(this.event_http_get_section.success, (msg) =>
       {
+        this.fillDataVariable(msg.data);
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http.fail, (msg) =>
+      EventBus.$on(this.event_http_get_section.fail, (msg) =>
       {
+        this.datas = [];
+        this.seismics = [];
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
@@ -226,7 +261,7 @@
 
 <style lang="scss" scoped>
   .lc_seismic_chart {
-    height: 95vh;
+    height: 83vh;
   }
 
   .btn_toolbar {

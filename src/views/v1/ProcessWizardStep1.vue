@@ -222,7 +222,7 @@
     createTableFromHeatmapFullData,
     getAreaFirstCoordinate, getMaxHeatmapData
   } from "../../libs/libUpdateData";
-  import {getMapPinMarker} from "../../_constant/http_api";
+  import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
 
   import '@geoman-io/leaflet-geoman-free'
   import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
@@ -263,7 +263,7 @@
     },
     data() {
       return {
-        bdemo: true,
+        bdemo: appDemoMode(),
         showLoader: true,
         retStatus: {status: 0, title: "", message: "", data: []},
 

@@ -12,7 +12,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@arction/lcjs": "^2.2.1",
+    "@arction/lcjs": "^3.1.0",
     "@babel/polyfill": "^7.0.0-rc.1",
     "@geoman-io/leaflet-geoman-free": "^2.11.2",
     "@syncfusion/ej2-base": "19.1.57",

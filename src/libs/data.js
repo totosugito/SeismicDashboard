@@ -3,6 +3,11 @@ export function getData() {
   return (data);
 }
 
+export function getSectionData() {
+  let data = [];
+  return (data);
+}
+
 export function createDemoGather() {
   let data = [];
   return(data);

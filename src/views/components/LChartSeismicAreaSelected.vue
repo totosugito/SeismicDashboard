@@ -18,10 +18,12 @@
   import {get2dColSize, get2dMaxData, get2dMinData, get2dRowSize, getLcColormap} from "../../libs/colormap";
   import {createColorObject} from "../../libs/libLC";
   import {getIndexFromArray, getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
+  import {getDefaultDarkColorAtIdx} from "../../libs/defApexChartLine";
 
   export default {
-    name: "LChartSeismic",
-    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax'],
+    name: "LChartSeismicAreaSelected",
+    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax',
+      "boundaryX", "boundaryY"],
     data()
     {
       return {
@@ -136,27 +138,45 @@
 
 
 
-        const palette = ColorPalettes.arction(10)
-        const colors = [6, 9, 0].map(palette)
-        const axisYColors = [colors[0], colors[5]]
-        const axisYStyles = axisYColors.map((color) => new SolidFill({ color }))
-        const axisYStrokeStyles = axisYStyles.map((fillStyle) => new SolidLine({ fillStyle, thickness: 2 }))
-        // Add a Band to the X/Y Axis
+        let x_stroke_style = new SolidLine()
+          .setFillStyle(new SolidFill().setColor(ColorHEX(getDefaultDarkColorAtIdx(0))))
+          .setThickness(2.0);
+        let y_stroke_style = new SolidLine()
+          .setFillStyle(new SolidFill().setColor(ColorHEX(getDefaultDarkColorAtIdx(1))))
+          .setThickness(2.0);
+
         // Add a Constantline to the X Axis
-        const xAxisConstantline = customX.addConstantLine()
-        xAxisConstantline
-          .setValue(3250)
-          .setStrokeStyle(axisYStrokeStyles[0]);
+        // const xAxisConstantline1 = customX.addConstantLine();
+        // xAxisConstantline1
+        //   .setValue(3250)
+        // .setStrokeStyle(x_stroke_style);
+        // const xAxisConstantline2 = customX.addConstantLine();
+        // xAxisConstantline2
+        //   .setValue(3500)
+        //   .setStrokeStyle(x_stroke_style);
+
+        // // Add a Constantline to the Y Axis
+        // const yAxisConstantline1 = customY.addConstantLine();
+        // yAxisConstantline1
+        //   .setValue(200)
+        //   .setStrokeStyle(y_stroke_style);
+        // const yAxisConstantline2 = customY.addConstantLine();
+        // yAxisConstantline2
+        //   .setValue(300)
+        //   .setStrokeStyle(y_stroke_style);
+
+
         const xAxisBand = customX.addBand();
         xAxisBand
-          .setValueStart(3250)
-          .setValueEnd(3300)
-          // .setFillStyle(axisYStrokeStyles)
+          .setValueStart(this.boundaryX["p1"])
+          .setValueEnd(this.boundaryX["p2"])
+          .setStrokeStyle(x_stroke_style)
           .setName('X Axis Band');
         const yAxisBand = customY.addBand();
         yAxisBand
-          .setValueStart(50)
-          .setValueEnd(200)
+          .setValueStart(this.boundaryY["p1"])
+          .setValueEnd(this.boundaryY["p2"])
+          .setStrokeStyle(y_stroke_style)
           .setName('Y Axis Band');
 
         // document.addEventListener('mousemove', (event) =>
