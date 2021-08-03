@@ -57,3 +57,33 @@ export function getMaxHeatmapData(datas) {
   r["max"] = max_data;
   return (r);
 }
+
+export function createDefaultSectionAreaParameter() {
+  let param = [
+    {
+      title: "InLine",
+      min: 1,
+      max: 3201,
+      step: 1,
+      vmin: 20,
+      vmax: 80
+    },
+    {
+      title: "XLine",
+      min: 1,
+      max: 100,
+      step: 1,
+      vmin: 20,
+      vmax: 80
+    },
+    {
+      title: "Depth",
+      min: 1,
+      max: 400,
+      step: 1,
+      vmin: 20,
+      vmax: 80
+    }
+  ];
+  return(param);
+}

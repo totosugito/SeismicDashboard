@@ -22,7 +22,7 @@
 
   export default {
     name: "LChartSeismicAreaSelected",
-    props: ['title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax',
+    props: ['id', 'title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax',
       "boundaryX", "boundaryY"],
     data()
     {
@@ -34,6 +34,10 @@
         ns: 0,
         ntrc: 0,
         ystart : 0,
+        updateBoundaryX: {},
+        updateBoundaryY: {},
+        xAxisBand: null,
+        yxAxisBand: null,
 
         // x_cursor_info : '',
         // y_cursor_info : '',
@@ -47,7 +51,8 @@
         },
         grColor: null,
         pointInLcAxis: {},
-        cursorInfo: {x:0, y:0}
+        cursorInfo: {x:0, y:0},
+        // bupdate: true
       }
     },
     methods: {
@@ -166,18 +171,33 @@
         //   .setStrokeStyle(y_stroke_style);
 
 
-        const xAxisBand = customX.addBand();
-        xAxisBand
+        this.xAxisBand = customX.addBand();
+        this.xAxisBand
           .setValueStart(this.boundaryX["p1"])
           .setValueEnd(this.boundaryX["p2"])
           .setStrokeStyle(x_stroke_style)
           .setName('X Axis Band');
-        const yAxisBand = customY.addBand();
-        yAxisBand
+
+        this.yAxisBand = customY.addBand();
+        this.yAxisBand
           .setValueStart(this.boundaryY["p1"])
           .setValueEnd(this.boundaryY["p2"])
           .setStrokeStyle(y_stroke_style)
           .setName('Y Axis Band');
+
+        this.xAxisBand.onValueChange((xAxisBand, start, end) => {
+          this.updateBoundaryX = {
+            p1: start,
+            p2: end
+          }
+        });
+
+        this.yAxisBand.onValueChange((yAxisBand, start, end) => {
+          this.updateBoundaryY = {
+            p1: start,
+            p2: end
+          }
+        });
 
         // document.addEventListener('mousemove', (event) =>
         // {
@@ -192,6 +212,14 @@
           // )
           // this.cursor_move_event(tmp_point);
         // })
+      },
+      updateChartYAxisBoundary()
+      {
+        // console.log(JSON.stringify(this.updateBoundaryY))
+        // this.bupdate = false;
+        // this.yAxisBand.setValueStart(this.updateBoundaryY["p1"])
+        // this.yAxisBand.setValueEnd(this.updateBoundaryY["p2"])
+        // this.bupdate = true;
       },
 
       cursor_move_event(tmp_point)
@@ -253,7 +281,14 @@
         {
           this.$emit('cursorInfo', val);
         },
-
+        updateBoundaryX(val)
+        {
+          this.$emit('updateBoundaryX', this.id, val);
+        },
+        updateBoundaryY(val)
+        {
+          this.$emit('updateBoundaryY', this.id, val);
+        },
         pointInLcAxis(val)
         {
           if (val)
@@ -276,6 +311,11 @@
         {
           this.cmax = val;
           this.createChart();
+        },
+        boundaryY: function (val)
+        {
+          this.boundaryY = val;
+          this.updateChartYAxisBoundary();
         },
         resizeevent: function (val)
         {

@@ -2,52 +2,52 @@
   <div>
     <b-card header="Dynamic input for map" class="text-left">
       <div>
-        <div>{{param.iline.title}}</div>
+        <div>{{param[0].title}}</div>
         <b-row>
           <b-col cols="5">
-            <ejs-numerictextbox :min="param.iline.min" :max="param.iline.max" :step="param.iline.step"
-                                :value="param.iline.min" v-model="param.iline.min" format="n0"/>
+            <ejs-numerictextbox :min="param[0].min" :max="param[0].max" :step="param[0].step"
+                                :value="param[0].vmin" v-model="param[0].vmin" format="n0"/>
           </b-col>
           <b-col cols="2" class="text-center">
             to
           </b-col>
           <b-col cols="5">
-            <ejs-numerictextbox :min="param.iline.min" :max="param.iline.max" :step="param.iline.step"
-                                :value="param.iline.max" v-model="param.iline.max" format="n0"/>
+            <ejs-numerictextbox :min="param[0].min" :max="param[0].max" :step="param[0].step"
+                                :value="param[0].vmax" v-model="param[0].vmax" format="n0"/>
           </b-col>
         </b-row>
       </div>
 
       <div class="mt-2">
-        <div>{{param.xline.title}}</div>
+        <div>{{param[1].title}}</div>
         <b-row>
           <b-col cols="5">
-            <ejs-numerictextbox :min="param.xline.min" :max="param.xline.max" :step="param.xline.step"
-                                :value="param.xline.min" v-model="param.xline.min" format="n0"/>
+            <ejs-numerictextbox :min="param[1].min" :max="param[1].max" :step="param[1].step"
+                                :value="param[1].vmin" v-model="param[1].vmin" format="n0"/>
           </b-col>
           <b-col cols="2" class="text-center">
             to
           </b-col>
           <b-col cols="5">
-            <ejs-numerictextbox :min="param.xline.min" :max="param.xline.max" :step="param.xline.step"
-                                :value="param.xline.max" v-model="param.xline.max" format="n0"/>
+            <ejs-numerictextbox :min="param[1].min" :max="param[1].max" :step="param[1].step"
+                                :value="param[1].vmax" v-model="param[1].vmax" format="n0"/>
           </b-col>
         </b-row>
       </div>
 
       <div class="mt-2">
-        <div>{{param.depth.title}}</div>
+        <div>{{param[2].title}}</div>
         <b-row>
           <b-col cols="5">
-            <ejs-numerictextbox :min="param.depth.min" :max="param.depth.max" :step="param.depth.step"
-                                :value="param.depth.min" v-model="param.depth.min" format="n2"/>
+            <ejs-numerictextbox :min="param[2].min" :max="param[2].max" :step="param[2].step"
+                                :value="param[2].vmin" v-model="param[2].vmin" format="n2"/>
           </b-col>
           <b-col cols="2" class="text-center">
             to
           </b-col>
           <b-col cols="5">
-            <ejs-numerictextbox :min="param.depth.min" :max="param.depth.max" :step="param.depth.step"
-                                :value="param.depth.max" v-model="param.depth.max" format="n2"/>
+            <ejs-numerictextbox :min="param[2].min" :max="param[2].max" :step="param[2].step"
+                                :value="param[2].vmax" v-model="param[2].vmax" format="n2"/>
           </b-col>
         </b-row>
       </div>
@@ -73,35 +73,41 @@
     name: "DynamicInputForMap",
     props: {
       param: {
-        type: Object,
+        type: Array,
         required: false,
         default: function () {
-          return {
-            iline: {
+          return [
+            {
               title: "InLine",
               min: 1,
-              max: 100,
+              max: 3201,
               step: 1,
               min: 1,
-              max: 100
+              max: 4000,
+              vmin: 20,
+              vmax: 80
             },
-            xline: {
+            {
               title: "XLine",
               min: 1,
               max: 100,
               step: 1,
               min: 1,
-              max: 100
+              max: 100,
+              vmin: 20,
+              vmax: 80
             },
-            depth: {
+            {
               title: "Depth",
               min: 1,
               max: 100,
               step: 1,
               min: 1,
-              max: 100
+              max: 100,
+              vmin: 20,
+              vmax: 80
             }
-          }
+          ]
         }
       },
     },

@@ -10,7 +10,7 @@
 
     <splitpanes class="default-theme" vertical style="height: 88vh" vertical>
       <pane class="p-2" min-size="20" max-size="40" style="background: white">
-        <DynamicInputForMap @onClickRefreshSection="dynamicInputOnClickRefreshSection" @onClickViewProspect="dynamicInputOnClickViewProspect"/>
+        <DynamicInputForMap :param="paramInput" @onClickRefreshSection="dynamicInputOnClickRefreshSection" @onClickViewProspect="dynamicInputOnClickViewProspect"/>
       </pane>
       <pane class="p-2" min-size="40" max-size="80" style="background: white">
     <div>
@@ -60,19 +60,22 @@
 
     <b-container fluid>
       <b-row>
-        <template v-for="seismic in seismics">
+        <template v-for="(seismic,index) in seismics">
           <b-col>
             <LChartSeismicAreaSelected
               class="lc_seismic_chart"
+              :id="index"
               :colormap="colormap"
               :title="seismic.file_name"
               :points="seismic.cdp_data"
               :xaxis="seismic.x"
               :yaxis="seismic.y"
-              :boundaryX="seismic.boundaryX"
+              :boundaryX="boundaryX[index]"
               :boundaryY="boundaryY"
               :cmin="cmin"
               :cmax="cmax"
+              @updateBoundaryX="updateBoundaryX"
+              @updateBoundaryY="updateBoundaryY"
             />
           </b-col>
         </template>
@@ -100,6 +103,7 @@
   import DynamicInputForMap from "../myview/DynamicInputForMap";
   import {appDemoMode} from "../../_constant/http_api";
   import {rotate, rotate90} from "../../libs/2d-array-rotation";
+  import {createDefaultSectionAreaParameter} from "../../libs/libUpdateData";
 
   export default {
     name: "SeismicViewerByXY",
@@ -127,8 +131,10 @@
         lat: 0,
         lng: 0,
 
+        paramInput: createDefaultSectionAreaParameter(),
         datas: [],
         seismics: [],
+        boundaryX: [],
         boundaryY: {
           p1: 0,
           p2: 0,
@@ -160,6 +166,19 @@
         this.httpGetSection();
     },
     methods: {
+      updateBoundaryX(ii, val)
+      {
+        this.boundaryX[ii] = val;
+        this.paramInput[ii]["vmin"] = val["p1"];
+        this.paramInput[ii]["vmax"] = val["p2"];
+      },
+      updateBoundaryY(ii, val)
+      {
+        this.boundaryY = val;
+        this.paramInput[2]["vmin"] = val["p1"];
+        this.paramInput[2]["vmax"] = val["p2"];
+      },
+
       dynamicInputOnClickRefreshSection(val)
       {
         console.log(JSON.stringify(val));
@@ -212,16 +231,26 @@
       {
         this.datas = tmp;
         this.seismics = this.datas;
+        this.boundaryX = [];
         for(let i=0; i<this.datas.length; i++) {
           this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
           this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
 
           let ntrc = this.seismics[i]["ntrace"];
-          this.seismics[i]["boundaryX"] = {
-            p1: this.seismics[i]["cdp_header"][0] + Math.round(ntrc/2),
-            p2: this.seismics[i]["cdp_header"][ntrc-1] - Math.round(ntrc/2)
-          };
+          this.boundaryX.push({
+            p1: this.seismics[i]["idx_st"] + Math.round(ntrc/2),
+            p2: this.seismics[i]["idx_en"] - Math.round(ntrc/2)
+          });
+
+          this.paramInput[i]["min"] = this.seismics[i]["idx_st"];
+          this.paramInput[i]["max"] = this.seismics[i]["idx_en"];
+          this.paramInput[i]["vmin"] = this.seismics[i]["idx_st"];
+          this.paramInput[i]["vmax"] = this.seismics[i]["idx_en"];
         }
+        this.paramInput[2]["min"] = 0;
+        this.paramInput[2]["max"] = 400;
+        this.paramInput[2]["vmin"] = 0;
+        this.paramInput[2]["vmax"] = 400;
         this.boundaryY["p1"] = 200;
         this.boundaryY["p2"] = 300;
       }
