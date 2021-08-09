@@ -66,7 +66,7 @@
               class="lc_seismic_chart"
               :id="index"
               :colormap="colormap"
-              :title="seismic.file_name"
+              :title="getSeismicTitle(seismic)"
               :points="seismic.cdp_data"
               :xaxis="seismic.x"
               :yaxis="seismic.y"
@@ -74,6 +74,7 @@
               :boundaryY="boundaryY"
               :cmin="cmin"
               :cmax="cmax"
+              :target="getSeismicTargetPos(index)"
               @updateBoundaryX="updateBoundaryX"
               @updateBoundaryY="updateBoundaryY"
             />
@@ -128,13 +129,26 @@
         bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: false,
-        lat: 0,
-        lng: 0,
+        pageParam : {
+          area: -1,
+          layer: -1,
+          lat: 0,
+          lng: 0,
+        },
 
         paramInput: createDefaultSectionAreaParameter(),
         datas: [],
         seismics: [],
-        boundaryX: [],
+        boundaryX: [
+          {
+            p1: 0,
+            p2: 0,
+          },
+          {
+            p1: 0,
+            p2: 0,
+          }
+        ],
         boundaryY: {
           p1: 0,
           p2: 0,
@@ -157,8 +171,10 @@
 
     beforeMount: function ()
     {
-      this.lat = this.$route.query.lat;
-      this.lng = this.$route.query.lng;
+      this.pageParam["area"] = this.$route.query.area*1;
+      this.pageParam["layer"] = this.$route.query.layer*1;
+      this.pageParam["lat"] = this.$route.query.lat*1.0;
+      this.pageParam["lng"] = this.$route.query.lng*1.0;
       if (this.bdemo) {
         this.fillDataVariable(getSectionData());
         this.showLoader = false;
@@ -166,6 +182,17 @@
         this.httpGetSection();
     },
     methods: {
+      getSeismicTargetPos(idx)
+      {
+        if(idx===0)
+          return(this.seismics[1]["cdp_no"]*1);
+        else
+          return(this.seismics[0]["cdp_no"]*1);
+      },
+      getSeismicTitle(s)
+      {
+        return(s["title"] + " " + s["cdp_no"]);
+      },
       updateBoundaryX(ii, val)
       {
         this.boundaryX[ii] = val;
@@ -213,46 +240,58 @@
       httpGetSection() {
         let param = {
           "state": 0,
-          "type": "/api/heatmap/find-sandbox",
+          "type": "/api/probmap/find-sandbox",
           "mesg": "",
           "data": {
-            "id_area": 2,
-            "x": this.lng,
-            "y": this.lat,
+            "id_area": this.pageParam["area"],
+            "layer": this.pageParam["layer"],
+            "x": this.pageParam["lng"],
+            "y": this.pageParam["lat"],
             // "x": 550766.97,
             // "y": 9912090.44
           }
         };
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("get_section_data"), param, this.event_http_get_section]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_sandbox"), param, this.event_http_get_section]).then();
       },
 
       fillDataVariable(tmp)
       {
         this.datas = tmp;
         this.seismics = this.datas;
-        this.boundaryX = [];
+        let tstart = 0;
+        let tend = 0;
+        let ns, ntrc, dt;
         for(let i=0; i<this.datas.length; i++) {
           this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
           this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
 
-          let ntrc = this.seismics[i]["ntrace"];
-          this.boundaryX.push({
-            p1: this.seismics[i]["idx_st"] + Math.round(ntrc/2),
-            p2: this.seismics[i]["idx_en"] - Math.round(ntrc/2)
-          });
+          ns = this.seismics[i]["ns"];
+          ntrc = this.seismics[i]["ntrace"];
+          dt = this.seismics[i]["y"]["sampling"];
+          let tmpx1 = Math.floor(this.seismics[i]["idx_st"] + Math.round(ntrc/2));
+          let tmpx2 = Math.floor(this.seismics[i]["idx_en"] - Math.round(ntrc/2));
 
+          tstart = this.seismics[i]["y"]["start"] * dt;
+          tend = (this.seismics[i]["ns"] - this.seismics[i]["y"]["start"]) * dt;
           this.paramInput[i]["min"] = this.seismics[i]["idx_st"];
           this.paramInput[i]["max"] = this.seismics[i]["idx_en"];
-          this.paramInput[i]["vmin"] = this.seismics[i]["idx_st"];
-          this.paramInput[i]["vmax"] = this.seismics[i]["idx_en"];
+          this.paramInput[i]["vmin"] = tmpx1;
+          this.paramInput[i]["vmax"] = tmpx2;
+
+
+          this.boundaryX[i]["p1"] = tmpx1;
+          this.boundaryX[i]["p2"] = tmpx2;
         }
-        this.paramInput[2]["min"] = 0;
-        this.paramInput[2]["max"] = 400;
-        this.paramInput[2]["vmin"] = 0;
-        this.paramInput[2]["vmax"] = 400;
-        this.boundaryY["p1"] = 200;
-        this.boundaryY["p2"] = 300;
+
+        let tmpy1 = Math.floor(tstart + Math.round(ns*dt/3));
+        let tmpy2 = Math.floor(tend - Math.round(ns*dt/3));
+        this.paramInput[2]["min"] = tstart;
+        this.paramInput[2]["max"] = tend;
+        this.paramInput[2]["vmin"] = tmpy1;
+        this.paramInput[2]["vmax"] = tmpy2;
+        this.boundaryY["p1"] = tmpy1;
+        this.boundaryY["p2"] = tmpy2;
       }
     },
 
@@ -290,7 +329,8 @@
 
 <style lang="scss" scoped>
   .lc_seismic_chart {
-    height: 83vh;
+    height: 81vh;
+    width: 100%;
   }
 
   .btn_toolbar {

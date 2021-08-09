@@ -84,7 +84,10 @@ export default class VarRouter {
 
     "demo-heatmap": "/api/heatmap/data",
     "demo-heatmap-multi": "/api/heatmap/multi",
-    "get_section_data": "/api/heatmap/find-sandbox"
+    "get_section_data": "/api/heatmap/find-sandbox",
+
+    "probmap_multi": "/api/probmap/multi",
+    "probmap_sandbox": "/api/probmap/find-sandbox"
   };
 
   schematype = {

@@ -993,7 +993,7 @@ export function createTableAreaListHeader_V1()
       label: 'Layer',
       sortable: false,
       thClass: 'text-center',
-      tdClass: 'text-center',
+      tdClass: 'text-left',
       thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
     },
   ];

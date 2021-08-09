@@ -6,14 +6,14 @@
         <b-row>
           <b-col cols="5">
             <ejs-numerictextbox :min="param[0].min" :max="param[0].max" :step="param[0].step"
-                                :value="param[0].vmin" v-model="param[0].vmin" format="n0"/>
+                                :value="param[0].vmin" format="n0"/>
           </b-col>
           <b-col cols="2" class="text-center">
             to
           </b-col>
           <b-col cols="5">
             <ejs-numerictextbox :min="param[0].min" :max="param[0].max" :step="param[0].step"
-                                :value="param[0].vmax" v-model="param[0].vmax" format="n0"/>
+                                :value="param[0].vmax" format="n0"/>
           </b-col>
         </b-row>
       </div>
@@ -23,14 +23,14 @@
         <b-row>
           <b-col cols="5">
             <ejs-numerictextbox :min="param[1].min" :max="param[1].max" :step="param[1].step"
-                                :value="param[1].vmin" v-model="param[1].vmin" format="n0"/>
+                                :value="param[1].vmin" format="n0"/>
           </b-col>
           <b-col cols="2" class="text-center">
             to
           </b-col>
           <b-col cols="5">
             <ejs-numerictextbox :min="param[1].min" :max="param[1].max" :step="param[1].step"
-                                :value="param[1].vmax" v-model="param[1].vmax" format="n0"/>
+                                :value="param[1].vmax" format="n0"/>
           </b-col>
         </b-row>
       </div>
