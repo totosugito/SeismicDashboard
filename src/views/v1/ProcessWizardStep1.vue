@@ -477,7 +477,6 @@
         {
           this.table_area[this.selected_area].heatmap_data = createHeatmapDemoData();
           this.table_area[this.selected_area].heatmap_available = true;
-          console.log(idx)
         }
         else
           this.httpHeatmapDataByIdx();
@@ -602,13 +601,11 @@
 
         let param = {
           "state": 0,
-          "type": "/api/heatmap/multi",
+          "type": "/api/probmap/multi",
           "mesg": "",
           "data": {
-            "id_area": 2,
-            "file_loc": "TUNU95/08_heatmap",
+            "id_area": this.table_area[this.selected_area]["id_area"],
             "feature": "sum",
-            "file_name": [list_file[this.selected_area]]
           }
         };
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_multi"), param, this.event_http_heatmap_data]).then();
