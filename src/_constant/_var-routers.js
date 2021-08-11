@@ -87,7 +87,8 @@ export default class VarRouter {
     "get_section_data": "/api/heatmap/find-sandbox",
 
     "probmap_multi": "/api/probmap/multi",
-    "probmap_sandbox": "/api/probmap/find-sandbox"
+    "probmap_sandbox": "/api/probmap/find-sandbox",
+    "potprosp-propose": "/api/potprosp/propose"
   };
 
   schematype = {

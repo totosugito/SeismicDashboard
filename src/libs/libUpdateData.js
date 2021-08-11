@@ -61,7 +61,7 @@ export function getMaxHeatmapData(datas) {
 export function createDefaultSectionAreaParameter() {
   let param = [
     {
-      title: "InLine",
+      title: "XLine",
       min: 1,
       max: 3201,
       step: 1,
@@ -69,7 +69,7 @@ export function createDefaultSectionAreaParameter() {
       vmax: 80
     },
     {
-      title: "XLine",
+      title: "InLine",
       min: 1,
       max: 100,
       step: 1,
@@ -86,4 +86,42 @@ export function createDefaultSectionAreaParameter() {
     }
   ];
   return(param);
+}
+
+export function convertProposeProspectBoxObjectToArray(datas) {
+  let R = [];
+
+  let item = datas.boxa["p1"];
+  R.push({
+    name: "P1",
+    iline: item["iline"],
+    xline: item["xline"],
+    x: item["x"],
+    y: item["y"],
+  })
+  item = datas.boxa["p2"];
+  R.push({
+    name: "P2",
+    iline: item["iline"],
+    xline: item["xline"],
+    x: item["x"],
+    y: item["y"],
+  })
+  item = datas.boxa["p3"];
+  R.push({
+    name: "P3",
+    iline: item["iline"],
+    xline: item["xline"],
+    x: item["x"],
+    y: item["y"],
+  })
+  item = datas.boxa["p4"];
+  R.push({
+    name: "P4",
+    iline: item["iline"],
+    xline: item["xline"],
+    x: item["x"],
+    y: item["y"],
+  })
+  return(R);
 }

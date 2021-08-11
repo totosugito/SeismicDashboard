@@ -9,8 +9,12 @@
       :background-color="spinLoader.background_color"/>
 
     <splitpanes class="default-theme" vertical style="height: 88vh" vertical>
-      <pane class="p-2" min-size="20" max-size="40" style="background: white">
-        <DynamicInputForMap :param="paramInput" @onClickRefreshSection="dynamicInputOnClickRefreshSection" @onClickViewProspect="dynamicInputOnClickViewProspect"/>
+      <pane class="scrollable p-2" min-size="20" max-size="40" style="background: white">
+        <DynamicInputForMap :param="paramInput"
+                            @onClickResetSection="dynamicInputOnClickResetSection"
+                            @onClickSetParameter="dynamicInputOnClickSetParameter"
+                            @onClickViewPropose="dynamicInputOnClickViewPropose"/>
+        <ProposeProspectInfo :param="proposeProspect" @onClickViewProspect="proposeProspectOnClickViewProspect"/>
       </pane>
       <pane class="p-2" min-size="40" max-size="80" style="background: white">
     <div>
@@ -77,6 +81,7 @@
               :target="getSeismicTargetPos(index)"
               @updateBoundaryX="updateBoundaryX"
               @updateBoundaryY="updateBoundaryY"
+              :refreshChart="refreshChart"
             />
           </b-col>
         </template>
@@ -105,11 +110,14 @@
   import {appDemoMode} from "../../_constant/http_api";
   import {rotate, rotate90} from "../../libs/2d-array-rotation";
   import {createDefaultSectionAreaParameter} from "../../libs/libUpdateData";
+  import {createDemoProposeProspect} from "../../libs/demo_data";
+  import ProposeProspectInfo from "../myview/ProposeProspectInfo";
 
   export default {
     name: "SeismicViewerByXY",
 
     components: {
+      ProposeProspectInfo,
       DynamicInputForMap,
       LChartSeismicAreaSelected,
       EnhancedCheck,
@@ -135,6 +143,8 @@
           lat: 0,
           lng: 0,
         },
+        refreshChart: false,
+        proposeProspect: {},
 
         paramInput: createDefaultSectionAreaParameter(),
         datas: [],
@@ -162,6 +172,7 @@
         tmp_cmax: 20,
 
         event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
+        event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
       }
     },
     created()
@@ -205,12 +216,30 @@
         this.paramInput[2]["vmin"] = val["p1"];
         this.paramInput[2]["vmax"] = val["p2"];
       },
+      updateRefreshChart(val)
+      {
+        this.refreshChart = val;
+      },
 
-      dynamicInputOnClickRefreshSection(val)
+      dynamicInputOnClickResetSection(val)
+      {
+        this.createDefaultBoundaryParameter();
+        this.refreshChart = !this.refreshChart;
+      },
+      dynamicInputOnClickSetParameter(val)
       {
         console.log(JSON.stringify(val));
       },
-      dynamicInputOnClickViewProspect(val)
+      dynamicInputOnClickViewPropose(val)
+      {
+        if(this.bdemo)
+          this.proposeProspect = createDemoProposeProspect();
+        else
+        {
+          this.httpGetProposeProspect(val);
+        }
+      },
+      proposeProspectOnClickViewProspect(val)
       {
         console.log(JSON.stringify(val));
       },
@@ -254,18 +283,36 @@
         this.showLoader = true;
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_sandbox"), param, this.event_http_get_section]).then();
       },
-
-      fillDataVariable(tmp)
+      httpGetProposeProspect(val)
       {
-        this.datas = tmp;
-        this.seismics = this.datas;
+        let param = {
+          data: {
+          id_area: this.pageParam["area"],
+          layer: this.pageParam["layer"],
+          xline: {
+            min: val[0]["vmin"],
+            max: val[0]["vmax"],
+          },
+          iline: {
+            min: val[1]["vmin"],
+            max: val[1]["vmax"],
+          },
+          z: {
+            min: val[2]["vmin"],
+            max: val[2]["vmax"],
+          },
+        }};
+        // console.log(JSON.stringify(param))
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-propose"), param, this.event_http_propose_prospect]).then();
+      },
+
+      createDefaultBoundaryParameter()
+      {
         let tstart = 0;
         let tend = 0;
         let ns, ntrc, dt;
         for(let i=0; i<this.datas.length; i++) {
-          this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
-          this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
-
           ns = this.seismics[i]["ns"];
           ntrc = this.seismics[i]["ntrace"];
           dt = this.seismics[i]["y"]["sampling"];
@@ -283,7 +330,6 @@
           this.boundaryX[i]["p1"] = tmpx1;
           this.boundaryX[i]["p2"] = tmpx2;
         }
-
         let tmpy1 = Math.floor(tstart + Math.round(ns*dt/3));
         let tmpy2 = Math.floor(tend - Math.round(ns*dt/3));
         this.paramInput[2]["min"] = tstart;
@@ -292,20 +338,42 @@
         this.paramInput[2]["vmax"] = tmpy2;
         this.boundaryY["p1"] = tmpy1;
         this.boundaryY["p2"] = tmpy2;
+      },
+      fillDataVariable(tmp)
+      {
+        this.datas = tmp;
+        this.seismics = this.datas;
+        for(let i=0; i<this.datas.length; i++) {
+          this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
+          this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
+        }
+        this.createDefaultBoundaryParameter();
       }
     },
 
     mounted()
     {
       EventBus.$on(this.event_http_get_section.success, (msg) =>
-      {
-        this.fillDataVariable(msg.data);
-        this.showLoader = false;
-      });
+    {
+      this.fillDataVariable(msg.data);
+      this.showLoader = false;
+    });
       EventBus.$on(this.event_http_get_section.fail, (msg) =>
       {
         this.datas = [];
         this.seismics = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+      EventBus.$on(this.event_http_propose_prospect.success, (msg) =>
+      {
+        // this.fillDataVariable(msg.data);
+        this.proposeProspect = msg.data;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_propose_prospect.fail, (msg) =>
+      {
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
@@ -315,6 +383,8 @@
     {
       EventBus.$off(this.event_http.success);
       EventBus.$off(this.event_http.fail);
+      EventBus.$off(this.event_http_propose_prospect.success);
+      EventBus.$off(this.event_http_propose_prospect.fail);
     },
     watch:
       {
@@ -335,5 +405,10 @@
 
   .btn_toolbar {
     font-size: 1.4em;
+  }
+
+  .scrollable{
+    overflow-y: auto;
+    max-height: 100%;
   }
 </style>

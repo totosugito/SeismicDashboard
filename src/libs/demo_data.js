@@ -2874,4 +2874,52 @@ export function createDemoGeobodySectionList() {
   return (data);
 }
 
+export function createDemoProposeProspect()
+{
+  let data = {
+    "id_area": 2,
+    "layer": 1,
+    "exca": {
+      "iline": {
+        "min": 1786,
+        "max": 2112
+      },
+      "xline": {
+        "min": 3681,
+        "max": 3865
+      },
+      "z": {
+        "min": 817.0,
+        "max": 865.0
+      }
+    },
+    "boxa": {
+      "p1": {
+        "iline": 1786,
+        "xline": 3681,
+        "x": 548264.16,
+        "y": 9908105.45
+      },
+      "p2": {
+        "iline": 1786,
+        "xline": 3865,
+        "x": 545039.97,
+        "y": 9911386.41
+      },
+      "p3": {
+        "iline": 2112,
+        "xline": 3681,
+        "x": 554077.15,
+        "y": 9913817.86
+      },
+      "p4": {
+        "iline": 2112,
+        "xline": 3865,
+        "x": 550852.96,
+        "y": 9917098.82
+      }
+    }
+  };
+  return(data);
+}
 

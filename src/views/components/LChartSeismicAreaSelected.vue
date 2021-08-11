@@ -24,7 +24,7 @@
   export default {
     name: "LChartSeismicAreaSelected",
     props: ['id', 'title', 'points', 'xaxis', 'yaxis', 'perc', 'colormap', 'resizeevent', 'cmin', 'cmax',
-      "boundaryX", "boundaryY", "target"],
+      "boundaryX", "boundaryY", "target", "refreshChart"],
     data()
     {
       return {
@@ -37,6 +37,7 @@
         ystart : 0,
         updateBoundaryX: {},
         updateBoundaryY: {},
+        // refreshChart: false,
         xAxisBand: null,
         yxAxisBand: null,
 
@@ -347,6 +348,11 @@
         cmax: function (val)
         {
           this.cmax = val;
+          this.createChart();
+        },
+        refreshChart: function (val)
+        {
+          this.refreshChart = val;
           this.createChart();
         },
         resizeevent: function (val)

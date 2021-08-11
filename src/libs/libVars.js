@@ -1042,3 +1042,36 @@ export function createTableAreaListHeader3_V1()
   ];
   return (table_headers);
 }
+
+export function createTableProposeProspectBoxHeader()
+{
+  let table_headers = [
+    {
+      key: 'name',
+      label: '',
+      sortable: true,
+      // thStyle: { width: '40px'}
+    },
+    {
+      key: 'iline',
+      label: 'Inline',
+      sortable: true
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      sortable: true
+    },
+    {
+      key: 'x',
+      label: 'X',
+      sortable: true
+    },
+    {
+      key: 'y',
+      label: 'Y',
+      sortable: true
+    },
+  ];
+  return (table_headers);
+}
