@@ -1043,34 +1043,92 @@ export function createTableAreaListHeader3_V1()
   return (table_headers);
 }
 
+export function createTableExcaBoxHeader()
+{
+  let table_headers = [
+    {
+      key: 'name',
+      label: 'Label',
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'min',
+      label: 'Min',
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'max',
+      label: 'Max',
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+  ];
+  return (table_headers);
+}
+
 export function createTableProposeProspectBoxHeader()
 {
   let table_headers = [
     {
       key: 'name',
-      label: '',
+      label: 'Label',
       sortable: true,
-      // thStyle: { width: '40px'}
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+      // thClass: 'head-variant:primary; background-color: red;',
     },
     {
       key: 'iline',
       label: 'Inline',
-      sortable: true
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
     {
       key: 'xline',
       label: 'XLine',
-      sortable: true
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
     {
       key: 'x',
       label: 'X',
-      sortable: true
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
     {
       key: 'y',
       label: 'Y',
-      sortable: true
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+  ];
+  return (table_headers);
+}
+
+export function createTableProspectMapHeader()
+{
+  let table_headers = [
+    {
+      key: 'no',
+      label: 'No',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '60px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'z',
+      label: 'Layer',
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+      thClass: 'text-center',
+    },
+    {
+      key: 'show',
+      label: 'Visible',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '70px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
     },
   ];
   return (table_headers);

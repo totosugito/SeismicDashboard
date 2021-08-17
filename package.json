@@ -19,6 +19,8 @@
     "@syncfusion/ej2-vue-buttons": "19.1.54",
     "@syncfusion/ej2-vue-grids": "^18.4.48",
     "@syncfusion/ej2-vue-inputs": "18.4.47",
+    "@turf/area": "^6.5.0",
+    "@turf/turf": "^6.5.0",
     "apexcharts": "^3.26.1",
     "axios": "^0.21.1",
     "babel-loader": "^8.0.5",

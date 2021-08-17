@@ -12,3 +12,8 @@ export function createDemoGather() {
   let data = [];
   return(data);
 }
+
+export function createProspectMapData() {
+  let data = {};
+  return(data);
+}

@@ -7,7 +7,7 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-    <splitpanes class="default-theme" vertical style="height: 88vh" vertical>
+    <splitpanes class="default-theme" vertical style="height: 86vh" vertical>
       <pane class="p-2" min-size="20" max-size="30" style="background: white">
         <!--        <b-tabs v-model="tabIndex">-->
         <!--          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">Tab contents 1</b-tab>-->
@@ -151,7 +151,6 @@
   import Vue from 'vue';
 
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
-
   Vue.use(ButtonPlugin);
 
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
@@ -372,35 +371,35 @@
       onMapReady() {
         this.map = this.$refs.map.mapObject;
 
-        const measureControl = new window.L.Control.Measure({
-          position: "topleft",
-          activeColor: '#FF0000',
-          completedColor: '#FF0000',
-          primaryLengthUnit: "meters",
-          secondaryLengthUnit: "kilometers",
-          primaryAreaUnit: "sqmeters",
-          secondaryAreaUnit: "hectares"
-        });
-        this.map.addControl(measureControl);
-
-        this.map.pm.addControls({
-          position: 'topleft',
-          drawMarker: false,
-          drawCircleMarker: false,
-          drawPolyline: false,
-          drawRectangle: false,
-          drawCircle: false
-        });
-        this.map.pm.setPathOptions({
-          color: 'orange',
-          fillColor: 'orange',
-          fillOpacity: 0.4,
-        });
-
-        // listen to events
-        this.map.on('pm:create', this.mapUpdated);
-        this.map.on('pm:remove', this.mapUpdated);
-        this.map.on('pm:cut', this.mapUpdated);
+        // const measureControl = new window.L.Control.Measure({
+        //   position: "topleft",
+        //   activeColor: '#FF0000',
+        //   completedColor: '#FF0000',
+        //   primaryLengthUnit: "meters",
+        //   secondaryLengthUnit: "kilometers",
+        //   primaryAreaUnit: "sqmeters",
+        //   secondaryAreaUnit: "hectares"
+        // });
+        // this.map.addControl(measureControl);
+        //
+        // this.map.pm.addControls({
+        //   position: 'topleft',
+        //   drawMarker: false,
+        //   drawCircleMarker: false,
+        //   drawPolyline: false,
+        //   drawRectangle: false,
+        //   drawCircle: false
+        // });
+        // this.map.pm.setPathOptions({
+        //   color: 'orange',
+        //   fillColor: 'orange',
+        //   fillOpacity: 0.4,
+        // });
+        //
+        // // listen to events
+        // this.map.on('pm:create', this.mapUpdated);
+        // this.map.on('pm:remove', this.mapUpdated);
+        // this.map.on('pm:cut', this.mapUpdated);
 
       },
 
@@ -448,7 +447,7 @@
       //
       // ------------------------------------------------
       eventSelectedAreaCssStyle(item) {
-        let fg_color = "#DCDCDC";
+        let fg_color = "#808080";
         if (item.area_show)
           fg_color = item["poly"]["color"];
 
@@ -462,7 +461,7 @@
         item.area_show = !item.area_show; // select/unselect
       },
       eventDownloadHeatmapCssStyle(item) {
-        let fg_color = "#DCDCDC";
+        let fg_color = "#808080";
         if (item.heatmap_available)
           fg_color = "#4169E1";
         let strstyle =
@@ -482,7 +481,7 @@
           this.httpHeatmapDataByIdx();
       },
       eventHeatmapShowLayerCssStyle(item) {
-        let fg_color = "#DCDCDC";
+        let fg_color = "#808080";
         if (item.show)
           fg_color = "#4169E1";
         let strstyle =

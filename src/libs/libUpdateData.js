@@ -1,4 +1,4 @@
-import {createLeafletAreaPolygon, fillLeafletAreaVariable} from "./simpleLib";
+import {createLeafletAreaPolygon, createLeafletColormap, createLeafletCrs, fillLeafletAreaVariable} from "./simpleLib";
 
 
 export function addPlotDataToTableArea(map_var, datas)
@@ -88,8 +88,34 @@ export function createDefaultSectionAreaParameter() {
   return(param);
 }
 
+export function convertProposeExcaBoxObjectToArray(datas) {
+  let R = [];
+  // if(_.isEmpty(datas))
+  //   return (R);
+  let item = datas.exca;
+  R.push({
+    name: "XLine",
+    min: item["xline"]["min"],
+    max: item["xline"]["max"],
+  });
+  R.push({
+    name: "InLine",
+    min: item["iline"]["min"],
+    max: item["iline"]["max"],
+  });
+  R.push({
+    name: "Z",
+    min: item["z"]["min"],
+    max: item["z"]["max"],
+  });
+
+  return(R);
+}
+
 export function convertProposeProspectBoxObjectToArray(datas) {
   let R = [];
+  // if(_.isEmpty(datas))
+  //   return (R);
 
   let item = datas.boxa["p1"];
   R.push({
@@ -124,4 +150,49 @@ export function convertProposeProspectBoxObjectToArray(datas) {
     y: item["y"],
   })
   return(R);
+}
+
+export function fillLeafletProspectMapVariable(m, datas, idx) {
+  m.crs = createLeafletCrs(m);
+
+  // m.polygon.push([
+  //   [coordinate["p1"]["y"], coordinate["p1"]["x"]],
+  //   [coordinate["p2"]["y"], coordinate["p2"]["x"]],
+  //   [coordinate["p3"]["y"], coordinate["p3"]["x"]],
+  //   [coordinate["p4"]["y"], coordinate["p4"]["x"]]
+  // ]);
+  m.poly_color.push(createLeafletColormap(idx));
+
+  let coordinate = datas["boxa"];
+  let x = [coordinate["p1"]["x"], coordinate["p2"]["x"], coordinate["p3"]["x"], coordinate["p4"]["x"]];
+  let xmin = Math.min.apply(null, x);
+  let xmax = Math.max.apply(null, x);
+  let dx = Math.abs(xmax - xmin);
+  let y = [coordinate["p1"]["y"], coordinate["p2"]["y"], coordinate["p3"]["y"], coordinate["p4"]["y"]];
+  let ymin = Math.min.apply(null, y);
+  let ymax = Math.max.apply(null, y);
+  let dy = Math.abs(ymax - ymin);
+  m.center = L.latLng(ymin + dy/2, xmin + dx/2);
+
+  return(m);
+}
+
+export function addPlotDataToProspectMap(map_var, datas)
+{
+  map_var = fillLeafletProspectMapVariable(map_var, datas, 0);
+  // datas.poly = createLeafletProspectMapPolygon(m, datas);
+  datas.area_show = false;
+  datas.heatmap_show = true;
+  datas.ndata = datas["label_z"].length;
+
+  let layers = [];
+  for(let i=0; i<datas.ndata; i++) {
+    layers.push({
+      no: i+1,
+      z: datas["label_z"][i],
+      show: false,
+      heatmap: datas["prob_list"][i]
+    })
+  }
+  return(layers);
 }

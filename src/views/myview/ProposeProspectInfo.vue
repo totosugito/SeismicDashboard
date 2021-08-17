@@ -13,18 +13,15 @@
           </b-row>
 
           <div class="item_title">Exca</div>
-          <b-row>
-            <b-col cols="3">Xline :</b-col>
-            <b-col cols="9"><span class="item_value">{{param.exca.xline.min}} - {{param.exca.xline.max}}</span></b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="3">Inline :</b-col>
-            <b-col cols="9"><span class="item_value">{{param.exca.iline.min}} - {{param.exca.iline.max}}</span></b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="3">Z :</b-col>
-            <b-col cols="9"><span class="item_value">{{param.exca.z.min}} - {{param.exca.z.max}}</span></b-col>
-          </b-row>
+          <b-table
+            show-empty
+            :small="true"
+            :striped="false"
+            :bordered="true"
+            :outlined="true"
+            :fields="table_exca_heder"
+            :items="getTableExcaBox()">
+          </b-table>
 
           <div class="item_title">Box</div>
           <b-table
@@ -52,8 +49,11 @@
 
   Vue.use(NumericTextBoxPlugin);
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
-  import {createTableProposeProspectBoxHeader} from "../../libs/libVars";
-  import {convertProposeProspectBoxObjectToArray} from "../../libs/libUpdateData";
+  import {
+    createTableExcaBoxHeader,
+    createTableProposeProspectBoxHeader
+  } from "../../libs/libVars";
+  import {convertProposeExcaBoxObjectToArray, convertProposeProspectBoxObjectToArray} from "../../libs/libUpdateData";
 
   Vue.use(ButtonPlugin);
 
@@ -113,8 +113,10 @@
     },
     data: () => {
       return {
+        table_exca_heder: createTableExcaBoxHeader(),
+        table_exca: [],
         table_propose_box_header: createTableProposeProspectBoxHeader(),
-        table_propose_box: {}
+        table_propose_box: []
       }
     },
     watch:
@@ -124,8 +126,23 @@
         this.$emit('onClickViewProspect', this.param);
       },
 
+      getTableExcaBox()
+      {
+        if("exca" in this.param === false) {
+          console.log("exca NOT EXIST")
+          return ;
+        }
+
+        this.table_exca = convertProposeExcaBoxObjectToArray(this.param);
+        return(this.table_exca);
+      },
       getTableProposeProspectBox()
       {
+        if("boxa" in this.param === false) {
+          console.log("boxa NOT EXIST")
+          return ;
+        }
+
         this.table_propose_box = convertProposeProspectBoxObjectToArray(this.param);
         return(this.table_propose_box);
       }
