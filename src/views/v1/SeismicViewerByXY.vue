@@ -394,7 +394,7 @@
           }
 
           event.layer.internalId = uuidv4();
-          // console.log(JSON.stringify(event.layer.toGeoJSON(16)))
+          console.log(JSON.stringify(event.layer.toGeoJSON(16)))
 
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
           // console.log("create")
