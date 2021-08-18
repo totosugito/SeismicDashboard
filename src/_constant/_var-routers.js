@@ -89,7 +89,8 @@ export default class VarRouter {
     "probmap_multi": "/api/probmap/multi",
     "probmap_sandbox": "/api/probmap/find-sandbox",
     "potprosp-propose": "/api/potprosp/propose",
-    "potprosp-data": "/api/potprosp/data"
+    "potprosp-data": "/api/potprosp/data",
+    "potprosp-score": "/api/potprosp/calc-score"
   };
 
   schematype = {

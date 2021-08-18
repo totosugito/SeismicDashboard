@@ -10,7 +10,7 @@
 
     <b-tabs v-model="tabIndex">
       <b-tab title="Propose Prospect" :title-link-class="linkClass(0)">
-        <splitpanes class="default-theme" vertical style="height: 88vh" vertical>
+        <splitpanes class="default-theme" vertical style="height: 76vh" vertical>
           <pane class="scrollable p-2" min-size="20" max-size="40" style="background: white">
             <DynamicInputForMap :param="paramInput"
                                 @onClickResetSection="dynamicInputOnClickResetSection"
@@ -97,10 +97,11 @@
       </b-tab>
       <b-tab title="View Prospect" :title-link-class="linkClass(1)">
         <splitpanes class="default-theme" vertical style="height: 76vh" vertical>
-          <pane class="scrollable p-2" min-size="20" max-size="40" style="background: white">
+          <pane class="p-2" min-size="20" max-size="40" style="background: white">
 <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
 <!--            <b-card-body>-->
               <b-table
+                sticky-header="65vh"
                 show-empty
                 :small="true"
                 :striped="false"
@@ -122,11 +123,19 @@
 <!--                  </b-form-checkbox>-->
                 </template>
               </b-table>
+            <div>
+              <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>
+              <span>Score : <b>{{prospectScore.score.score}}</b></span>
+            </div>
+            <div class="mt-2">
+              <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score</ejs-button>
+              <ejs-button cssClass='e-success' class="mr-2 mb-2">Save</ejs-button>
+            </div>
 <!--            </b-card-body>-->
           </pane>
           <pane class="p-2" min-size="40" max-size="80" style="background: white">
 
-            <template v-if="showMapProspect===false">
+            <template v-if="showMapProspect">
             <div class="mb-1">
               <!-- map button -->
               <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
@@ -278,10 +287,12 @@
         bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: false,
-        showMapProspect: true,
+        showMapProspect: false,
 
         // map variable
         map_var: {},
+        prospectScore: {score: {np:0, score:0}},
+        geo_json: {},
 
         tabIndex: 0,
         pageParam: {
@@ -331,6 +342,7 @@
         event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
         event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
         event_http_prospect_map: {success: "successProspectMap", fail: "failProspectMap"},
+        event_http_prospect_score: {success: "successProspectScore", fail: "failProspectScore"},
       }
     },
     created() {
@@ -352,6 +364,7 @@
 
         this.tabIndex = 1;
         this.showLoader = false;
+        this.showMapProspect = true;
       } else
         this.httpGetSection();
     },
@@ -394,7 +407,8 @@
           }
 
           event.layer.internalId = uuidv4();
-          console.log(JSON.stringify(event.layer.toGeoJSON(16)))
+          this.geo_json = event.layer.toGeoJSON(16);
+          console.log(JSON.stringify(this.geo_json))
 
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
           // console.log("create")
@@ -403,6 +417,8 @@
         {
           // console.log("edit")
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
+          this.geo_json = event.layer.toGeoJSON(16);
+          console.log(JSON.stringify(this.geo_json))
         }
         else if (event.type === 'pm:remove') {
           event.layer.off(); // remove all event listeners
@@ -609,6 +625,16 @@
         this.cmax = this.tmp_cmax;
       },
 
+      onClickComputeScore()
+      {
+        let param = {
+          data: this.proposeProspect
+        };
+        param["data"]["polygon"] = this.geo_json["geometry"]["coordinates"][0];
+        // console.log(JSON.stringify(param))
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
+      },
       httpGetSection() {
         let param = {
           "state": 0,
@@ -655,7 +681,7 @@
           data: this.proposeProspect
         }
         this.showLoader = true;
-        this.showMapProspect = true;
+        this.showMapProspect = false
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-data"), param, this.event_http_prospect_map]).then();
       },
 
@@ -739,22 +765,34 @@
         this.table_prospect_map = addPlotDataToProspectMap(this.map_var, this.prospectMap);
         this.tabIndex = 1;
         this.showLoader = false;
-        this.showMapProspect = false;
+        this.showMapProspect = true;
       });
       EventBus.$on(this.event_http_prospect_map.fail, (msg) => {
         this.showLoader = false;
         this.prospectMap = {};
         this.retStatus = msg;
+        this.showMapProspect = false;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      EventBus.$on(this.event_http_prospect_score.success, (msg) => {
+        this.prospectScore = msg.data;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_prospect_score.fail, (msg) => {
+        this.showLoader = false;
+        this.prospectScore = {score: {np:0, score:0}};
+        this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
     },
     beforeDestroy() {
-      EventBus.$off(this.event_http.success);
-      EventBus.$off(this.event_http.fail);
       EventBus.$off(this.event_http_propose_prospect.success);
       EventBus.$off(this.event_http_propose_prospect.fail);
       EventBus.$off(this.event_http_prospect_map.success);
       EventBus.$off(this.event_http_prospect_map.fail);
+      EventBus.$off(this.event_http_prospect_score.success);
+      EventBus.$off(this.event_http_prospect_score.fail);
     },
     watch:
       {
@@ -768,7 +806,7 @@
 
 <style lang="scss" scoped>
   .lc_seismic_chart {
-    height: 81vh;
+    height: 71vh;
     width: 100%;
   }
 
