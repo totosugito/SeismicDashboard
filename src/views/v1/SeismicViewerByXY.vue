@@ -125,7 +125,8 @@
               </b-table>
             <div>
               <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>
-              <span>Score : <b>{{prospectScore.score.score}}</b></span>
+              <span class="mr-5">Score : <b>{{prospectScore.score.score.toFixed(3)}}</b></span>
+              <span>Area : <b>{{prospectScore.score.area.toFixed(3)}}</b></span>
             </div>
             <div class="mt-2">
               <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score</ejs-button>
@@ -291,7 +292,7 @@
 
         // map variable
         map_var: {},
-        prospectScore: {score: {np:0, score:0}},
+        prospectScore: {score: {np:0, score:0, area: 0}},
         geo_json: {},
 
         tabIndex: 0,

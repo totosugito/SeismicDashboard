@@ -60,7 +60,7 @@
 
       <div class="mt-3">
         <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickResetSection'>Reset</ejs-button>
-        <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSetParameter'>Set Parameter</ejs-button>
+<!--        <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSetParameter'>Set Parameter</ejs-button>-->
         <ejs-button cssClass='e-info' class="mb-2" v-on:click.native='onClickViewPropose'>Propose Prospect</ejs-button>
       </div>
         </b-card-body>
