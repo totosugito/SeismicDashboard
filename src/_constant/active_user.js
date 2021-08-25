@@ -94,20 +94,10 @@ export function getUser()
   return(user);
 }
 
-// export function saveSelectedUser(item_)
-// {
-//   localStorage.setItem(key_selected_user, JSON.stringify(item_));
-// }
-// export function getSelectedUserData()
-// {
-//   return(JSON.parse(localStorage.getItem(key_selected_user)));
-// }
-
-// export function saveSelectedLokasi(item_)
-// {
-//   localStorage.setItem(key_location, JSON.stringify(item_)); //save data
-// }
-// export function readSelectedLokasi()
-// {
-//   return(JSON.parse(localStorage.getItem(key_location)));
-// }
+export function saveProspectData(item) {
+  localStorage.setItem(item["id"], JSON.stringify(item))
+}
+export function readProspectData(key_id) {
+  let r = localStorage.getItem(key_id);
+  return(JSON.parse(r));
+}

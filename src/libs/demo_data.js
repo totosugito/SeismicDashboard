@@ -1,5 +1,14 @@
 import {getLocalMapServer} from "../_constant/http_api";
 
+export function getSampleGeoJson() {
+  let data = [
+    {"type":"Feature","properties":{},
+      "geometry":{"type":"Polygon",
+        "coordinates":[[[547829.4524432644,9921902.680855785],[552717.8998333141,9918002.664901333],
+          [548593.2723479569,9912802.64362873],[540420.3993677162,9914561.474353287],
+          [539427.43349161,9917926.194000265],[542482.713110391,9920832.088240836],[547829.4524432644,9921902.680855785]]]}}];
+  return(data);
+}
 export function createAreaDemoData() {
   let data = [
     {

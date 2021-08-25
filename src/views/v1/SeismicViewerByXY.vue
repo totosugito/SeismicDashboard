@@ -627,6 +627,7 @@
         let param = {
           data: this.proposeProspect
         };
+        param["data"]["geojson"] = this.geo_json;
         param["data"]["polygon"] = this.geo_json["geometry"]["coordinates"][0];
         // console.log(JSON.stringify(param))
         this.showLoader = true;
@@ -637,7 +638,7 @@
         let param = {
           data: this.proposeProspect
         };
-        param["data"]["polygon"] = this.geo_json;
+        param["data"]["geojson"] = this.geo_json;
         console.log(JSON.stringify(param));
       },
       httpGetSection() {

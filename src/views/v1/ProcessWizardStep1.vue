@@ -236,6 +236,7 @@
   import "../../libs/leaflet-measure";
   import "../../_assets/leaflet-measure.css";
   import {v4 as uuidv4} from 'uuid';
+  import {saveProspectData} from "../../_constant/active_user";
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -693,14 +694,15 @@
 
       eventEditProspectProjectClicked(item)
       {
-        let param = {
-          id_area: item["id_area"],
-          filename: item["filename"]
-        };
-        this.$router.push({
+        saveProspectData(item);
+
+        let routeData = this.$router.resolve({
           path: "prospect-edit",
-          query: param
+          query: {
+            id: item["id"],
+          }
         });
+        window.open(routeData.href, '_blank');
       },
       getHttpRefreshProspectProject()
       {

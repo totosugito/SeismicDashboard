@@ -197,6 +197,19 @@ export function addPlotDataToProspectMap(map_var, datas)
   return(layers);
 }
 
-export function addPlotDataToProspectEdit(map_var, datas) {
-  map_var = fillLeafletProspectMapVariable(map_var, datas, 0);
+export function addPlotDataToProspectEdit(datas) {
+  datas.area_show = false;
+  datas.heatmap_show = true;
+  datas.ndata = datas["label_z"].length;
+
+  let layers = [];
+  for(let i=0; i<datas.ndata; i++) {
+    layers.push({
+      no: i+1,
+      z: datas["label_z"][i],
+      show: false,
+      heatmap: datas["val_list"][i]
+    })
+  }
+  return(layers);
 }
