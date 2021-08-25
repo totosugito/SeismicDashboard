@@ -156,6 +156,11 @@ export default new Router({
               name: varRouter.getRoute("seismic-viewer-by-xy", 2),
               component: () => import('../views/v1/SeismicViewerByXY')
             },
+            {
+              path: varRouter.getRoute("prospect-edit", 1),
+              name: varRouter.getRoute("prospect-edit", 2),
+              component: () => import('../views/v1/ProspectEdit')
+            },
 
             // ---------------------------------------------------------
             //                    ADMIN

@@ -2923,3 +2923,139 @@ export function createDemoProposeProspect()
   return(data);
 }
 
+export function createDemoProspectProjectList()
+{
+  let data = [
+    {
+      "id_area": 2,
+      "userId": "tofan",
+      "layer": 2,
+      "group": "",
+      "filename": "2-2-1820-1848-3741-3757-1180-1260",
+      "loc": "TUNU95/prospect_list",
+      "score": 549.778,
+      "np": 68,
+      "area": 42500.0,
+      "note": "",
+      "ctime": "2021-08-25T13:10:14.989000",
+      "dmp": {
+        "id_area": 2,
+        "layer": 2,
+        "exca": {
+          "iline": {
+            "min": 1820,
+            "max": 1848
+          },
+          "xline": {
+            "min": 3741,
+            "max": 3757
+          },
+          "z": {
+            "min": 1180,
+            "max": 1260
+          }
+        },
+        "boxa": {
+          "p1": {
+            "iline": 1820,
+            "xline": 3741,
+            "x": 547819.06,
+            "y": 9909771.1
+          },
+          "p2": {
+            "iline": 1820,
+            "xline": 3757,
+            "x": 547538.69,
+            "y": 9910056.4
+          },
+          "p3": {
+            "iline": 1848,
+            "xline": 3741,
+            "x": 548318.33,
+            "y": 9910261.74
+          },
+          "p4": {
+            "iline": 1848,
+            "xline": 3757,
+            "x": 548037.97,
+            "y": 9910547.04
+          }
+        },
+        "np": 68,
+        "score": 549.778,
+        "area": 42500,
+        "title": "TUNU95-venus-1",
+        "userId": "tofan",
+        "group": "",
+        "filename": "2-2-1820-1848-3741-3757-1180-1260"
+      },
+      "id": "6125dec6a9e87ad2c82b7ac6"
+    },
+    {
+      "id_area": 2,
+      "userId": "tofan",
+      "layer": 2,
+      "group": "",
+      "filename": "2-2-1936-1960-3595-3627-1015-1100",
+      "loc": "TUNU95/prospect_list",
+      "score": 999.888,
+      "np": 98,
+      "area": 61250.0,
+      "note": "",
+      "ctime": "2021-08-25T13:22:08.247000",
+      "dmp": {
+        "id_area": 2,
+        "layer": 2,
+        "exca": {
+          "iline": {
+            "min": 1936,
+            "max": 1960
+          },
+          "xline": {
+            "min": 3595,
+            "max": 3627
+          },
+          "z": {
+            "min": 1015,
+            "max": 1100
+          }
+        },
+        "boxa": {
+          "p1": {
+            "iline": 1936,
+            "xline": 3595,
+            "x": 552445.8,
+            "y": 9909200.37
+          },
+          "p2": {
+            "iline": 1936,
+            "xline": 3627,
+            "x": 551885.08,
+            "y": 9909770.97
+          },
+          "p3": {
+            "iline": 1960,
+            "xline": 3595,
+            "x": 552873.75,
+            "y": 9909620.92
+          },
+          "p4": {
+            "iline": 1960,
+            "xline": 3627,
+            "x": 552313.03,
+            "y": 9910191.52
+          }
+        },
+        "np": 98,
+        "score": 999.888,
+        "area": 61250.0,
+        "title": "TUNU95-pluto-1",
+        "userId": "tofan",
+        "group": "",
+        "filename": "2-2-1936-1960-3595-3627-1015-1100"
+      },
+      "id": "6125e190a9e87ad2c82b7ac7"
+    }
+  ];
+  return(data);
+}

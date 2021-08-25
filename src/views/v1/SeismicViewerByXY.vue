@@ -16,7 +16,10 @@
                                 @onClickResetSection="dynamicInputOnClickResetSection"
                                 @onClickSetParameter="dynamicInputOnClickSetParameter"
                                 @onClickViewPropose="dynamicInputOnClickViewPropose"/>
-            <ProposeProspectInfo :param="proposeProspect" @onClickViewProspect="proposeProspectOnClickViewProspect"/>
+
+            <template v-if="showLoader===false">
+              <ProposeProspectInfo :param="proposeProspect" @onClickViewProspect="proposeProspectOnClickViewProspect"/>
+            </template>
           </pane>
           <pane class="p-2" min-size="40" max-size="80" style="background: white">
             <div>
@@ -98,18 +101,18 @@
       <b-tab title="View Prospect" :title-link-class="linkClass(1)">
         <splitpanes class="default-theme" vertical style="height: 76vh" vertical>
           <pane class="p-2" min-size="20" max-size="40" style="background: white">
-<!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
-<!--            <b-card-body>-->
-              <b-table
-                sticky-header="65vh"
-                show-empty
-                :small="true"
-                :striped="false"
-                :bordered="true"
-                :outlined="true"
-                :fields="table_prospect_map_heder"
-                :items="table_prospect_map">
-                <template v-slot:cell(show)="row">
+            <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
+            <!--            <b-card-body>-->
+            <b-table
+              sticky-header="65vh"
+              show-empty
+              :small="true"
+              :striped="false"
+              :bordered="true"
+              :outlined="true"
+              :fields="table_prospect_map_heder"
+              :items="table_prospect_map">
+              <template v-slot:cell(show)="row">
                   <span @click="eventSwitchLayerClicked(row.index, row.item)"
                         :style="eventSelectedLayerCssStyle(row.item)">
                     <template v-if="row.item.show">
@@ -119,70 +122,71 @@
                       <i class="btn_toolbar fa fa-toggle-off"/>
                     </template>
                   </span>
-<!--                  <b-form-checkbox switch @change="eventSwitchLayerClicked(row.item)">-->
-<!--                  </b-form-checkbox>-->
-                </template>
-              </b-table>
+                <!--                  <b-form-checkbox switch @change="eventSwitchLayerClicked(row.item)">-->
+                <!--                  </b-form-checkbox>-->
+              </template>
+            </b-table>
             <div>
               <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>
               <span class="mr-5">Score : <b>{{prospectScore.score.score.toFixed(3)}}</b></span>
               <span>Area : <b>{{prospectScore.score.area.toFixed(3)}}</b></span>
             </div>
             <div class="mt-2">
-              <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score</ejs-button>
-              <ejs-button cssClass='e-success' class="mr-2 mb-2">Save</ejs-button>
+              <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score
+              </ejs-button>
+              <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Save</ejs-button>
             </div>
-<!--            </b-card-body>-->
+            <!--            </b-card-body>-->
           </pane>
           <pane class="p-2" min-size="40" max-size="80" style="background: white">
 
             <template v-if="showMapProspect">
-            <div class="mb-1">
-              <!-- map button -->
-              <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
-                          v-on:click.native="markerLocationEventClick()"><i
-                class="fa fa-map-marker"/></ejs-button>
-              <!--            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i-->
-              <!--              class="fa fa-download"/></ejs-button>-->
-              <!--          <template v-if="show_marker_drag">-->
-<!--              <span class="ml-5"><b>x</b> : {{pageParam.lng.toFixed(2)}}   ,    <b>y</b> : {{pageParam.lat.toFixed(2)}}</span>-->
-              <!--          </template>-->
-            </div>
+              <div class="mb-1">
+                <!-- map button -->
+                <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
+                            v-on:click.native="markerLocationEventClick()"><i
+                  class="fa fa-map-marker"/></ejs-button>
+                <!--            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i-->
+                <!--              class="fa fa-download"/></ejs-button>-->
+                <!--          <template v-if="show_marker_drag">-->
+                <!--              <span class="ml-5"><b>x</b> : {{pageParam.lng.toFixed(2)}}   ,    <b>y</b> : {{pageParam.lat.toFixed(2)}}</span>-->
+                <!--          </template>-->
+              </div>
 
-<!--            <template v-for="(layer, index) in prospectMap.prob_list">-->
-<!--              {{prospectMap.layers[index]}}-{{index}}-->
-<!--            </template>-->
-            <!-- layer map -->
-            <l-map ref="map" style="width: 100%; height:72vh;" :zoom="map_var.zoom" :center="map_var.center"
-                   :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
-                   @ready="onMapReady" @click="onMapClickEvent">
-              <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
-              <template v-if="show_marker_drag">
-                <l-marker :lat-lng="pageParam" :draggable="false" :icon="markerDragIcon">
-                  <l-popup>
-                    <div style="width: 100%">
-                      Lat (x) : <b>{{pageParam.lng.toFixed(2)}}</b><br>
-                      Lon (y) : <b>{{pageParam.lat.toFixed(2)}}</b><br>
-                    </div>
-                  </l-popup>
-                </l-marker>
-              </template>
-
-<!--              <template v-for="item in tmp_array_autoupdate">-->
-<!--              </template>-->
-
-              <template v-for="layer in table_prospect_map">
-                <template v-if="layer.show===true">
-                  <LHeatmap
-                    :latLngs="layer.heatmap"
-                    :radius="15"
-                    :blur="15"
-                    :minOpacity="0.1"
-                    :max="1.0">
-                  </LHeatmap>
+              <!--            <template v-for="(layer, index) in prospectMap.prob_list">-->
+              <!--              {{prospectMap.layers[index]}}-{{index}}-->
+              <!--            </template>-->
+              <!-- layer map -->
+              <l-map ref="map" style="width: 100%; height:72vh;" :zoom="map_var.zoom" :center="map_var.center"
+                     :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
+                     @ready="onMapReady" @click="onMapClickEvent">
+                <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
+                <template v-if="show_marker_drag">
+                  <l-marker :lat-lng="pageParam" :draggable="false" :icon="markerDragIcon">
+                    <l-popup>
+                      <div style="width: 100%">
+                        Lat (x) : <b>{{pageParam.lng.toFixed(2)}}</b><br>
+                        Lon (y) : <b>{{pageParam.lat.toFixed(2)}}</b><br>
+                      </div>
+                    </l-popup>
+                  </l-marker>
                 </template>
-              </template>
-            </l-map>
+
+                <!--              <template v-for="item in tmp_array_autoupdate">-->
+                <!--              </template>-->
+
+                <template v-for="layer in table_prospect_map">
+                  <template v-if="layer.show===true">
+                    <LHeatmap
+                      :latLngs="layer.heatmap"
+                      :radius="15"
+                      :blur="15"
+                      :minOpacity="0.1"
+                      :max="1.0">
+                    </LHeatmap>
+                  </template>
+                </template>
+              </l-map>
             </template>
           </pane>
         </splitpanes>
@@ -292,7 +296,7 @@
 
         // map variable
         map_var: {},
-        prospectScore: {score: {np:0, score:0, area: 0}},
+        prospectScore: {score: {np: 0, score: 0, area: 0}},
         geo_json: {},
 
         tabIndex: 0,
@@ -310,7 +314,7 @@
         show_marker_drag: true,
         refreshChart: false,
         proposeProspect: {},
-        prospectMap: {ndata: 0, layers:[]},
+        prospectMap: {ndata: 0, layers: []},
 
         paramInput: createDefaultSectionAreaParameter(),
         datas: [],
@@ -370,8 +374,7 @@
         this.httpGetSection();
     },
     methods: {
-      convertLayerToLeafletPopup(layer)
-      {
+      convertLayerToLeafletPopup(layer) {
         let geo_json = layer.toGeoJSON(16);
         let geom_type = geo_json["geometry"]["type"];
         let geom_polygon = geo_json["geometry"]["coordinates"];
@@ -385,16 +388,15 @@
         html_string = html_string + `Point : <b>${geom_polygon[0].length}</b><br>`;
         html_string = html_string + `Area : <br>`;
         html_string = html_string + `<b>${(area).toLocaleString()}</b> m<sup>2</sup><br>`;
-        html_string = html_string + `<b>${(area/(1e+4)).toLocaleString()}</b> ha<br>`;
+        html_string = html_string + `<b>${(area / (1e+4)).toLocaleString()}</b> ha<br>`;
         html_string = html_string + `Length : <br>`;
         html_string = html_string + `<b>${(length_meters).toLocaleString()}</b> meters<br>`;
         html_string = html_string + `<b>${(length_miles).toLocaleString()}</b> miles<br>`;
-        return(html_string);
+        return (html_string);
       },
       mapUpdated(event) {
         // add listeners on creation and delete on removal
-        if (event.type === 'pm:create')
-        {
+        if (event.type === 'pm:create') {
           event.layer.on('pm:edit', this.mapUpdated);
 
           // add data
@@ -413,15 +415,12 @@
 
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
           // console.log("create")
-        }
-        else if (event.type === 'pm:edit')
-        {
+        } else if (event.type === 'pm:edit') {
           // console.log("edit")
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
           this.geo_json = event.layer.toGeoJSON(16);
           console.log(JSON.stringify(this.geo_json))
-        }
-        else if (event.type === 'pm:remove') {
+        } else if (event.type === 'pm:remove') {
           event.layer.off(); // remove all event listeners
         }
 
@@ -544,8 +543,7 @@
           "font-size:100%;";
         return (strstyle);
       },
-      eventSwitchLayerClicked(index, item)
-      {
+      eventSwitchLayerClicked(index, item) {
         let status = !item.show;
         item.show = status;
         // this.prospectMap.layers[index].show = status;
@@ -553,8 +551,7 @@
         // this.tmp_array_autoupdate = [];
         // console.log(JSON.stringify(this.prospectMap.layers[index]))
       },
-      updateProspectMapLayerShow(item)
-      {
+      updateProspectMapLayerShow(item) {
         item.show = !item.show;
       },
       getSeismicTargetPos(idx) {
@@ -626,8 +623,7 @@
         this.cmax = this.tmp_cmax;
       },
 
-      onClickComputeScore()
-      {
+      onClickComputeScore() {
         let param = {
           data: this.proposeProspect
         };
@@ -635,6 +631,14 @@
         // console.log(JSON.stringify(param))
         this.showLoader = true;
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
+      },
+      onClickSaveProject()
+      {
+        let param = {
+          data: this.proposeProspect
+        };
+        param["data"]["polygon"] = this.geo_json;
+        console.log(JSON.stringify(param));
       },
       httpGetSection() {
         let param = {
@@ -782,7 +786,7 @@
       });
       EventBus.$on(this.event_http_prospect_score.fail, (msg) => {
         this.showLoader = false;
-        this.prospectScore = {score: {np:0, score:0}};
+        this.prospectScore = {score: {np: 0, score: 0}};
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });

@@ -1133,3 +1133,72 @@ export function createTableProspectMapHeader()
   ];
   return (table_headers);
 }
+
+export function createTableProspectProjectHeader_V1()
+{
+  let table_headers = [
+    {
+      key: 'id_area',
+      label: 'ID Area',
+      sortable: true,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'userId',
+      label: 'User',
+      sortable: true,
+      thClass: 'text-center',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'loc',
+      label: 'Location',
+      sortable: true,
+      thClass: 'text-center',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'layer',
+      label: 'Layer',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'np',
+      label: 'nPoint',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'score',
+      label: 'Score',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-right',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'area',
+      label: 'Area',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-right',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-right',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+  ];
+  return (table_headers);
+}

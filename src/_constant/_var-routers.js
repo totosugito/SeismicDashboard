@@ -48,6 +48,7 @@ export default class VarRouter {
     "processwizard6": ["process-wizard6", "/process-wizard6", "Process Wizard Step 6"],
 
     'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer"],
+    'prospect-edit': ["prospect-edit", "/prospect-edit", "Prospect Edit"],
   };
 
   httptype = {
@@ -90,7 +91,10 @@ export default class VarRouter {
     "probmap_sandbox": "/api/probmap/find-sandbox",
     "potprosp-propose": "/api/potprosp/propose",
     "potprosp-data": "/api/potprosp/data",
-    "potprosp-score": "/api/potprosp/calc-score"
+    "potprosp-score": "/api/potprosp/calc-score",
+
+    "prospect-list": "/api/prospect/list",
+    "prospect-data": "/api/prospect/data"
   };
 
   schematype = {

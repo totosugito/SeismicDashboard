@@ -196,3 +196,7 @@ export function addPlotDataToProspectMap(map_var, datas)
   }
   return(layers);
 }
+
+export function addPlotDataToProspectEdit(map_var, datas) {
+  map_var = fillLeafletProspectMapVariable(map_var, datas, 0);
+}

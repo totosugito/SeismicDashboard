@@ -17,3 +17,8 @@ export function createProspectMapData() {
   let data = {};
   return(data);
 }
+
+export function createProspectEditDemoData() {
+  let data = {};
+  return(data);
+}
