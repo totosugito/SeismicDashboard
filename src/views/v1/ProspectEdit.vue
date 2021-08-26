@@ -12,6 +12,7 @@
       <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
       <!--            <b-card-body>-->
       <b-table
+        responsive
         sticky-header="75vh"
         show-empty
         :small="true"
@@ -79,7 +80,7 @@
                 :radius="15"
                 :blur="15"
                 :minOpacity="0.1"
-                :max="1.0">
+                :max="prospectMap.v_min_max.max">
               </LHeatmap>
             </template>
           </template>
@@ -254,11 +255,19 @@
 
       beforeMount: function () {
         this.map_var = createAreaLeafletDemoData();
+        this.map_var.zoom = 14;
+
         this.pageParam["id"] = this.$route.query.id;
         this.objParam = readProspectData(this.pageParam["id"]);
         this.proposeProspect = this.objParam["dmp"];
-        this.proposeProspect["geojson"] = getSampleGeoJson();
+
+        // console.log(JSON.stringify(this.proposeProspect))
+        let tmp_geojson = getSampleGeoJson();
+        tmp_geojson[0]["geometry"]["coordinates"] = [this.proposeProspect["polygon"]]
+
+        this.proposeProspect["geojson"] = tmp_geojson;
         this.geo_json = this.proposeProspect["geojson"];
+        // console.log(JSON.stringify(this.geo_json))
 
         this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
 

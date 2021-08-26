@@ -1160,6 +1160,20 @@ export function createTableProspectProjectHeader_V1()
       thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
     {
+      key: 'filename',
+      label: 'Filename',
+      sortable: true,
+      thClass: 'text-center',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
+      key: 'title',
+      label: 'Title',
+      sortable: true,
+      thClass: 'text-center',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
       key: 'layer',
       label: 'Layer',
       sortable: false,

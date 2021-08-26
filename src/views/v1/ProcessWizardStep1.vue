@@ -18,7 +18,7 @@
 
             <b-row>
               <b-col md="12">
-                <b-table style="height: 90vh"
+                <b-table responsive style="height: 90vh"
                          show-empty
                          sticky-header="90vh"
                          :small="true"
@@ -144,6 +144,7 @@
         </div>
 
         <b-table style="height: 74vh"
+                 responsive
                  show-empty
                  sticky-header="74vh"
                  :small="true"
@@ -156,6 +157,9 @@
                  @filtered="onFiltered"
                  :fields="table_prospect_headers"
                  :items="table_prospect">
+          <template v-slot:cell(title)="row">
+            {{row.item.dmp.title}}
+          </template>
           <template v-slot:cell(action)="row">
             <ejs-button cssClass='e-success'
                         v-on:click.native="eventEditProspectProjectClicked(row.item)">Edit</ejs-button>
