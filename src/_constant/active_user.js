@@ -1,5 +1,6 @@
 // utils/active-user.js
 const key_active_user = "user";
+const key_dashboard_user = "dashuser";
 // const key_selected_user = "selected_user";
 // const key_projects = "projects";
 // const key_location = "location";
@@ -46,16 +47,7 @@ export function researchLogOut()
     localStorage.removeItem(key_research_user);
   }
 }
-export function researchSaveUser(item_)
-{
-  localStorage.setItem(key_research_user, JSON.stringify(item_)); //save data
-}
 
-export function researchGetUser()
-{
-  let user = JSON.parse(localStorage.getItem(key_research_user));
-  return(user);
-}
 export function researchSaveProjects(item_)
 {
   localStorage.setItem(key_research_project, JSON.stringify(item_)); //save data
@@ -66,29 +58,46 @@ export function researchGetProjects()
 }
 
 
-export function isValidUser(item_) {
-  if(item_==null) //null data
-    return(false);
-
-  if (item_.token.length > 5)
-    return (true);
-  else
-    return (false);
-}
 export function logOut()
 {
-  if (localStorage.getItem(key_active_user) !== null) {
+  if (localStorage.getItem(key_active_user) !== null)
     localStorage.removeItem(key_active_user);
-  }
+  if (localStorage.getItem(key_dashboard_user) !== null)
+    localStorage.removeItem(key_dashboard_user);
+}
+export function isValidUser(item_) {
+  if((item_ === undefined) || (item_=== null))
+    return (false);
+
+  if("user" in item_)
+    return (true);
+
+  return (false);
+}
+export function saveUserDashboard(item_)
+{
+  let data = {
+    dashboard: true,
+    user: item_
+  };
+  writeData(key_dashboard_user, data);
+}
+export function readUserDashboard()
+{
+  let user = JSON.parse(localStorage.getItem(key_dashboard_user));
+  return(user);
 }
 
 export function saveUser(item_)
 {
-  // if(item_.message!=="user already login")
-  localStorage.setItem(key_active_user, JSON.stringify(item_)); //save data
+  let data = {
+    dashboard: false,
+    user: item_
+  };
+  writeData(key_active_user, data);
 }
 
-export function getUser()
+export function readUser()
 {
   let user = JSON.parse(localStorage.getItem(key_active_user));
   return(user);
@@ -100,4 +109,25 @@ export function saveProspectData(item) {
 export function readProspectData(key_id) {
   let r = localStorage.getItem(key_id);
   return(JSON.parse(r));
+}
+
+export function writeData(key_, value_)
+{
+  localStorage.setItem(key_, JSON.stringify(value_));
+}
+
+export function readData(key_)
+{
+  if (localStorage.getItem(key_) !== null)
+    return (JSON.parse(localStorage.getItem(key_)));
+  else
+    return null
+}
+
+export function deleteData(key_)
+{
+  if (localStorage.getItem(key_) !== null)
+  {
+    localStorage.removeItem(key_);
+  }
 }

@@ -6,25 +6,25 @@
         <div class="login_user_card">
           <div class="d-flex justify-content-center">
             <div class="login_brand_logo_container">
-              <img src="../../_assets/images/idea-icon.png" class="login_brand_logo" alt="Logo">
+              <img src="../../_assets/images/dashboard_lock.png" class="login_brand_logo" alt="Logo">
             </div>
           </div>
           <div class="d-flex justify-content-center login_form_container">
             <b-form>
-              <h1 class="page-title mb-4">Login</h1>
+              <h1 class="page-title mb-4">Dashboard</h1>
 
               <b-input-group class="mb-3">
-                <b-input-group-prepend><b-input-group-text><i class="fa fa-user"></i></b-input-group-text></b-input-group-prepend>
+                <b-input-group-prepend><b-input-group-text class="dashboard_prefix_input"><i class="fa fa-user"></i></b-input-group-text></b-input-group-prepend>
                 <b-form-input type="text" class="form-control" placeholder="Login ID" autocomplete="username email" v-model="textUserName"/>
               </b-input-group>
               <b-input-group class="mb-4">
-                <b-input-group-prepend><b-input-group-text><i class="fa fa-lock"></i></b-input-group-text></b-input-group-prepend>
+                <b-input-group-prepend><b-input-group-text class="dashboard_prefix_input"><i class="fa fa-lock"></i></b-input-group-text></b-input-group-prepend>
                 <b-form-input type="password" class="form-control" placeholder="Password" autocomplete="current-password" v-model="textPassword"/>
               </b-input-group>
 
               <div style="color: darkred">{{msg_error}}</div>
               <div class="d-flex justify-content-center mt-3 login_bottom_container">
-                <b-button variant="danger" class="btn login_btn_user" @click="gotoDashboardPage()">Login</b-button>
+                <b-button variant="primary" class="btn login_btn_user" @click="gotoDashboardPage()">Login</b-button>
               </div>
             </b-form>
           </div>
@@ -34,7 +34,7 @@
               <b-button router-link to="/forgot-password" variant="link" class="px-0">Forgot your password?</b-button>
             </div>
             <div class="d-flex justify-content-center warning">
-              <b-button router-link to="/dashboard-login" variant="link" class="px-0">User Dashboard</b-button>
+              <b-button router-link to="/login" variant="link" class="px-0">User Login</b-button>
             </div>
           </div>
         </div>
@@ -61,10 +61,10 @@ import {mapState} from "vuex";
 import "../../_constant/_var-routers";
 import {appDebugServer, getDefaultUserIcon} from "../../_constant/http_api";
 import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
-import {isValidUser, saveUser} from "../../_constant/active_user";
+import {isValidUser, saveUser, saveUserDashboard} from "../../_constant/active_user";
 
 export default {
-  name: 'Login',
+  name: 'DashboardLogin',
 
   computed: mapState({
     varRouter: state => state.varRouter,
@@ -129,8 +129,8 @@ export default {
 
       let status = isValidUser(msg)
       if(status) {
-        saveUser(msg.user);
-        this.$router.push(this.varRouter.getRoute("processwizard1", 1));
+        saveUserDashboard(msg.user);
+        this.$router.push(this.varRouter.getRoute("admin-area-list", 1));
       }
       else
       {
@@ -155,8 +155,8 @@ export default {
 </script>
 
 <style>
-  .input-group-text {
-    background: #c0392b !important;
+  .dashboard_prefix_input {
+    background: lightskyblue !important;
     color: white !important;
     border: 0 !important;
     border-radius: 0.25rem 0 0 0.25rem !important;

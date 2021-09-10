@@ -51,7 +51,7 @@ export default {
 
     {
       title: true,
-      name: 'Account',
+      name: 'User Settings',
       class: '',
       wrapper: {
         element: '',
@@ -59,14 +59,14 @@ export default {
       }
     },
     {
-      name: 'Profil',
-      url: '/user-profile',
+      name: 'Users',
+      url: '/dashboard-user-list',
       router: 'user-profile',
       icon: 'fa fa-user '
     },
     {
-      name: 'Logout',
-      url: '/login',
+      name: 'Authentication',
+      url: '/dashboard-user-authentication',
       router: 'logout',
       icon: 'fa fa-lock'
     },

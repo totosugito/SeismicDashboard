@@ -14,14 +14,12 @@ import {
   url_http_post, url_http_post_with_header
 } from "./http_api";
 import {
-  getUser,
   isValidUser,
-  logOut,
+  logOut, readUser, readUserDashboard,
   researchGetProjects,
-  researchGetUser,
   researchIsValidUser,
   researchLogOut,
-  researchSaveProjects, saveUser
+  researchSaveProjects, saveUser, writeData
 } from "./active_user";
 
 Vue.use(Vuex);
@@ -60,7 +58,15 @@ const state = {
 const actions = {
   createVarRouter(){
     state.varRouter = new VarRouter();
-    state.user = getUser();
+    let dash_user = readUserDashboard();
+    if(isValidUser(dash_user)) {
+      state.user = dash_user;
+      return;
+    }
+
+    let user = readUser();
+    if(isValidUser(user))
+      state.user = user;
   },
 
   createReturnStatus(status, title, msg)
@@ -223,6 +229,16 @@ const actions = {
     context.commit("saveSelectedUser", payload);
   },
 
+  // logout(context)
+  // {
+  //   deleteData(key_user);
+  //   deleteData(key_survey);
+  // },
+  write_user_data(context, param)
+  {
+    writeData(key_active_user, param);
+  },
+
   actionSaveSelectedArea(context, payload){
     context.commit("actionSaveSelectedArea", payload);
   },
@@ -321,11 +337,6 @@ const mutations = {
 };
 
 const getters = {
-  researchIsAuthenticated(state)
-  {
-    state.myUser = researchGetUser();
-    return (researchIsValidUser(state.myUser));
-  },
   researchGetSelectedProject(state){
     state.myProject = researchGetProjects();
     return(state.myProject);
@@ -334,10 +345,9 @@ const getters = {
   // reusable data accessors
   isAuthenticated(state)
   {
-    // state.user = getUser();
-    // return (isValidUser(state.user));
-
-    return(true);
+    state.user = readUser();
+    return (isValidUser(state.user));
+    // return(true);
   },
 
   readSelectedUser(state){

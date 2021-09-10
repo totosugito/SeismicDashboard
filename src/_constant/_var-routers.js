@@ -7,6 +7,9 @@ export default class VarRouter {
     "500": ["500", "/500", "Page500"],
     "auto-loc": ["auto-loc", "/auto-loc", "Auto GPS Location"],
 
+    "dashboard-login": ["dashboard-login", "/dashboard-login", "Login"],
+    "dashboard": ["", "/", "Dashboard"],
+
     "page-qr": ["page-qr", "/page-qr", "QR Page"],
     "forgot-password": ["forgot-password", "/forgot-password", "Forgot Password"],
     "login": ["login", "/login", "Login"],
@@ -15,7 +18,6 @@ export default class VarRouter {
 
     "start": ["start", "/start", "Start"],
     "home": ["home", "/home", "Home"],
-    "dashboard": ["", "/", "Dashboard"],
     "well": ["well", "/well", "Well"],
     "inline-crossline": ["inline-crossline", "/well/inline-crossline", "Inline & Crossline"],
     "seismicviewer": ["seismicviewer", "/inline-crossline/seismic-viewer", "Seismic Viewer"],
@@ -52,6 +54,9 @@ export default class VarRouter {
   };
 
   httptype = {
+    "user-login": "/api/user/login",
+    "user-logout": "/api/user/logout",
+
     "area-list": "/api/area/list",
     "area-register": "/api/area/register",
     "area-delete": "/api/area/delete",

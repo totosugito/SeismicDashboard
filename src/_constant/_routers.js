@@ -94,38 +94,108 @@ export default new Router({
       component: PageLogin
     },
     {
+      path: varRouter.getRoute("dashboard-login", 1),
+      name: varRouter.getRoute("dashboard-login", 2),
+      component: () => import('../views/frontpage/DashboardLogin')
+    },
+    {
       path: varRouter.getRoute('forgot-password', 1),
       name: varRouter.getRoute('forgot-password', 2),
       component: () => import('../views/frontpage/PageForgotPassword') //PageForgotPassword
     },
-
     {
-      path: '/',
+      path: "/",
+      redirect: "",
+      name: "",
+      component: PageLogin
+    },
+    {
+      path: 'dashboard',
       redirect: varRouter.getRoute("dashboard", 1),
       name: varRouter.getRoute("dashboard", 2),
       component: DefaultContainer,
-      beforeEnter(to, from, next)
-      {
-        if (!store.getters.isAuthenticated)
-        {
-          next(varRouter.getRoute("login", 1))
-        }
-        else
-        {
-          next();
-        }
+      beforeEnter(to, from, next) {
+        // if (!store.getters.isAuthenticated)
+        // {
+        //   next(varRouter.getRoute("login", 1))
+        // }
+        // else
+        // {
+        next();
+        // }
       },
 
       children: [
         {
-          path: '/',
-          name: '',
-          component: () => import('../views/v1/ProcessWizardStep1')
-          // component: () => import('../views/Dashboard') //Dashboard
-          // component: () => import('../views/pages/WellTable') //Dashboard
-          // component: () => import('../views/pages/GeobodyTable') //Dashboard
-          // component: () => import('../views/pages/AreaTable') //Dashboard
-        },
+          path: '',
+          meta: {label: ''},
+          component: {
+            render(c) {
+              return c('router-view')
+            }
+          },
+          children: [
+            // ---------------------------------------------------------
+            //                    Dashboard
+            // ---------------------------------------------------------
+            {
+              path: varRouter.getRoute("admin-area-list", 1),
+              name: varRouter.getRoute("admin-area-list", 2),
+              component: () => import('../views/v1/AdminAreaList')
+            },
+            {
+              path: varRouter.getRoute("admin-segy-list", 1),
+              name: varRouter.getRoute("admin-segy-list", 2),
+              component: () => import('../views/v1/AdminSegyList')
+            },
+            {
+              path: varRouter.getRoute("admin-geobody-list", 1),
+              name: varRouter.getRoute("admin-geobody-list", 2),
+              component: () => import('../views/v1/AdminGeobodyList')
+            },
+            {
+              path: varRouter.getRoute("admin-mlmodel-list", 1),
+              name: varRouter.getRoute("admin-mlmodel-list", 2),
+              component: () => import('../views/v1/AdminModelList')
+            },
+            {
+              path: varRouter.getRoute("admin-well-list", 1),
+              name: varRouter.getRoute("admin-well-list", 2),
+              component: () => import('../views/v1/AdminWellList')
+            },
+
+            // ---------------------------------------------------------
+            //                    Processing
+            // ---------------------------------------------------------
+            {
+              path: varRouter.getRoute("processwizard1", 1),
+              name: varRouter.getRoute("processwizard1", 2),
+              component: () => import('../views/v1/ProcessWizardStep1')
+            },
+            {
+              path: varRouter.getRoute("seismic-viewer-by-xy", 1),
+              name: varRouter.getRoute("seismic-viewer-by-xy", 2),
+              component: () => import('../views/v1/SeismicViewerByXY')
+            },
+            {
+              path: varRouter.getRoute("prospect-edit", 1),
+              name: varRouter.getRoute("prospect-edit", 2),
+              component: () => import('../views/v1/ProspectEdit')
+            },
+          ]
+        }
+        ]
+
+        // {
+        //   path: '/',
+        //   name: '',
+        //   component: PageLogin
+        //   // component: () => import('../views/v1/ProcessWizardStep1')
+        //   // component: () => import('../views/Dashboard') //Dashboard
+        //   // component: () => import('../views/pages/WellTable') //Dashboard
+        //   // component: () => import('../views/pages/GeobodyTable') //Dashboard
+        //   // component: () => import('../views/pages/AreaTable') //Dashboard
+        // },
 
         // {
         //   path: varRouter.getRoute("admin-dashboard", 1),
@@ -141,209 +211,212 @@ export default new Router({
         //   // component: () => import('../views/pages/GeobodyTable') //Dashboard
         //   component: () => import('../views/pages/AreaTable') //Dashboard
         // },
-        {
-          path: '',
-          meta: {label: ''},
-          component: {
-            render(c)
-            {
-              return c('router-view')
-            }
-          },
-          children: [
-            {
-              path: varRouter.getRoute("seismic-viewer-by-xy", 1),
-              name: varRouter.getRoute("seismic-viewer-by-xy", 2),
-              component: () => import('../views/v1/SeismicViewerByXY')
-            },
-            {
-              path: varRouter.getRoute("prospect-edit", 1),
-              name: varRouter.getRoute("prospect-edit", 2),
-              component: () => import('../views/v1/ProspectEdit')
-            },
+        // {
+        //   path: '',
+        //   meta: {label: ''},
+        //   component: {
+        //     render(c) {
+        //       return c('router-view')
+        //     }
+        //   },
+          // children: [
+            // {
+            //   path: varRouter.getRoute("processwizard1", 1),
+            //   name: varRouter.getRoute("processwizard1", 2),
+            //   component: () => import('../views/v1/ProcessWizardStep1')
+            // },
+            // {
+            //   path: varRouter.getRoute("seismic-viewer-by-xy", 1),
+            //   name: varRouter.getRoute("seismic-viewer-by-xy", 2),
+            //   component: () => import('../views/v1/SeismicViewerByXY')
+            // },
+            // {
+            //   path: varRouter.getRoute("prospect-edit", 1),
+            //   name: varRouter.getRoute("prospect-edit", 2),
+            //   component: () => import('../views/v1/ProspectEdit')
+            // },
 
-            // ---------------------------------------------------------
-            //                    ADMIN
-            // ---------------------------------------------------------
-            {
-              path: varRouter.getRoute("admin-area-list", 1),
-              name: varRouter.getRoute("admin-area-list", 2),
-              component: () => import('../views/v0/AdminAreaList')
-            },
-            {
-              path: varRouter.getRoute("admin-segy-list", 1),
-              name: varRouter.getRoute("admin-segy-list", 2),
-              component: () => import('../views/v0/AdminSegyList')
-            },
-            {
-              path: varRouter.getRoute("admin-geobody-list", 1),
-              name: varRouter.getRoute("admin-geobody-list", 2),
-              component: () => import('../views/v0/AdminGeobodyList')
-            },
-            {
-              path: varRouter.getRoute("admin-mlmodel-list", 1),
-              name: varRouter.getRoute("admin-mlmodel-list", 2),
-              component: () => import('../views/v0/AdminModelList')
-            },
-            {
-              path: varRouter.getRoute("admin-well-list", 1),
-              name: varRouter.getRoute("admin-well-list", 2),
-              component: () => import('../views/v0/AdminWellList')
-            },
+            // // ---------------------------------------------------------
+            // //                    ADMIN
+            // // ---------------------------------------------------------
+            // {
+            //   path: varRouter.getRoute("admin-area-list", 1),
+            //   name: varRouter.getRoute("admin-area-list", 2),
+            //   component: () => import('../views/v0/AdminAreaList')
+            // },
+            // {
+            //   path: varRouter.getRoute("admin-segy-list", 1),
+            //   name: varRouter.getRoute("admin-segy-list", 2),
+            //   component: () => import('../views/v0/AdminSegyList')
+            // },
+            // {
+            //   path: varRouter.getRoute("admin-geobody-list", 1),
+            //   name: varRouter.getRoute("admin-geobody-list", 2),
+            //   component: () => import('../views/v0/AdminGeobodyList')
+            // },
+            // {
+            //   path: varRouter.getRoute("admin-mlmodel-list", 1),
+            //   name: varRouter.getRoute("admin-mlmodel-list", 2),
+            //   component: () => import('../views/v0/AdminModelList')
+            // },
+            // {
+            //   path: varRouter.getRoute("admin-well-list", 1),
+            //   name: varRouter.getRoute("admin-well-list", 2),
+            //   component: () => import('../views/v0/AdminWellList')
+            // },
 
             // ---------------------------------------------------------
             //                    USER
             // ---------------------------------------------------------
-            {
-              path: varRouter.getRoute("segy-list", 1),
-              name: varRouter.getRoute("segy-list", 2),
-              component: () => import('../views/pages/SegyTable')
-            },
-            {
-              path: varRouter.getRoute("home", 1),
-              name: varRouter.getRoute("home", 2),
-              component: () => import('../views/testing/SeismicView')
-            },
-            {
-              path: varRouter.getRoute("processwizard1", 1),
-              name: varRouter.getRoute("processwizard1", 2),
-              component: () => import('../views/v1/ProcessWizardStep1')
-            },
-            {
-              path: varRouter.getRoute("processwizard2-0", 1),
-              name: varRouter.getRoute("processwizard2-0", 2),
-              component: () => import('../views/v0/ProcessWizardStep2_0')
-            },
-            {
-              path: varRouter.getRoute("processwizard2-1", 1),
-              name: varRouter.getRoute("processwizard2-1", 2),
-              component: () => import('../views/v0/ProcessWizardStep2_1')
-            },
-            {
-              path: varRouter.getRoute("processwizard2-2", 1),
-              name: varRouter.getRoute("processwizard2-2", 2),
-              component: () => import('../views/v0/ProcessWizardStep2_2')
-            },
-            {
-              path: varRouter.getRoute("processwizard3", 1),
-              name: varRouter.getRoute("processwizard3", 2),
-              component: () => import('../views/testing/ProcessWizardStep3')
-            },
-            {
-              path: varRouter.getRoute("processwizard3-1", 1),
-              name: varRouter.getRoute("processwizard3-1", 2),
-              component: () => import('../views/testing/ProcessWizardStep3_1')
-            },
-            {
-              path: varRouter.getRoute("processwizard3-1-pick", 1),
-              name: varRouter.getRoute("processwizard3-1-pick", 2),
-              component: () => import('../views/testing/ProcessWizardStep3_1_Pick')
-            },
-            {
-              path: varRouter.getRoute("processwizard3-2", 1),
-              name: varRouter.getRoute("processwizard3-2", 2),
-              component: () => import('../views/testing/ProcessWizardStep3_2')
-            },
+            // {
+            //   path: varRouter.getRoute("segy-list", 1),
+            //   name: varRouter.getRoute("segy-list", 2),
+            //   component: () => import('../views/pages/SegyTable')
+            // },
+            // {
+            //   path: varRouter.getRoute("home", 1),
+            //   name: varRouter.getRoute("home", 2),
+            //   component: () => import('../views/testing/SeismicView')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard1", 1),
+            //   name: varRouter.getRoute("processwizard1", 2),
+            //   component: () => import('../views/v1/ProcessWizardStep1')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard2-0", 1),
+            //   name: varRouter.getRoute("processwizard2-0", 2),
+            //   component: () => import('../views/v0/ProcessWizardStep2_0')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard2-1", 1),
+            //   name: varRouter.getRoute("processwizard2-1", 2),
+            //   component: () => import('../views/v0/ProcessWizardStep2_1')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard2-2", 1),
+            //   name: varRouter.getRoute("processwizard2-2", 2),
+            //   component: () => import('../views/v0/ProcessWizardStep2_2')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard3", 1),
+            //   name: varRouter.getRoute("processwizard3", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep3')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard3-1", 1),
+            //   name: varRouter.getRoute("processwizard3-1", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep3_1')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard3-1-pick", 1),
+            //   name: varRouter.getRoute("processwizard3-1-pick", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep3_1_Pick')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard3-2", 1),
+            //   name: varRouter.getRoute("processwizard3-2", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep3_2')
+            // },
             // {
             //   path: varRouter.getRoute("processwizard3-3", 1),
             //   name: varRouter.getRoute("processwizard3-3", 2),
             //   component: () => import('../views/testing/ProcessWizardStep3_3')
             // },
-            {
-              path: varRouter.getRoute("processwizard3-3", 1),
-              name: varRouter.getRoute("processwizard3-3", 2),
-              component: () => import('../views/testing/ProcessWizardStep3_3_WithILZ')
-            },
+            // {
+            //   path: varRouter.getRoute("processwizard3-3", 1),
+            //   name: varRouter.getRoute("processwizard3-3", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep3_3_WithILZ')
+            // },
             // {
             //   path: varRouter.getRoute("processwizard3-3-ilz", 1),
             //   name: varRouter.getRoute("processwizard3-3-ilz", 2),
             //   component: () => import('../views/testing/ProcessWizardStep3_3_WithILZ')
             // },
-            {
-              path: varRouter.getRoute("processwizard4", 1),
-              name: varRouter.getRoute("processwizard4", 2),
-              component: () => import('../views/testing/ProcessWizardStep4')
-            },
-            {
-              path: varRouter.getRoute("processwizard5", 1),
-              name: varRouter.getRoute("processwizard5", 2),
-              component: () => import('../views/testing/ProcessWizardStep5')
-            },
-            {
-              path: varRouter.getRoute("processwizard6", 1),
-              name: varRouter.getRoute("processwizard6", 2),
-              component: () => import('../views/testing/ProcessWizardStep6')
-            },
+            // {
+            //   path: varRouter.getRoute("processwizard4", 1),
+            //   name: varRouter.getRoute("processwizard4", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep4')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard5", 1),
+            //   name: varRouter.getRoute("processwizard5", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep5')
+            // },
+            // {
+            //   path: varRouter.getRoute("processwizard6", 1),
+            //   name: varRouter.getRoute("processwizard6", 2),
+            //   component: () => import('../views/testing/ProcessWizardStep6')
+            // },
 
             // ---------------------------------------------------
             // ---------------------- geobody -----------------------
             // ---------------------------------------------------
-            {
-              path: varRouter.getRoute("geobody", 1),
-              name: varRouter.getRoute("geobody", 2),
-              component: () => import('../views/pages/GeobodyTable')
-            },
-            {
-              path: varRouter.getRoute("geobody", 1),
-              meta: {label: varRouter.getRoute("geobody", 2)},
-              component: {
-                render(c) {
-                  return c('router-view')
-                }
-              },
-              children: [
-                {
-                  path: varRouter.getRoute("geobody-info", 1),
-                  name: varRouter.getRoute("geobody-info", 2),
-                  component: () => import('../views/pages/GeobodyTableContents')
-                },
-              ]
-            },
+            // {
+            //   path: varRouter.getRoute("geobody", 1),
+            //   name: varRouter.getRoute("geobody", 2),
+            //   component: () => import('../views/pages/GeobodyTable')
+            // },
+            // {
+            //   path: varRouter.getRoute("geobody", 1),
+            //   meta: {label: varRouter.getRoute("geobody", 2)},
+            //   component: {
+            //     render(c) {
+            //       return c('router-view')
+            //     }
+            //   },
+            //   children: [
+            //     {
+            //       path: varRouter.getRoute("geobody-info", 1),
+            //       name: varRouter.getRoute("geobody-info", 2),
+            //       component: () => import('../views/pages/GeobodyTableContents')
+            //     },
+            //   ]
+            // },
 
             // ---------------------------------------------------
             // ---------------------- WELL -----------------------
             // ---------------------------------------------------
-            {
-              path: varRouter.getRoute("well", 1),
-              name: varRouter.getRoute("well", 2),
-              component: () => import('../views/pages/WellTable')
-            },
-            {
-              path: varRouter.getRoute("well", 1),
-              meta: {label: varRouter.getRoute("well", 2)},
-              component: {
-                render(c) {
-                  return c('router-view')
-                }
-              },
-              children: [
-                {
-                  path: varRouter.getRoute("inline-crossline", 1),
-                  name: varRouter.getRoute("inline-crossline", 2),
-                  component: () => import('../views/pages/InlineTable')
-                },
-              ]
-            },
+            // {
+            //   path: varRouter.getRoute("well", 1),
+            //   name: varRouter.getRoute("well", 2),
+            //   component: () => import('../views/pages/WellTable')
+            // },
+            // {
+            //   path: varRouter.getRoute("well", 1),
+            //   meta: {label: varRouter.getRoute("well", 2)},
+            //   component: {
+            //     render(c) {
+            //       return c('router-view')
+            //     }
+            //   },
+            //   children: [
+            //     {
+            //       path: varRouter.getRoute("inline-crossline", 1),
+            //       name: varRouter.getRoute("inline-crossline", 2),
+            //       component: () => import('../views/pages/InlineTable')
+            //     },
+            //   ]
+            // },
 
-            {
-              path: varRouter.getRoute("inline-crossline", 1),
-              meta: {label: varRouter.getRoute("inline-crossline", 2)},
-              component: {
-                render(c) {
-                  return c('router-view')
-                }
-              },
-              children: [
-                {
-                  path: varRouter.getRoute("seismicviewer", 1),
-                  name: varRouter.getRoute("seismicviewer", 2),
-                  component: () => import('../views/pages/SeismicViewer')
-                },
-              ]
-            },
-          ]
+            // {
+            //   path: varRouter.getRoute("inline-crossline", 1),
+            //   meta: {label: varRouter.getRoute("inline-crossline", 2)},
+            //   component: {
+            //     render(c) {
+            //       return c('router-view')
+            //     }
+            //   },
+            //   children: [
+            //     {
+            //       path: varRouter.getRoute("seismicviewer", 1),
+            //       name: varRouter.getRoute("seismicviewer", 2),
+            //       component: () => import('../views/pages/SeismicViewer')
+            //     },
+            //   ]
+            // },
+          // ]
         },
-
 
 
         // {
@@ -366,12 +439,12 @@ export default new Router({
         // ---------------------------------------------------------------
         // RESEARCH PAGE
         // ---------------------------------------------------------------
-        {
-          path: "/overlay",
-          name: "overlay",
-          component: () => import('../views/research/DemoOverlay')
-        },
-      ]
-    },
+    //     {
+    //       path: "/overlay",
+    //       name: "overlay",
+    //       component: () => import('../views/research/DemoOverlay')
+    //     },
+    //   ]
+    // },
   ]
 })
