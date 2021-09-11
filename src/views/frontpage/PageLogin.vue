@@ -61,7 +61,7 @@ import {mapState} from "vuex";
 import "../../_constant/_var-routers";
 import {appDebugServer, getDefaultUserIcon} from "../../_constant/http_api";
 import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
-import {isValidUser, saveUser} from "../../_constant/active_user";
+import {deleteUser, isValidUser, saveUser} from "../../_constant/active_user";
 
 export default {
   name: 'Login',
@@ -76,17 +76,18 @@ export default {
   },
   created() {
     this.$store.dispatch('createVarRouter').then(); //no selected project
-    this.$store.dispatch('logout').then(); //no selected project
+    // this.$store.dispatch('deleteUser').then(); //no selected project
+    deleteUser();
   },
 
   data () {
     return {
       showLoader : false,
       retStatus: {status: 0, title: "", message: "", data: []},
-      textUserName: 'pandu@mail.com',
-      textPassword: 'pandu',
-      // textUserName: '',
-      // textPassword: '',
+      // textUserName: 'pandu@mail.com',
+      // textPassword: 'pandu',
+      textUserName: '',
+      textPassword: '',
       msg_error: '',
       event_http :{success:"success", fail:"fail"},
     }

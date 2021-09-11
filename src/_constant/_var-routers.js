@@ -31,6 +31,8 @@ export default class VarRouter {
     "admin-mlmodel-list": ["admin-mlmodel-list", "/admin-mlmodel-list", "Admin Model"],
     "admin-well-list": ["admin-well-list", "/admin-well-list", "Admin Well"],
 
+    "dashboard-user-list": ["dashboard-user-list", "/dashboard-user-list", "Dashboard Users"],
+
     "segy-list": ["segy-list", "/segy-list", "SEGY List"],
     "processwizard": ["process-wizard", "/process-wizard", "Process Wizard"],
     "processwizard1": ["process-wizard1", "/process-wizard1", "Process Wizard Step 1"],
@@ -56,6 +58,8 @@ export default class VarRouter {
   httptype = {
     "user-login": "/api/user/login",
     "user-logout": "/api/user/logout",
+    "user-list": "/api/user/list",
+    "user-register": "/api/user/register",
 
     "area-list": "/api/area/list",
     "area-register": "/api/area/register",
@@ -99,7 +103,8 @@ export default class VarRouter {
     "potprosp-score": "/api/potprosp/calc-score",
 
     "prospect-list": "/api/prospect/list",
-    "prospect-data": "/api/prospect/data"
+    "prospect-data": "/api/prospect/data",
+    "prospect-save": "/api/prospect/save"
   };
 
   schematype = {

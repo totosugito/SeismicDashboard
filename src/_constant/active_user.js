@@ -96,6 +96,13 @@ export function saveUser(item_)
   };
   writeData(key_active_user, data);
 }
+export function deleteUser()
+{
+  let data = {
+  };
+  writeData(key_active_user, data);
+  writeData(key_dashboard_user, data);
+}
 
 export function readUser()
 {

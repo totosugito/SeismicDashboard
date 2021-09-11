@@ -13,7 +13,7 @@
       <!--            <b-card-body>-->
       <b-table
         responsive
-        sticky-header="75vh"
+        sticky-header="72vh"
         show-empty
         :small="true"
         :striped="false"
@@ -186,6 +186,7 @@
       computed: mapState({
         varRouter: state => state.varRouter,
         spinLoader: state => state.spinLoader,
+        user: state => state.user,
       }),
 
       data: () => {
@@ -247,6 +248,7 @@
           event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
           event_http_prospect_map: {success: "successProspectMap", fail: "failProspectMap"},
           event_http_prospect_score: {success: "successProspectScore", fail: "failProspectScore"},
+          event_http_save_prospect: {success: "successSaveProspect", fail: "failSaveProspect"},
         }
       },
       created() {
@@ -283,6 +285,9 @@
       },
 
       methods: {
+        dialogMessageBtn1Click() {
+          this.$refs.dialogMessage.hideModal();
+        },
         eventSelectedLayerCssStyle(item) {
           let fg_color = "#808080";
           if (item.show)
@@ -499,6 +504,7 @@
 
         onClickComputeScore() {
           let param = {
+            user: this.user["user"],
             data: this.proposeProspect
           };
           // console.log(JSON.stringify(param))
@@ -510,15 +516,20 @@
         onClickSaveProject()
         {
           let param = {
+            user: this.user["user"],
             data: this.proposeProspect
           };
-          param["data"]["polygon"] = this.geo_json;
-          console.log(JSON.stringify(param));
+          // param["data"]["polygon"] = this.geo_json;
+          // console.log(JSON.stringify(param));
+
+          this.showLoader = true;
+          this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
         },
 
         httpGetProspectData()
         {
           let param = {
+            user: this.user["user"],
             data: {
               id_area: this.objParam["id_area"],
               filename: this.objParam["filename"]
@@ -565,13 +576,29 @@
           this.retStatus = msg;
           this.$refs.dialogMessage.showModal();
         });
+
+        EventBus.$on(this.event_http_save_prospect.success, (msg) => {
+          // this.prospectMap = msg.data;
+          // this.table_prospect_map = addPlotDataToProspectEdit(this.prospectMap);
+
+          this.showLoader = false;
+          // this.showMapProspect = true;
+        });
+        EventBus.$on(this.event_http_save_prospect.fail, (msg) => {
+          this.showLoader = false;
+          // this.prospectMap = {};
+          // this.table_prospect_map = [];
+          this.retStatus = msg;
+          this.$refs.dialogMessage.showModal();
+        });
       },
       beforeDestroy() {
         EventBus.$off(this.event_http_prospect_score.success);
         EventBus.$off(this.event_http_prospect_score.fail);
         EventBus.$off(this.event_http_prospect_map.success);
         EventBus.$off(this.event_http_prospect_map.fail);
-
+        EventBus.$off(this.event_http_save_prospect.success);
+        EventBus.$off(this.event_http_save_prospect.fail);
       },
     }
 </script>

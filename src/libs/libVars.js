@@ -1216,3 +1216,106 @@ export function createTableProspectProjectHeader_V1()
   ];
   return (table_headers);
 }
+
+export function createTableUsersList()
+{
+  let table_headers = [
+    {
+      key: 'username',
+      label: 'User Name',
+      sortable: true
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      sortable: true
+    },
+    {
+      key: 'level',
+      label: 'Level',
+      sortable: true
+    },
+    {
+      key: 'label',
+      label: 'Label',
+      sortable: true
+    },
+    {
+      key: 'isLogin',
+      label: 'Active',
+      sortable: true
+    },
+    {
+      key: 'action',
+      label: 'Action',
+      sortable: false,
+    },
+  ];
+  return (table_headers);
+}
+
+export function createAddUserModel()
+{
+  let model = {
+    email: "",
+    username: "",
+    password: "",
+    level: 0,
+    label: ""
+  };
+  return(model);
+}
+
+export function createAddUserSchema()
+{
+  let schema = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Email',
+        model: 'email',
+        placeholder: 'User email',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'User Name',
+        model: 'username',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'password',
+        label: 'Password',
+        model: 'password',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Level',
+        model: 'level',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'User Label',
+        model: 'label',
+        placeholder: '',
+        featured: true,
+        required: true
+      }
+    ]
+  };
+  return(schema);
+}

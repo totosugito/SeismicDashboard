@@ -12,7 +12,7 @@
       <b-col md="12">
         <b-card>
           <!--          <div slot="header"></div>-->
-          <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
+          <splitpanes class="default-theme" vertical style="height: 77vh" vertical>
             <pane class="p-2" min-size="20" max-size="80" style="background: ghostwhite">
               <!-- -------------------------------------------- -->
               <!-- TABLE -->
@@ -201,6 +201,7 @@
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
+      user: state => state.user,
     }),
 
     created() {
@@ -343,7 +344,10 @@
       },
       getListArea() {
         this.showLoader = true;
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_list]).then();
+        let param = {
+          user: this.user["user"]
+        }
+        this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), param, this.event_http_list]).then();
       },
 
       eventSegyList(item)
@@ -422,6 +426,7 @@
       {
         let param =
         {
+          "user": this.user["user"],
           "data": this.selected_data
         };
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("area-delete"), param, this.event_http_del]).then();

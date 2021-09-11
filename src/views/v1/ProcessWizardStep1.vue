@@ -10,7 +10,7 @@
     <b-tabs v-model="tabIndex">
       <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">
 
-        <splitpanes class="default-theme" vertical style="height: 79vh" vertical>
+        <splitpanes class="default-theme" style="height: 76vh" vertical>
           <pane class="p-2" min-size="20" max-size="30" style="background: white">
             <!--          <b-tab title="Data by WELL" :title-link-class="linkClass(1)">Tab contents 2</b-tab>-->
             <!--          <b-tab title="Well Files" :title-link-class="linkClass(2)">Tab contents 3</b-tab>-->
@@ -146,7 +146,7 @@
         <b-table style="height: 74vh"
                  responsive
                  show-empty
-                 sticky-header="74vh"
+                 sticky-header="70vh"
                  :small="true"
                  :striped="false"
                  :bordered="true"
@@ -269,6 +269,7 @@
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
+      user: state => state.user,
     }),
 
     created() {
@@ -624,25 +625,31 @@
 
       httpListArea() {
         this.showLoader = true;
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), {}, this.event_http_area_list]).then();
+        let param = {
+          user: this.user["user"],
+          data: {
+          }
+        }
+        this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), param, this.event_http_area_list]).then();
       },
       httpHeatmapDataByIdx() {
         if (this.selected_area < 0)
           return;
 
         this.showLoader = true;
-        let list_file = [
-          "heatmap_TUNU95_v30_cal_prob_0500_0600.csv",
-          "heatmap_TUNU95_v30_cal_prob_0600_0700.csv",
-          "heatmap_TUNU95_v30_cal_prob_0700_0800.csv",
-          "heatmap_TUNU95_v30_cal_prob_0800_0900.csv",
-          "heatmap_TUNU95_v30_cal_prob_0900_1000.csv"
-        ];
+        // let list_file = [
+        //   "heatmap_TUNU95_v30_cal_prob_0500_0600.csv",
+        //   "heatmap_TUNU95_v30_cal_prob_0600_0700.csv",
+        //   "heatmap_TUNU95_v30_cal_prob_0700_0800.csv",
+        //   "heatmap_TUNU95_v30_cal_prob_0800_0900.csv",
+        //   "heatmap_TUNU95_v30_cal_prob_0900_1000.csv"
+        // ];
 
         let param = {
           "state": 0,
           "type": "/api/probmap/multi",
           "mesg": "",
+          "user": this.user["user"],
           "data": {
             "id_area": this.table_area[this.selected_area]["id_area"],
             "feature": "sum",
@@ -669,6 +676,7 @@
           "state": 0,
           "type": "/api/heatmap/multi",
           "mesg": "",
+          "user": this.user["user"],
           "data": {
             "id_area": 2,
             "file_loc": "TUNU95/08_heatmap",
@@ -710,7 +718,12 @@
       },
       getHttpRefreshProspectProject()
       {
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("prospect-list"), {}, this.event_http_prospect_list]).then();
+        let param = {
+          user: this.user["user"],
+          data: {
+          }
+        }
+        this.$store.dispatch('http_get', [this.varRouter.getHttpType("prospect-list"), param, this.event_http_prospect_list]).then();
       }
     },
     mounted() {

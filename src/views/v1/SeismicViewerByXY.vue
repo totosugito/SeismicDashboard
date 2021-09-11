@@ -285,6 +285,7 @@
     computed: mapState({
       varRouter: state => state.varRouter,
       spinLoader: state => state.spinLoader,
+      user: state => state.user,
     }),
 
     data: () => {
@@ -625,6 +626,7 @@
 
       onClickComputeScore() {
         let param = {
+          user: this.user["user"],
           data: this.proposeProspect
         };
         param["data"]["geojson"] = this.geo_json;
@@ -646,6 +648,7 @@
           "state": 0,
           "type": "/api/probmap/find-sandbox",
           "mesg": "",
+          "user": this.user["user"],
           "data": {
             "id_area": this.pageParam["area"],
             "layer": this.pageParam["layer"],
@@ -660,6 +663,7 @@
       },
       httpGetProposeProspect(val) {
         let param = {
+          user: this.user["user"],
           data: {
             id_area: this.pageParam["area"],
             layer: this.pageParam["layer"],
@@ -684,6 +688,7 @@
 
       httpGetProspectMap(val) {
         let param = {
+          user: this.user["user"],
           data: this.proposeProspect
         }
         this.showLoader = true;

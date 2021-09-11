@@ -163,6 +163,11 @@ export default new Router({
               name: varRouter.getRoute("admin-well-list", 2),
               component: () => import('../views/v1/AdminWellList')
             },
+            {
+              path: varRouter.getRoute("dashboard-user-list", 1),
+              name: varRouter.getRoute("dashboard-user-list", 2),
+              component: () => import('../views/v1/AdminUsersList')
+            },
 
             // ---------------------------------------------------------
             //                    Processing
