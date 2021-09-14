@@ -349,6 +349,7 @@
         event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
         event_http_prospect_map: {success: "successProspectMap", fail: "failProspectMap"},
         event_http_prospect_score: {success: "successProspectScore", fail: "failProspectScore"},
+        event_http_save_prospect: {success: "successSaveProspect", fail: "failSaveProspect"},
       }
     },
     created() {
@@ -638,10 +639,15 @@
       onClickSaveProject()
       {
         let param = {
-          data: this.proposeProspect
+          user: this.user["user"],
+          data: this.proposeProspect,
+          score: this.prospectScore.score
         };
         param["data"]["geojson"] = this.geo_json;
-        console.log(JSON.stringify(param));
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
+
+        // console.log(JSON.stringify(param));
       },
       httpGetSection() {
         let param = {
@@ -792,7 +798,22 @@
       });
       EventBus.$on(this.event_http_prospect_score.fail, (msg) => {
         this.showLoader = false;
-        this.prospectScore = {score: {np: 0, score: 0}};
+        this.prospectScore = {score: {np: 0, score: 0, area:0}};
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      EventBus.$on(this.event_http_save_prospect.success, (msg) => {
+        // this.prospectMap = msg.data;
+        // this.table_prospect_map = addPlotDataToProspectEdit(this.prospectMap);
+
+        this.showLoader = false;
+        // this.showMapProspect = true;
+      });
+      EventBus.$on(this.event_http_save_prospect.fail, (msg) => {
+        this.showLoader = false;
+        // this.prospectMap = {};
+        // this.table_prospect_map = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
@@ -804,6 +825,8 @@
       EventBus.$off(this.event_http_prospect_map.fail);
       EventBus.$off(this.event_http_prospect_score.success);
       EventBus.$off(this.event_http_prospect_score.fail);
+      EventBus.$off(this.event_http_save_prospect.success);
+      EventBus.$off(this.event_http_save_prospect.fail);
     },
     watch:
       {

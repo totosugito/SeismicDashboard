@@ -517,7 +517,8 @@
         {
           let param = {
             user: this.user["user"],
-            data: this.proposeProspect
+            data: this.proposeProspect,
+            score: this.prospectScore.score
           };
           // param["data"]["polygon"] = this.geo_json;
           // console.log(JSON.stringify(param));
@@ -557,7 +558,7 @@
         });
         EventBus.$on(this.event_http_prospect_score.fail, (msg) => {
           this.showLoader = false;
-          this.prospectScore = {score: {np: 0, score: 0}};
+          this.prospectScore = {score: {np: 0, score: 0, area:0}};
           this.retStatus = msg;
           this.$refs.dialogMessage.showModal();
         });
