@@ -103,8 +103,14 @@
           <pane class="p-2" min-size="20" max-size="40" style="background: white">
             <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
             <!--            <b-card-body>-->
+
+            <div>
+              <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/> Uncheck All
+              </ejs-button>
+            </div>
+
             <b-table
-              sticky-header="65vh"
+              sticky-header="40vh"
               show-empty
               :small="true"
               :striped="false"
@@ -126,6 +132,20 @@
                 <!--                  </b-form-checkbox>-->
               </template>
             </b-table>
+
+            <div>
+              <div class="mb-2">CONFIDENCE RATING</div>
+              <StarRating v-model="confidence_score" :rating="confidence_score" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
+            </div>
+            <div>
+              <div class="mb-2 mt-3">NOTE</div>
+              <b-form-textarea
+                v-model="text_note"
+                placeholder="Enter something..."
+                rows="3"
+                max-rows="6"/>
+            </div>
+
             <div>
               <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>
               <span class="mr-5">Score : <b>{{prospectScore.score.score.toFixed(3)}}</b></span>
@@ -221,6 +241,7 @@
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
+  import StarRating from 'MyLibVue/src/views/star-rating/star-rating'
 
   import {getColormapAsset, getColormapName} from "../../libs/colormap";
 
@@ -229,7 +250,7 @@
   import DynamicInputForMap from "../myview/DynamicInputForMap";
   import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
   import {rotate} from "../../libs/2d-array-rotation";
-  import {addPlotDataToProspectMap, createDefaultSectionAreaParameter} from "../../libs/libUpdateData";
+  import {addPlotDataToProspectMap, createDefaultSectionAreaParameter, uncheckAllData} from "../../libs/libUpdateData";
   import {
     addShowKeyToLayer,
     createAreaLeafletDemoData,
@@ -271,6 +292,7 @@
       bFormSlider,
       VueSimpleDialog,
 
+      StarRating,
       Splitpanes, Pane,
 
       LMap,
@@ -290,6 +312,9 @@
 
     data: () => {
       return {
+        confidence_score: 7,
+        text_note: "",
+
         bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: false,
@@ -413,7 +438,7 @@
 
           event.layer.internalId = uuidv4();
           this.geo_json = event.layer.toGeoJSON(16);
-          console.log(JSON.stringify(this.geo_json))
+          // console.log(JSON.stringify(this.geo_json))
 
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
           // console.log("create")
@@ -421,7 +446,7 @@
           // console.log("edit")
           event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
           this.geo_json = event.layer.toGeoJSON(16);
-          console.log(JSON.stringify(this.geo_json))
+          // console.log(JSON.stringify(this.geo_json))
         } else if (event.type === 'pm:remove') {
           event.layer.off(); // remove all event listeners
         }
@@ -631,7 +656,7 @@
           data: this.proposeProspect
         };
         param["data"]["geojson"] = this.geo_json;
-        param["data"]["polygon"] = this.geo_json["geometry"]["coordinates"][0];
+        // param["data"]["polygon"] = this.geo_json["geometry"]["coordinates"][0];
         // console.log(JSON.stringify(param))
         this.showLoader = true;
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
@@ -741,7 +766,12 @@
           this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
         }
         this.createDefaultBoundaryParameter();
-      }
+      },
+
+      onUncheckAll()
+      {
+        uncheckAllData(this.table_prospect_map);
+      },
     },
 
     mounted() {

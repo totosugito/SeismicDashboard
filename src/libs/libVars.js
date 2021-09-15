@@ -1152,13 +1152,13 @@ export function createTableProspectProjectHeader_V1()
       thClass: 'text-center',
       thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
-    {
-      key: 'loc',
-      label: 'Location',
-      sortable: true,
-      thClass: 'text-center',
-      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
-    },
+    // {
+    //   key: 'loc',
+    //   label: 'Location',
+    //   sortable: true,
+    //   thClass: 'text-center',
+    //   thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+    // },
     {
       key: 'filename',
       label: 'Filename',
@@ -1167,8 +1167,8 @@ export function createTableProspectProjectHeader_V1()
       thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'title',
-      label: 'Title',
+      key: 'star',
+      label: 'Star',
       sortable: true,
       thClass: 'text-center',
       thStyle: {'background-color': '#1E90FF', 'color': 'white'},

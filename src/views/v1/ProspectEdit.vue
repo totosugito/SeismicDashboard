@@ -11,9 +11,13 @@
     <pane class="p-2" min-size="20" max-size="40" style="background: white">
       <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
       <!--            <b-card-body>-->
+      <div>
+        <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/> Uncheck All
+        </ejs-button>
+      </div>
       <b-table
         responsive
-        sticky-header="72vh"
+        sticky-header="50vh"
         show-empty
         :small="true"
         :striped="false"
@@ -33,6 +37,19 @@
                   </span>
         </template>
       </b-table>
+
+      <div>
+        <div class="mb-2">CONFIDENCE RATING</div>
+        <StarRating v-model="confidence_score" :rating="confidence_score" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
+      </div>
+      <div>
+        <div class="mb-2 mt-3">NOTE</div>
+        <b-form-textarea
+          v-model="text_note"
+          placeholder="Enter something..."
+          rows="3"
+          max-rows="6"/>
+      </div>
       <div>
         <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>
         <span class="mr-5">Score : <b>{{prospectScore.score.score.toFixed(3)}}</b></span>
@@ -115,6 +132,7 @@
   import {createProspectEditDemoData, createProspectMapData, getSectionData} from "../../libs/data";
   import LChartSeismicAreaSelected from "../components/LChartSeismicAreaSelected";
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
+  import StarRating from 'MyLibVue/src/views/star-rating/star-rating'
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
   import { forEach } from 'lodash';
@@ -128,7 +146,7 @@
   import {
     addPlotDataToProspectEdit,
     addPlotDataToProspectMap,
-    createDefaultSectionAreaParameter, fillLeafletProspectMapVariable
+    createDefaultSectionAreaParameter, fillLeafletProspectMapVariable, uncheckAllData
   } from "../../libs/libUpdateData";
   import {
     addShowKeyToLayer,
@@ -171,6 +189,7 @@
         EnhancedCheck,
         bFormSlider,
         VueSimpleDialog,
+        StarRating,
 
         Splitpanes, Pane,
 
@@ -191,6 +210,9 @@
 
       data: () => {
         return {
+          confidence_score: 7,
+          text_note: "",
+
           bdemo: appDemoMode(),
           retStatus: {status: 0, title: "", message: "", data: []},
           showLoader: false,
@@ -262,14 +284,7 @@
         this.pageParam["id"] = this.$route.query.id;
         this.objParam = readProspectData(this.pageParam["id"]);
         this.proposeProspect = this.objParam["dmp"];
-
-        // console.log(JSON.stringify(this.proposeProspect))
-        let tmp_geojson = getSampleGeoJson();
-        tmp_geojson[0]["geometry"]["coordinates"] = [this.proposeProspect["polygon"]]
-
-        this.proposeProspect["geojson"] = tmp_geojson;
         this.geo_json = this.proposeProspect["geojson"];
-        // console.log(JSON.stringify(this.geo_json))
 
         this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
 
@@ -401,7 +416,7 @@
 
             event.layer.internalId = uuidv4();
             this.geo_json = event.layer.toGeoJSON(16);
-            console.log(JSON.stringify(this.geo_json))
+            // console.log(JSON.stringify(this.geo_json))
 
             event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
             // console.log("create")
@@ -409,7 +424,7 @@
             // console.log("edit")
             event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
             this.geo_json = event.layer.toGeoJSON(16);
-            console.log(JSON.stringify(this.geo_json))
+            // console.log(JSON.stringify(this.geo_json))
           } else if (event.type === 'pm:remove') {
             event.layer.off(); // remove all event listeners
           }
@@ -508,7 +523,7 @@
             data: this.proposeProspect
           };
           // console.log(JSON.stringify(param))
-          param["data"]["polygon"] = this.geo_json[0]["geometry"]["coordinates"][0];
+          // param["data"]["polygon"] = this.geo_json[0]["geometry"]["coordinates"][0];
           // console.log(JSON.stringify(param))
           this.showLoader = true;
           this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
@@ -527,6 +542,10 @@
           this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
         },
 
+        onUncheckAll()
+        {
+          uncheckAllData(this.table_prospect_map);
+        },
         httpGetProspectData()
         {
           let param = {
@@ -535,7 +554,7 @@
               id_area: this.objParam["id_area"],
               filename: this.objParam["filename"]
             }
-          }
+          };
 
           this.showLoader = true;
           this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-data"), param, this.event_http_prospect_map]).then();

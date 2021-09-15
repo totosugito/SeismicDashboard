@@ -213,3 +213,11 @@ export function addPlotDataToProspectEdit(datas) {
   }
   return(layers);
 }
+
+export function uncheckAllData(datas) {
+  let ndata = datas.length;
+  for(let i=0; i<ndata; i++)
+  {
+    datas[i]["show"] = false;
+  }
+}
