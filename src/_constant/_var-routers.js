@@ -53,6 +53,7 @@ export default class VarRouter {
 
     'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer"],
     'prospect-edit': ["prospect-edit", "/prospect-edit", "Prospect Edit"],
+    'plot-ava-gather': ["plot-ava-gather", "/plot-ava-gather", "Ava Gather"],
   };
 
   httptype = {
@@ -74,6 +75,8 @@ export default class VarRouter {
     "segy-view-list-ava": "/api/segy/view-list-ava",
     "segy-view-gather": "/api/segy/view-list-gather",
     "segy-view-section": "/api/segy/view-list-section",
+
+    "ava-segy-view-gather": "/api/segy/view-gather",
 
     "mlmodel-list": "/api/mlmodel/file-list",
     "mlmodel-register": "/api/mlmodel/file-register",

@@ -187,6 +187,11 @@ export default new Router({
               name: varRouter.getRoute("prospect-edit", 2),
               component: () => import('../views/v1/ProspectEdit')
             },
+            {
+              path: varRouter.getRoute("plot-ava-gather", 1),
+              name: varRouter.getRoute("plot-ava-gather", 2),
+              component: () => import('../views/v1/PlotAvaGather')
+            },
           ]
         }
         ]

@@ -663,6 +663,8 @@
       },
       onClickSaveProject()
       {
+        // this.prospectScore.score["confidence"] = this.confidence_score;
+        // this.prospectScore.score["note"] = this.text_note;
         let param = {
           user: this.user["user"],
           data: this.proposeProspect,

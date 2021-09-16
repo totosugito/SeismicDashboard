@@ -157,6 +157,13 @@
                  @filtered="onFiltered"
                  :fields="table_prospect_headers"
                  :items="table_prospect">
+          <!-- A virtual column -->
+          <template #cell(index)="data">
+            {{ data.index + 1 }}
+          </template>
+<!--          <template v-slot:cell(star)="row">-->
+<!--            {{row.item.score.confidence}}-->
+<!--          </template>-->
           <template v-slot:cell(title)="row">
             {{row.item.dmp.title}}
           </template>

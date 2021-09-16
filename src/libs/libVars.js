@@ -1138,6 +1138,14 @@ export function createTableProspectProjectHeader_V1()
 {
   let table_headers = [
     {
+      key: 'index',
+      label: 'No',
+      sortable: true,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
+    },
+    {
       key: 'id_area',
       label: 'ID Area',
       sortable: true,

@@ -56,9 +56,10 @@
         <span>Area : <b>{{prospectScore.score.area.toFixed(3)}}</b></span>
       </div>
       <div class="mt-2">
-        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score
-        </ejs-button>
+<!--        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score-->
+<!--        </ejs-button>-->
         <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Save</ejs-button>
+        <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather</ejs-button>
       </div>
       <!--            </b-card-body>-->
     </pane>
@@ -530,6 +531,8 @@
         },
         onClickSaveProject()
         {
+          this.prospectScore.score["confidence"] = this.confidence_score;
+          this.prospectScore.score["note"] = this.text_note;
           let param = {
             user: this.user["user"],
             data: this.proposeProspect,
@@ -541,7 +544,18 @@
           this.showLoader = true;
           this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
         },
-
+        onClickViewGather()
+        {
+          // console.log(JSON.stringify(this.objParam))
+          let routeData = this.$router.resolve({
+            path: "plot-ava-gather",
+            query: {
+              id_area: this.objParam["id_area"],
+              filename: this.objParam["filename"],
+            }
+          });
+          window.open(routeData.href, '_blank');
+        },
         onUncheckAll()
         {
           uncheckAllData(this.table_prospect_map);
