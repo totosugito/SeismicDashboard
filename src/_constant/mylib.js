@@ -182,3 +182,14 @@ export function parseLasFile(user_id, filename, sstr, skip_data, compress_file) 
     R.data = [];
   return([R, compressed_sstr]);
 }
+
+export function stringToFormattedDate(responseDate) {
+  let dateComponents = responseDate.split('T');
+  let time_without_ms = dateComponents[1].split('.');
+
+  let datePieces = dateComponents[0].split("-");
+  let timePieces = dateComponents[1].split(":");
+  // return(new Date(datePieces[2], (datePieces[1] - 1), datePieces[0], timePieces[0], timePieces[1], timePieces[2]))
+
+  return(dateComponents[0] + " " + time_without_ms[0]);
+}

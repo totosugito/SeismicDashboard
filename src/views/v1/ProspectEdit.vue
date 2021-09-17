@@ -40,20 +40,20 @@
 
       <div>
         <div class="mb-2">CONFIDENCE RATING</div>
-        <StarRating v-model="confidence_score" :rating="confidence_score" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
+        <StarRating v-model="proposeProspect.score.star" :rating="proposeProspect.score.star" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
       </div>
       <div>
         <div class="mb-2 mt-3">NOTE</div>
         <b-form-textarea
-          v-model="text_note"
+          v-model="proposeProspect.score.note"
           placeholder="Enter something..."
           rows="3"
           max-rows="6"/>
       </div>
       <div>
-        <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>
-        <span class="mr-5">Score : <b>{{prospectScore.score.score.toFixed(3)}}</b></span>
-        <span>Area : <b>{{prospectScore.score.area.toFixed(3)}}</b></span>
+        <span class="mr-5">NPoint : <b>{{proposeProspect.score.np}}</b></span>
+        <span class="mr-5">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
+        <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
       </div>
       <div class="mt-2">
 <!--        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score-->
@@ -171,7 +171,7 @@
   import {v4 as uuidv4} from 'uuid';
   import * as turf from "@turf/turf";
   import {createTableProspectMapHeader} from "../../libs/libVars";
-  import {readProspectData} from "../../_constant/active_user";
+  import {readProspectData, saveProspectData} from "../../_constant/active_user";
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -211,8 +211,8 @@
 
       data: () => {
         return {
-          confidence_score: 7,
-          text_note: "",
+          // confidence_score: 7,
+          // text_note: "",
 
           bdemo: appDemoMode(),
           retStatus: {status: 0, title: "", message: "", data: []},
@@ -287,6 +287,10 @@
         this.proposeProspect = this.objParam["dmp"];
         this.geo_json = this.proposeProspect["geojson"];
 
+        // this.confidence_score = this.proposeProspect.score.star;
+        // this.text_note = this.proposeProspect.score.note;
+        // console.log(JSON.stringify(this.proposeProspect))
+
         this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
 
         if (this.bdemo) {
@@ -296,7 +300,8 @@
           this.tabIndex = 1;
           this.showLoader = false;
           this.showMapProspect = true;
-        } else
+        }
+        else
           this.httpGetProspectData();
       },
 
@@ -531,18 +536,18 @@
         },
         onClickSaveProject()
         {
-          this.prospectScore.score["confidence"] = this.confidence_score;
-          this.prospectScore.score["note"] = this.text_note;
+          // this.prospectScore.score["confidence"] = this.confidence_score;
+          // this.prospectScore.score["note"] = this.text_note;
           let param = {
             user: this.user["user"],
             data: this.proposeProspect,
-            score: this.prospectScore.score
+            // score: this.prospectScore.score
           };
           // param["data"]["polygon"] = this.geo_json;
           // console.log(JSON.stringify(param));
 
           this.showLoader = true;
-          this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
+          this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-update"), param, this.event_http_save_prospect]).then();
         },
         onClickViewGather()
         {
@@ -615,7 +620,12 @@
           // this.prospectMap = msg.data;
           // this.table_prospect_map = addPlotDataToProspectEdit(this.prospectMap);
 
+          saveProspectData(this.objParam);
           this.showLoader = false;
+
+          this.retStatus.title = "Success";
+          this.retStatus.message = "Update data completed";
+          this.$refs.dialogMessage.showModal();
           // this.showMapProspect = true;
         });
         EventBus.$on(this.event_http_save_prospect.fail, (msg) => {

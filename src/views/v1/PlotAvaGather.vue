@@ -8,6 +8,15 @@
       :active="showLoader"/>
     <ApexChartLine class="lc_seismic_chart" :chart-options="avaPlotOptions" :series="avaPlotSeries"/>
 
+    <b-card no-body class="mt-2 mb-1">
+      <b-card-header header-tag="header" class="p-1" role="tab">
+        Compare Gather
+      </b-card-header>
+      <InputGatherByILXLZ/>
+      <InputGatherByILXLZ/>
+      <InputGatherByILXLZ/>
+    </b-card>
+
     <!-- show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
@@ -30,9 +39,11 @@
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import ApexChartLine from "../components/ApexChartLine";
   import {apexChartSimpleProperties} from "../../libs/defApexChartLine";
+  import InputGatherByILXLZ from "../myview/InputGatherByILXLZ";
   export default {
     name: "PlotAvaGather",
     components: {
+      InputGatherByILXLZ,
       VueSimpleDialog,
       ApexChartLine},
     computed: mapState({
@@ -127,6 +138,6 @@
 <style scoped>
   .lc_seismic_chart {
     width: 99%;
-    height: 85vh;
+    height: 60vh;
   }
 </style>

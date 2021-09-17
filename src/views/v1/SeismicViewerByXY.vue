@@ -110,7 +110,7 @@
             </div>
 
             <b-table
-              sticky-header="40vh"
+              sticky-header="50vh"
               show-empty
               :small="true"
               :striped="false"
@@ -133,18 +133,18 @@
               </template>
             </b-table>
 
-            <div>
-              <div class="mb-2">CONFIDENCE RATING</div>
-              <StarRating v-model="confidence_score" :rating="confidence_score" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
-            </div>
-            <div>
-              <div class="mb-2 mt-3">NOTE</div>
-              <b-form-textarea
-                v-model="text_note"
-                placeholder="Enter something..."
-                rows="3"
-                max-rows="6"/>
-            </div>
+<!--            <div>-->
+<!--              <div class="mb-2">CONFIDENCE RATING</div>-->
+<!--              <StarRating v-model="confidence_score" :rating="confidence_score" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>-->
+<!--            </div>-->
+<!--            <div>-->
+<!--              <div class="mb-2 mt-3">NOTE</div>-->
+<!--              <b-form-textarea-->
+<!--                v-model="text_note"-->
+<!--                placeholder="Enter something..."-->
+<!--                rows="3"-->
+<!--                max-rows="6"/>-->
+<!--            </div>-->
 
             <div>
               <span class="mr-5">NPoint : <b>{{prospectScore.score.np}}</b></span>

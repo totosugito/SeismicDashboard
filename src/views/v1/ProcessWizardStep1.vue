@@ -161,11 +161,17 @@
           <template #cell(index)="data">
             {{ data.index + 1 }}
           </template>
-<!--          <template v-slot:cell(star)="row">-->
-<!--            {{row.item.score.confidence}}-->
-<!--          </template>-->
+          <template v-slot:cell(star)="row">
+            {{row.item.dmp.score.star}}
+          </template>
           <template v-slot:cell(title)="row">
             {{row.item.dmp.title}}
+          </template>
+          <template v-slot:cell(score)="row">
+            {{row.item.score.toFixed(3)}}
+          </template>
+          <template v-slot:cell(ctime)="row">
+            {{createFormattedTime(row.item.ctime)}}
           </template>
           <template v-slot:cell(action)="row">
             <ejs-button cssClass='e-success'
@@ -248,6 +254,7 @@
   import "../../_assets/leaflet-measure.css";
   import {v4 as uuidv4} from 'uuid';
   import {saveProspectData} from "../../_constant/active_user";
+  import {stringToFormattedDate} from "../../_constant/mylib";
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -362,6 +369,10 @@
       {},
 
     methods: {
+      createFormattedTime(sstr)
+      {
+        return(stringToFormattedDate(sstr));
+      },
       mapUpdated(event) {
         // // add listeners on creation and delete on removal
         // if (event.type === 'pm:create') {
