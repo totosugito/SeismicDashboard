@@ -72,3 +72,42 @@ export function matrix_col_optimum_v1(nrow, ncol, mode, mat, row_start, xx, dy, 
 
   return ({opt: ret, info: series_info});
 }
+
+export function matrix_col_optimum_v2(nrow, ncol, mode, mat, row_start, xx, dy, ystart)
+{
+  let ret_data = [];
+  let series_info = [];
+
+  // minimum
+  let iy, vy;
+  for (let icol = 0; icol < ncol; icol++ )
+  {
+    iy = row_start;
+    let v_op = mat[0][icol];
+    for (let irow = 0; irow < nrow; irow++)
+    {
+      let v = mat[irow][icol];
+      if (mode === 'min' && v_op > v)
+      {
+        v_op = v;
+        iy = row_start + irow;
+      }
+      if (mode === 'max' && v_op < v)
+      {
+        v_op = v;
+        iy = row_start + irow;
+      }
+      if (mode === 'opt' && Math.abs(v_op) < Math.abs(v))
+      {
+        v_op = v;
+        iy = row_start + irow;
+      }
+    }
+
+    ret_data.push(v_op);
+    vy = ystart + (iy*dy);
+    series_info.push({x: xx[icol], y:vy})
+  }
+
+  return ({opt: ret_data, info: series_info});
+}

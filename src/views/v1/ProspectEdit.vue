@@ -279,6 +279,7 @@
       },
 
       beforeMount: function () {
+        console.log(JSON.stringify(this.user));
         this.map_var = createAreaLeafletDemoData();
         this.map_var.zoom = 14;
 
@@ -553,7 +554,8 @@
         {
           // console.log(JSON.stringify(this.objParam))
           let routeData = this.$router.resolve({
-            path: "plot-ava-gather",
+            // path: "plot-ava-gather",
+            path: "plot-ava-gather-section",
             query: {
               id_area: this.objParam["id_area"],
               filename: this.objParam["filename"],

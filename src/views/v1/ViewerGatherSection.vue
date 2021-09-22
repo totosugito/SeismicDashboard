@@ -11,10 +11,10 @@
       <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
 
 
-<!--        <b-input-group size="sm" :prepend="YAxis.label">-->
-<!--          <b-form-input v-model="timePos" class="text-right" style="width: 80px"></b-form-input>-->
-<!--        </b-input-group>-->
-<!--        <b-button size="sm" class="ml-1 mr-3" @click="applyTimePosClicked()" variant="dark">Apply</b-button>-->
+        <b-input-group size="sm" :prepend="YAxis.label">
+          <b-form-input v-model="timePos" class="text-right" style="width: 80px"></b-form-input>
+        </b-input-group>
+        <b-button size="sm" class="ml-1 mr-3" @click="applyTimePosClicked()" variant="dark">Apply</b-button>
 
         <b-dropdown size="sm" variant="dark" :text="getDropdownNeighbor()" class="mr-2">
           <b-dropdown-item-button @click="setNeighbor(0)">0</b-dropdown-item-button>
@@ -82,7 +82,7 @@
 
     <splitpanes class="default-theme" vertical style="height: 81vh" @resized="splitResizedEvent('resized', $event)">
       <pane min-size="20" max-size="80">
-        <template v-if="showLoader==false">
+        <template v-if="showLoader===false">
           <LChartSeismicWithLineV31 class="lc_seismic_chart" :colormap="colormap" :resizeevent="resizeevent"
                                  :title="dataTitle" :cmin="cmin" :cmax="cmax"
                                  :points="points" :xaxis="XAxis" :yaxis="YAxis"
@@ -91,9 +91,9 @@
         </template>
       </pane>
       <pane>
-<!--        <template v-if="showLoader==false">-->
-<!--          <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>-->
-<!--        </template>-->
+        <template v-if="showLoader===false">
+          <ApexChartLine class="lc_seismic_chart" :chart-options="lineChartOptions" :series="lineSeries"/>
+        </template>
       </pane>
     </splitpanes>
     <div>
@@ -102,23 +102,9 @@
       <span class="box_shadow pl-1 pr-1">dt : {{dt}}</span>
       <span class="box_shadow pl-1 pr-1">Y Start : {{ystart}}</span>
 
-      <span class="box_shadow ml-3 pl-1 pr-1">Target : {{cursorinfo.x}}</span>
+<!--      <span class="box_shadow ml-3 pl-1 pr-1">Target : {{cursorinfo.x}}</span>-->
 <!--      <span class="box_shadow pl-1 pr-1">{{cursorinfo.y}}</span>-->
     </div>
-
-    <!--    <vue-form-dialog-->
-    <!--      ref="dataDialog"-->
-    <!--      type="default"-->
-    <!--      header="Parameters" body="Body"-->
-    <!--      btn1_text="Close" btn2_text="Process"-->
-    <!--      btn1_style="danger" btn2_style="primary">-->
-    <!--&lt;!&ndash;      @btn1Click="radiusDialogBtn1Click()" @btn2Click="radiusDialogBtn2Click()">&ndash;&gt;-->
-
-    <!--      &lt;!&ndash; body slot &ndash;&gt;-->
-    <!--&lt;!&ndash;      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">&ndash;&gt;-->
-    <!--&lt;!&ndash;              <vue-form-generator :schema="schema" :model="model" :options="formOptions" @validated="onValidated"/>&ndash;&gt;-->
-    <!--&lt;!&ndash;            </span>&ndash;&gt;-->
-    <!--    </vue-form-dialog>-->
 
     <!-- show error dialog -->
     <vue-simple-dialog
@@ -145,12 +131,16 @@
   import {createDefaultColor, createDefaultMarker, createDefaultParam} from "../../libs/defApexChartLine";
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
-  import {matrix_col_optimum, matrix_col_optimum_v1} from "../../libs/test_max_min_val_each_column";
+  import {
+    matrix_col_optimum,
+    matrix_col_optimum_v1,
+    matrix_col_optimum_v2
+  } from "../../libs/test_max_min_val_each_column";
   import {getColormapAsset, getColormapName} from "../../libs/colormap";
 
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
-  import {getIndexFromArray, setPositionFromIndex} from "../../libs/simpleLib";
+  import {getIndexFromArray, getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import {appDemoMode} from "../../_constant/http_api";
@@ -217,7 +207,7 @@
         lineChartTitle: '',
         lineSeries: [],
         lineChartOptions: {},
-        event_http: {success: "success", fail: "fail"},
+        event_http_gather_section: {success: "successGatherSection", fail: "failGatherSection"},
       }
     },
     created()
@@ -234,15 +224,17 @@
       {
         let tmpdata = createAvaGatherSectionDemoData();
         this.parseLcSeismicData(tmpdata[0]);
+        this.createChartInfo();
         this.showLoader = false;
       }
       else {
+        // console.log(JSON.stringify(this.user))
         let param = {
           user: this.user["user"],
           data: this.pageParam
         };
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("ava-segy-view-gather-section"), param, this.event_http_ava_plot]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("ava-segy-view-gather-section"), param, this.event_http_gather_section]).then();
       }
     },
     methods: {
@@ -252,6 +244,7 @@
         this.ntrc = obj.header.length;
         this.dt = obj.interval;
         this.ystart = obj.z_st;
+        this.timePos = obj.z_c;
 
         this.points = [];
         for (let i = this.ns - 1; i >= 0; i--)
@@ -273,6 +266,61 @@
           sampling: this.dt
         };
         this.dataTitle = "IL-" + obj.iline + "/XL-" + obj.xline;
+      },
+      createChartInfo()
+      {
+        this.lineSeries = [];
+        let tidx = getIndexFromArray3(this.timePos, this.dt, this.ystart);
+        let pp = tidx;
+        if(tidx<0)
+          pp = 0;
+        else if(tidx>=this.ns)
+          pp = this.ns - 1;
+
+        this.timePos = setPositionFromIndex(pp, this.dt, this.ystart);
+        let t1 = pp - this.nNeighbor;
+        let t2 = pp + this.nNeighbor;
+        if (t1 < 0) t1 = 0;
+        if (t2 >= this.ns) t2 = this.ns - 1;
+
+        let ArrModeMinMax = [];
+        for (let k = t1; k <= t2; k++)
+        {
+          let tmp = [];
+          for (let i = 0; i < this.ntrc; i++)
+          {
+            tmp.push(this.points[this.ns-k-1][i]); //karena data terflip
+          }
+          let line_title = setPositionFromIndex(k, this.dt, this.ystart);
+          this.lineSeries.push({
+            type: 'line',
+            name: line_title,
+            data: tmp
+          });
+          ArrModeMinMax.push(tmp);
+        }
+
+        // plot min max data
+        this.seriesSeismicInfo = null;
+        if (this.modeMinMax !== 'off')
+        {
+          let opt_data = matrix_col_optimum_v2(t2 - t1 + 1, this.ntrc, this.modeMinMax, ArrModeMinMax, t1, this.XAxis["data"], this.dt, this.ystart);
+          this.lineSeries.push({
+            type: 'line',
+            name: "Mode : " + this.modeMinMax,
+            data: opt_data["opt"]
+          });
+          this.seriesSeismicInfo = opt_data["info"];
+        }
+
+        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + setPositionFromIndex(pp, this.dt, this.ystart);
+        this.lineChartOptions = createDefaultParam();
+        this.lineChartOptions["title"]["text"] = this.lineChartTitle;
+        this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
+        this.lineChartOptions["xaxis"]["title"]["text"] = this.XAxis["label"];
+        this.lineChartOptions["yaxis"]["title"]["text"] = "Amplitude";
+        this.lineChartOptions["colors"] = createDefaultColor(t1, t2 + 1, [pp, t2 + 1]);
+        this.lineChartOptions["markers"] = createDefaultMarker(t1, t2 + 1, [pp, t2 + 1], 4, 0)
       },
       fgetColormapName(ii)
       {
@@ -334,108 +382,10 @@
         return ("Colormap : " + getColormapName(this.colormap));
       },
 
-      getDemoData()
-      {
-        this.XAxis = {
-          "label": "Offset (m)",
-          "sampling": 1,
-          "start": 0
-        };
-        this.YAxis = {
-          "label": "Depth (m)",
-          "sampling": 2,
-          "start": 50
-        };
-        this.points = getData();
-        let data = [];
-        for (let i = 0; i < this.points[0].length; i++)
-          data.push(i);
-        this.XAxis["data"] = data;
-        this.ns = this.points.length;
-        this.dt = this.YAxis["sampling"];
-
-        this.dataTitle = "CDP NO : 1";
-        this.createChartInfo();
-        this.showLoader = false;
-      },
       applyTimePosClicked()
       {
         this.bApplyTimePos = true;
         this.createChartInfo();
-      },
-      createChartInfo()
-      {
-        this.lineSeries = [];
-        let tidx = getIndexFromArray(this.timePos, this.dt, this.ystart);
-
-        let pp = this.ns - tidx - 1;
-        if (pp < 0)
-        {
-          pp = 0;
-          this.timePos = setPositionFromIndex(this.ns - 1, this.dt, this.ystart);
-        }
-        else if (pp >= this.ns)
-        {
-          pp = this.ns - 1;
-          this.timePos = setPositionFromIndex(0, this.dt, this.ystart);
-        }
-
-        let t1 = pp - this.nNeighbor;
-        let t2 = pp + this.nNeighbor;
-        if (t1 < 0) t1 = 0;
-        if (t2 > this.ns) t2 = this.ns - 1;
-
-        let ArrModeMinMax = [];
-        for (let k = t2; k >= t1; k--)
-        {
-          let tmp = [];
-          for (let i = 0; i < this.points[0].length; i++)
-          {
-            tmp.push(this.points[k][i]);
-          }
-          let line_title = setPositionFromIndex(this.ns - k - 1, this.dt, this.ystart);
-          this.lineSeries.push({
-            type: 'line',
-            name: line_title,
-            data: tmp
-          });
-          ArrModeMinMax.push(tmp);
-        }
-
-        // plot min max data
-        if (this.modeMinMax !== 'off')
-        {
-          let nx = this.points[0].length;
-          //let v_data_minmax = matrix_col_optimum(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax);
-          let opt_data = matrix_col_optimum_v1(t2 - t1 + 1, nx, this.modeMinMax, ArrModeMinMax, t1, this.XAxis["data"], this.dt, this.ns);
-          this.lineSeries.push({
-            type: 'line',
-            name: "Mode : " + this.modeMinMax,
-            data: opt_data["opt"]
-          });
-          this.seriesSeismicInfo = opt_data["info"];
-          // console.log(JSON.stringify(this.seriesSeismicInfo))
-        }
-        else
-        {
-          this.seriesSeismicInfo = null;
-        }
-
-        this.lineChartTitle = this.dataTitle + ", " + this.YAxis["label"] + " : " + setPositionFromIndex(this.ns - pp - 1, this.dt, this.ystart);
-        this.lineChartOptions = createDefaultParam();
-        this.lineChartOptions["title"]["text"] = this.lineChartTitle;
-        this.lineChartOptions["xaxis"]["categories"] = this.XAxis["data"];
-        this.lineChartOptions["xaxis"]["title"]["text"] = this.XAxis["label"];
-        this.lineChartOptions["yaxis"]["title"]["text"] = "Amplitude";
-        this.lineChartOptions["colors"] = createDefaultColor(t1, t2 + 1, [pp, t2 + 1]);
-        this.lineChartOptions["markers"] = createDefaultMarker(t1, t2 + 1, [pp, t2 + 1], 4, 0)
-
-        if (this.bApplyTimePos === false)
-        {
-          this.timePos = setPositionFromIndex(this.ns - pp - 1, this.dt, this.ystart);
-        }
-
-        this.bApplyTimePos = false;
       },
 
       //MESSAGE HTTP I/O
@@ -451,32 +401,13 @@
 
     mounted()
     {
-      EventBus.$on(this.event_http.success, (msg) =>
+      EventBus.$on(this.event_http_gather_section.success, (msg) =>
       {
-        this.points = [];
-        let tmp = msg["cdp_data"];
-        this.ns = tmp[0].length;
-        this.ntrc = tmp.length;
-        for (let i = this.ns - 1; i >= 0; i--)
-        {
-          let tmp0 = [];
-          for (let j = 0; j < this.ntrc; j++)
-            tmp0.push(tmp[j][i]);
-          this.points.push(tmp0);
-        }
-
-        this.XAxis = msg["x"];
-        this.YAxis = msg["y"];
-        this.XAxis["data"] = msg["cdp_header"];
-        this.dt = this.YAxis["sampling"];
-        this.ystart = this.YAxis["start"];
-        // console.log(JSON.stringify(msg["cdp_header"]))
-
-        this.dataTitle = msg["title"] + msg["cdp_no"];
+        this.parseLcSeismicData(msg.data[0]);
         this.createChartInfo();
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http.fail, (msg) =>
+      EventBus.$on(this.event_http_gather_section.fail, (msg) =>
       {
         this.showLoader = false;
         this.retStatus = msg;
@@ -486,8 +417,8 @@
     },
     beforeDestroy()
     {
-      EventBus.$off(this.event_http.success);
-      EventBus.$off(this.event_http.fail);
+      EventBus.$off(this.event_http_gather_section.success);
+      EventBus.$off(this.event_http_gather_section.fail);
     },
 
     watch:
