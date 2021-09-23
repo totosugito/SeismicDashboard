@@ -4,7 +4,7 @@ import {getConfigMapUrl, globalVar} from "../../config";
 const DEBUG_MODE = true;
 const DEBUG_SERVER = true;
 const SERVER_DEVEL = 2;
-const DEMO_MODE = false
+const DEMO_MODE = false;
 
 export function appDebugMode() {
   return (DEBUG_MODE);

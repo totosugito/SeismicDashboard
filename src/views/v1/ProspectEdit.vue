@@ -98,7 +98,7 @@
                 :radius="15"
                 :blur="15"
                 :minOpacity="0.1"
-                :max="prospectMap.v_min_max.max">
+                :max="heatmap_range[layer.cmap].max">
               </LHeatmap>
             </template>
           </template>
@@ -145,7 +145,7 @@
   import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
   import {rotate} from "../../libs/2d-array-rotation";
   import {
-    addPlotDataToProspectEdit,
+    addPlotDataToProspectEdit, addPlotDataToProspectEditMultiData,
     addPlotDataToProspectMap,
     createDefaultSectionAreaParameter, fillLeafletProspectMapVariable, uncheckAllData
   } from "../../libs/libUpdateData";
@@ -238,6 +238,7 @@
           refreshChart: false,
           proposeProspect: {},
           prospectMap: {ndata: 0, layers: []},
+          heatmap_range: [],
 
           paramInput: createDefaultSectionAreaParameter(),
           datas: [],
@@ -279,7 +280,6 @@
       },
 
       beforeMount: function () {
-        console.log(JSON.stringify(this.user));
         this.map_var = createAreaLeafletDemoData();
         this.map_var.zoom = 14;
 
@@ -296,7 +296,8 @@
 
         if (this.bdemo) {
           this.prospectMap = createProspectEditDemoData();
-          this.table_prospect_map = addPlotDataToProspectEdit(this.prospectMap);
+          this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
+          this.heatmap_range = this.prospectMap.v_min_max;
 
           this.tabIndex = 1;
           this.showLoader = false;
@@ -605,7 +606,8 @@
 
         EventBus.$on(this.event_http_prospect_map.success, (msg) => {
           this.prospectMap = msg.data;
-          this.table_prospect_map = addPlotDataToProspectEdit(this.prospectMap);
+          this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
+          this.heatmap_range = this.prospectMap.v_min_max;
 
           this.showLoader = false;
           this.showMapProspect = true;

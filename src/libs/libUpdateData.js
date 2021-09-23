@@ -213,6 +213,31 @@ export function addPlotDataToProspectEdit(datas) {
   }
   return(layers);
 }
+export function addPlotDataToProspectEditMultiData(datas) {
+  datas.area_show = false;
+  datas.heatmap_show = true;
+
+  let id_no = 0;
+  let np = datas["label_z"].length;
+  let layers = [];
+  for(let i=0; i<np; i++) {
+    let nc = datas["label_z"][i].length;
+    for(let j=0; j<nc; j++)
+    {
+      layers.push({
+        no: id_no+1,
+        z: datas["label_z"][i][j],
+        show: false,
+        heatmap: datas["val_list"][i][j],
+        cmap: i,
+      });
+      id_no = id_no + 1;
+    }
+  }
+  datas.ndata = id_no;
+
+  return(layers);
+}
 
 export function uncheckAllData(datas) {
   let ndata = datas.length;
