@@ -385,6 +385,7 @@
       this.map_var = createAreaLeafletDemoData();
       this.pageParam["area"] = this.$route.query.area * 1;
       this.pageParam["layer"] = this.$route.query.layer * 1;
+      this.pageParam["label"] = this.$route.query.label;
       this.pageParam["lat"] = this.$route.query.lat * 1.0;
       this.pageParam["lng"] = this.$route.query.lng * 1.0;
       if (this.bdemo) {
@@ -668,7 +669,8 @@
         let param = {
           user: this.user["user"],
           data: this.proposeProspect,
-          score: this.prospectScore.score
+          score: this.prospectScore.score,
+          marker: this.pageParam
         };
         param["data"]["geojson"] = this.geo_json;
         this.showLoader = true;

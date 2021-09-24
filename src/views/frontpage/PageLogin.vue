@@ -131,7 +131,7 @@ export default {
       let status = isValidUser(msg)
       if(status) {
         saveUser(msg.user);
-        this.$router.push(this.varRouter.getRoute("processwizard1", 1));
+        this.$router.push(this.varRouter.getRoute("prospect-management", 1));
       }
       else
       {

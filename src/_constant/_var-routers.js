@@ -55,6 +55,9 @@ export default class VarRouter {
     'prospect-edit': ["prospect-edit", "/prospect-edit", "Prospect Edit"],
     'plot-ava-gather': ["plot-ava-gather", "/plot-ava-gather", "Ava Gather"],
     'plot-ava-gather-section': ["plot-ava-gather-section", "/plot-ava-gather-section", "Ava Gather Section"],
+
+    'prospect-management': ["prospect-management", "/prospect-management", "Prospect Management"],
+    'new-prospect-wizard': ["new-prospect-wizard", "/new-prospect-wizard", "New Prospect Wizard"],
   };
 
   httptype = {

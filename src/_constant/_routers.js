@@ -172,10 +172,20 @@ export default new Router({
             // ---------------------------------------------------------
             //                    Processing
             // ---------------------------------------------------------
+            // {
+            //   path: varRouter.getRoute("processwizard1", 1),
+            //   name: varRouter.getRoute("processwizard1", 2),
+            //   component: () => import('../views/v1/ProcessWizardStep1')
+            // },
             {
-              path: varRouter.getRoute("processwizard1", 1),
-              name: varRouter.getRoute("processwizard1", 2),
-              component: () => import('../views/v1/ProcessWizardStep1')
+              path: varRouter.getRoute("prospect-management", 1),
+              name: varRouter.getRoute("prospect-management", 2),
+              component: () => import('../views/v1/ProspectManagement')
+            },
+            {
+              path: varRouter.getRoute("new-prospect-wizard", 1),
+              name: varRouter.getRoute("new-prospect-wizard", 2),
+              component: () => import('../views/v1/NewProspectWizard')
             },
             {
               path: varRouter.getRoute("seismic-viewer-by-xy", 1),

@@ -58,7 +58,7 @@
       <div class="mt-2">
 <!--        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score-->
 <!--        </ejs-button>-->
-        <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Save</ejs-button>
+        <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update</ejs-button>
         <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather</ejs-button>
       </div>
       <!--            </b-card-body>-->
@@ -66,13 +66,15 @@
     <pane class="p-2" min-size="40" max-size="80" style="background: white">
 
       <template v-if="showMapProspect">
-<!--        <div class="mb-1">-->
-<!--          &lt;!&ndash; map button &ndash;&gt;-->
+        <div class="mb-1">
 <!--          <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"-->
-<!--                      v-on:click.native="markerLocationEventClick()"><i-->
-<!--            class="fa fa-map-marker"/></ejs-button>-->
-<!--        </div>-->
-        <l-map ref="map" style="width: 100%; height:85vh;" :zoom="map_var.zoom" :center="map_var.center"
+<!--                      v-on:click.native="markerHideGeojsonEventClick()"><i-->
+<!--            class="fa fa-line-chart"/></ejs-button>-->
+          <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
+                      v-on:click.native="markerLocationEventClick()"><i
+            class="fa fa-map-marker"/></ejs-button>
+        </div>
+        <l-map ref="map" style="width: 100%; height:82vh;" :zoom="map_var.zoom" :center="map_var.center"
                :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
                @ready="onMapReady" @click="onMapClickEvent">
           <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
@@ -234,6 +236,7 @@
             iconSize: [32, 36],
             iconAnchor: [16, 36]
           }),
+          show_geo_json: true,
           show_marker_drag: true,
           refreshChart: false,
           proposeProspect: {},
@@ -303,8 +306,9 @@
           this.showLoader = false;
           this.showMapProspect = true;
         }
-        else
+        else {
           this.httpGetProspectData();
+        }
       },
 
       methods: {
@@ -479,6 +483,9 @@
             return ("e-warning");
           else
             return ("e-outline");
+        },
+        markerHideGeojsonEventClick() {
+          this.show_geo_json = !this.show_geo_json;
         },
         markerLocationEventClick() {
           this.show_marker_drag = !this.show_marker_drag;

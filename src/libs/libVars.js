@@ -1158,7 +1158,7 @@ export function createTableProspectProjectHeader_V1()
       label: 'User',
       sortable: true,
       thClass: 'text-center',
-      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+      thStyle: {'width': '120px', 'min-width': '120px', 'max-width': '120px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     // {
     //   key: 'loc',
@@ -1172,7 +1172,7 @@ export function createTableProspectProjectHeader_V1()
       label: 'Filename',
       sortable: true,
       thClass: 'text-center',
-      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+      thStyle: {'width': '200px', 'min-width': '200px', 'max-width': '200px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
       key: 'group',
