@@ -246,3 +246,12 @@ export function uncheckAllData(datas) {
     datas[i]["show"] = false;
   }
 }
+
+export function setDmpMarkerStatus(datas, key_parent, key_child, default_value) {
+  let ndata = datas.length;
+  for(let i=0; i<ndata; i++)
+  {
+    if (key_parent in datas[i]["dmp"])
+      datas[i]["dmp"][key_parent][key_child] = default_value;
+  }
+}

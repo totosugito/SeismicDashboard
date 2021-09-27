@@ -278,8 +278,8 @@
         tabIndex: 0,
         cur_tab: 0,
 
-        perPageView: 10,
-        perPage: 10,
+        perPageView: 100,
+        perPage: 100,
         pageOptions: [5, 10, 15, 25, 50, 100, "All"],
         currentPage: 1,
         totalRows: 0,
@@ -528,7 +528,7 @@
 
       openSectionByCoord() {
         let routeData = this.$router.resolve({
-          path: "seismic-viewer-by-xy",
+          path: this.varRouter.getRoute("seismic-viewer-by-xy", 1),
           query: {
             area: this.selectedLayer["area"],
             layer: this.selectedLayer["layer"],

@@ -11,11 +11,9 @@ import _ from "lodash";
 
 export function createColormapData(color_list, vmin_, vmax_)
 {
-
-
-  let ndata_range = 256;
+  let ndata_range = color_list.length;
   let data_range = vmax_ - vmin_;
-  let delta_data_range = data_range / ndata_range;
+  let delta_data_range = data_range / (ndata_range-1);
 
   let vcolormap = [];
   for (let i = 0; i < ndata_range; i++)
@@ -106,6 +104,52 @@ export function getLcColormap(colormap, mmin_, mmax_)
 
   palette = new LUT({
     steps: createColormapData(cc, mmin_, mmax_),
+    interpolate: true
+  });
+  return (palette);
+}
+
+export function getLcColormapV1(ncolor, colormap, mmin_, mmax_)
+{
+  let cc;
+  switch (colormap.id)
+  {
+    case 0:
+      cc = colormapSharp();
+      break;
+    case 1:
+      cc = colormapYrwbc();
+      break;
+    case 2:
+      cc = colormapOdtSeismic();
+      break;
+    case 3:
+      cc = colormapOdtPetrel();
+      break;
+    case 4:
+      cc = colormapGray();
+      break;
+    case 5:
+      cc = colormapDensity();
+      break;
+    default:
+      cc = colormapOdtPetrel();
+      break;
+  }
+  if (colormap.reverse)
+    _.reverse(cc);
+
+  let n_cc = cc.length;
+  let cc_small = [];
+  let c_spacing = Math.round(n_cc/ncolor);
+  for(let i=0; i<ncolor; i++)
+  {
+    cc_small.push(cc[c_spacing*i])
+  }
+  cc_small.push(cc[n_cc-1]);
+
+  let palette = new LUT({
+    steps: createColormapData(cc_small, mmin_, mmax_),
     interpolate: true
   });
   return (palette);

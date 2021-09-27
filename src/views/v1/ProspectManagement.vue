@@ -9,19 +9,32 @@
 
     <splitpanes class="default-theme" style="height: 88vh" vertical>
       <pane class="p-2" min-size="20" max-size="70" style="background: white">
-        <div class="mb-1">
-          <!-- map button -->
-          <ejs-button cssClass='e-outline' class="mr-1"
-                      v-on:click.native="gotoNewProspectPage"><i class="fa fa-plus"/> New Prospect</ejs-button>
-          <ejs-button cssClass='e-outline' class="mr-1"
-                      v-on:click.native="getHttpRefreshProspectProject"><i
-            class="fa fa-refresh"/></ejs-button>
+        <div class="group-header">
+          <b-row>
+            <b-col md="5" class="my-1">
+              <ejs-button cssClass='e-outline' class="mr-1"
+                          v-on:click.native="gotoNewProspectPage"><i class="fa fa-plus"/> New Prospect</ejs-button>
+              <ejs-button cssClass='e-outline' class="mr-1"
+                          v-on:click.native="getHttpRefreshProspectProject"><i
+                class="fa fa-refresh"/></ejs-button>
+            </b-col>
+            <b-col md="7" class="my-1">
+              <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
+                <b-input-group prepend="">
+                  <b-form-input v-model="filter" placeholder="Search"/>
+                  <b-input-group-append>
+                    <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </b-col>
+          </b-row>
         </div>
 
-        <b-table style="height: 82vh"
+        <b-table style="height: 65vh"
                  responsive
                  show-empty
-                 sticky-header="82vh"
+                 sticky-header="80vh"
                  :small="true"
                  :striped="false"
                  :bordered="true"
@@ -31,10 +44,24 @@
                  :filter="filter"
                  @filtered="onFiltered"
                  :fields="table_prospect_headers"
-                 :items="table_prospect">
+                 :items="table_prospect"
+                 @row-contextmenu="rightClicked">
           <!-- A virtual column -->
           <template #cell(index)="data">
             {{ data.index + 1 }}
+          </template>
+          <template v-slot:cell(marker)="row">
+            <template v-if="'marker' in row.item.dmp">
+                  <span @click="eventSwitchLayerClicked(row.index, row.item.dmp.marker)"
+                        :style="eventSelectedLayerCssStyle(row.item.dmp.marker)">
+                    <template v-if="row.item.dmp.marker.show">
+                      <i class="btn_toolbar fa fa-toggle-on"/>
+                    </template>
+                    <template v-else>
+                      <i class="btn_toolbar fa fa-toggle-off"/>
+                    </template>
+                  </span>
+            </template>
           </template>
           <template v-slot:cell(star)="row">
             {{row.item.dmp.score.star}}
@@ -54,23 +81,35 @@
             </ejs-button>
           </template>
         </b-table>
+
+        <!-- table footer -->
+        <b-row>
+          <b-col md="8" class="my-1">
+            <b-pagination :total-rows="computeTotalRow()" :per-page="perPage" v-model="currentPage" class="my-0"/>
+          </b-col>
+          <b-col md="4" class="my-1">
+            <b-input-group prepend="Per Page : ">
+              <b-form-select :options="pageOptions" v-model="perPageView" v-on:change="showPerPage"/>
+            </b-input-group>
+          </b-col>
+        </b-row>
       </pane>
       <pane class="p-2" min-size="30" max-size="80" style="background: white">
         <template v-if="showLoader===false">
-          <div class="mb-1">
-            <!-- map button -->
-            <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
-                        v-on:click.native="markerLocationEventClick()"><i
-              class="fa fa-map-marker"/></ejs-button>
-            <!--            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i-->
-            <!--              class="fa fa-download"/></ejs-button>-->
-            <template v-if="show_marker_drag">
-              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>
-            </template>
-          </div>
+<!--          <div class="mb-1">-->
+<!--            &lt;!&ndash; map button &ndash;&gt;-->
+<!--            <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"-->
+<!--                        v-on:click.native="markerLocationEventClick()"><i-->
+<!--              class="fa fa-map-marker"/></ejs-button>-->
+<!--            &lt;!&ndash;            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i&ndash;&gt;-->
+<!--            &lt;!&ndash;              class="fa fa-download"/></ejs-button>&ndash;&gt;-->
+<!--            <template v-if="show_marker_drag">-->
+<!--              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>-->
+<!--            </template>-->
+<!--          </div>-->
 
           <!-- layer map -->
-          <l-map ref="map" style="width: 100%; height:96%;" :zoom="map_var.zoom" :center="map_var.center"
+          <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
                  :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
                  @ready="onMapReady" @click="onMapClickEvent">
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
@@ -113,6 +152,26 @@
                   </b-button>
                 </l-popup>
               </l-marker>
+            </template>
+
+            <template v-for="prospect in table_prospect">
+              <template v-if="'marker' in prospect.dmp">
+                <template v-if="prospect.dmp.marker.show">
+                  <l-marker :lat-lng="{lat: prospect.dmp.marker.lat, lng: prospect.dmp.marker.lng}" :draggable="false" :icon="markerDragIcon">
+                    <l-popup>
+                      <div style="width: 100%;">
+                        Lat (x) : <b>{{prospect.dmp.marker.lng.toFixed(2)}}</b><br>
+                        Lon (y) : <b>{{prospect.dmp.marker.lat.toFixed(2)}}</b><br>
+                        Area : <b>{{prospect.dmp.marker.area}}</b><br>
+                        Layer : <b>{{prospect.dmp.marker.layer}}</b><br>
+                        <b>{{prospect.dmp.marker.label}}</b>
+                      </div>
+<!--                      <b-button class="btn btn-sm mt-1" variant="primary" @click="openSectionByCoord()">Section-->
+<!--                      </b-button>-->
+                    </l-popup>
+                  </l-marker>
+                </template>
+              </template>
             </template>
 
           </l-map>
@@ -184,7 +243,7 @@
   import {
     addPlotDataToTableArea,
     createTableFromHeatmapFullData,
-    getAreaFirstCoordinate, getMaxHeatmapData
+    getAreaFirstCoordinate, getMaxHeatmapData, setDmpMarkerStatus
   } from "../../libs/libUpdateData";
   import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
 
@@ -309,6 +368,26 @@
       {},
 
     methods: {
+      rightClicked (item, index, evt) {
+        // Prevent native OS/Browser context menu showing
+        evt.preventDefault()
+        // Log the event
+        console.log('right clicked row ' + index, evt.type)
+      },
+      eventSelectedLayerCssStyle(item) {
+        let fg_color = "#808080";
+        if (item.show)
+          fg_color = "#4169E1";
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:100%;";
+        return (strstyle);
+      },
+      eventSwitchLayerClicked(index, item) {
+        let status = !item.show;
+        item.show = status;
+        this.tmp_array_autoupdate = [];
+      },
       createFormattedTime(sstr) {
         return (stringToFormattedDate(sstr));
       },
@@ -533,14 +612,14 @@
       //-----------------------------------------------------
       showPerPage(selected_per_page) {
         if (selected_per_page === "All" || selected_per_page === "Semua")
-          this.perPage = this.table_area.length;
+          this.perPage = this.table_prospect.length;
         else
           this.perPage = selected_per_page;
         this.perPageView = selected_per_page;
       },
       computeTotalRow() {
         try {
-          return (this.table_area.length);
+          return (this.table_prospect.length);
         } catch (e) {
           return (0);
         }
@@ -680,7 +759,10 @@
       },
       gotoNewProspectPage()
       {
-        this.$router.push(this.varRouter.getRoute("new-prospect-wizard", 1));
+        let routeData = this.$router.resolve({
+          path: this.varRouter.getRoute("new-prospect-wizard", 1),
+        });
+        window.open(routeData.href, '_blank');
       }
     },
     mounted() {
@@ -735,6 +817,7 @@
       //-----------------------------------------------------------------
       EventBus.$on(this.event_http_prospect_list.success, (msg) => {
         this.table_prospect = msg.data;
+        setDmpMarkerStatus(this.table_prospect, "marker", "show", false);
         this.showLoader = false;
         this.tmp_array_autoupdate = [];
       });

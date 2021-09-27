@@ -5,8 +5,24 @@
 </template>
 
 <script>
-  import {ColorHEX, ColorPalettes, ColorRGBA, lightningChart, PalettedFill, SolidFill, SolidLine, translatePoint, PointShape} from '@arction/lcjs'
-  import {get2dColSize, get2dMaxData, get2dMinData, get2dRowSize, getLcColormap} from "../../libs/colormap";
+  import {
+    ColorHEX,
+    ColorPalettes,
+    ColorRGBA,
+    lightningChart,
+    PalettedFill,
+    SolidFill,
+    SolidLine,
+    translatePoint,
+    PointShape, LegendBoxBuilders, UIElementBuilders, UIOrigins, emptyFill, emptyLine
+  } from '@arction/lcjs'
+  import {
+    get2dColSize,
+    get2dMaxData,
+    get2dMinData,
+    get2dRowSize,
+    getLcColormapV1
+  } from "../../libs/colormap";
   import {createColorObject} from "../../libs/libLC";
   import {getIndexFromArray, getIndexFromArray3, setPositionFromIndex} from "../../libs/simpleLib";
   import {getDefaultDarkColorAtIdx} from "../../libs/defApexChartLine";
@@ -14,8 +30,7 @@
   export default {
     name: "LChartSeismicWithLineV3-1",
     props: ['title', 'points', 'xaxis', 'yaxis', 'colormap', 'resizeevent', 'cmin', 'cmax', 'chart_info_data'],
-    data()
-    {
+    data() {
       return {
         chart: null,
         chartId: null,
@@ -46,13 +61,11 @@
     },
     methods: {
 
-      isValidTrace(tmp_point)
-      {
+      isValidTrace(tmp_point) {
         // if(tmp_point.x < 0 || tmp_point.x >= this.ntrc)
         //   return(false);
 
-        if (tmp_point.x < this.xaxis["data"][0] || tmp_point >= this.xaxis["data"][this.ntrc - 1])
-        {
+        if (tmp_point.x < this.xaxis["data"][0] || tmp_point >= this.xaxis["data"][this.ntrc - 1]) {
           // console.log("x " + tmp_point)
           return (false)
         }
@@ -64,10 +77,8 @@
 
         return (true);
       },
-      createChart()
-      {
-        if (this.chart !== null)
-        {
+      createChart() {
+        if (this.chart !== null) {
           this.chart.dispose();
         }
 
@@ -77,8 +88,8 @@
         this.chart = lightningChart().ChartXY({container: `${this.chartId}`})
           .setTitleFillStyle(this.grColor.foreground)
           .setBackgroundFillStyle(this.grColor.background)
-        // .setChartBackgroundFillStyle(this.grColor.background);
-        this.chart.setTitle(this.title);
+          .setTitle("");
+        // .setTitle(this.title);
 
         // Create LUT and FillStyle
         this.minData = get2dMinData(this.points);
@@ -89,7 +100,7 @@
         this.minData = this.minData + dmin_;
         this.maxData = this.maxData - dmax_;
 
-        this.palette = getLcColormap(this.colormap, this.minData, this.maxData);
+        this.palette = getLcColormapV1(8, this.colormap, this.minData, this.maxData);
 
         this.ntrc = get2dColSize(this.points);
         this.ns = get2dRowSize(this.points);
@@ -97,7 +108,7 @@
         this.dy = this.yaxis["sampling"] * 1.0;
         this.ystart = this.yaxis["start"];
         let start_time = Math.round(setPositionFromIndex(0, this.dy, this.ystart));
-        let end_time = Math.round(setPositionFromIndex(this.ns-1, this.dy, this.ystart));
+        let end_time = Math.round(setPositionFromIndex(this.ns - 1, this.dy, this.ystart));
 
         let resolutionX = this.ns;
         let resolutionY = this.ntrc;
@@ -106,7 +117,7 @@
           // .setTickStyle((visibleTicks) => visibleTicks.setLabelFillStyle(new SolidFill({color: ColorHEX(this.defForeColor)})))
           .disableAnimations()
           .setInterval(0, this.ntrc)
-          .setTitle(this.xaxis["label"])
+          // .setTitle(this.xaxis["label"]);
 
         let customYAxis = this.chart.addAxisY(false)
           .setTitleFillStyle(this.grColor.foreground)
@@ -121,18 +132,34 @@
           end: {x: this.xaxis["data"][this.ntrc - 1], y: start_time},
           pixelate: false,
           xAxis: customXAxis,
-          yAxis: customYAxis
+          yAxis: customYAxis,
         })
+          .setName("Intensity")
           .setMouseInteractions(true)
           // Add data and invalidate the Series based on added data.
           .invalidateValuesOnly(this.points)
           .setFillStyle(new PalettedFill({lut: this.palette}));
+        this.chart.setPadding({bottom: 40})
         this.chart.getDefaultAxisX().dispose();
         this.chart.getDefaultAxisY().dispose();
+
+        this.chart.addUIElement(UIElementBuilders.LUTRange)
+          .setLUT(this.palette)
+          .setLUTLength(400)
+          .setPosition({x: 100, y: 0})
+          .setOrigin(UIOrigins.RightBottom)
+          .setAutoDispose({
+            type: 'max-width',
+            maxWidth: 0.80,
+          })
+          .setBackground(background => background
+            .setFillStyle(emptyFill)
+            .setStrokeStyle(emptyLine)
+          );
+        // lutRange.setText("vertical")
       },
 
-      createLineChart()
-      {
+      createLineChart() {
         if (this.chart_info_data === null)
           return;
 
@@ -167,60 +194,49 @@
       },
     },
 
-    mounted()
-    {
+    mounted() {
       // Chart can only be created when the component has mounted the DOM because
       // the chart needs the element with specified containerId to exist in the DOM
       this.createChart();
     },
 
-    beforeMount()
-    {
+    beforeMount() {
       // Generate random ID to us as the containerId for the chart and the target div id
       this.chartId = Math.trunc(Math.random() * 1000000)
     },
 
-    beforeDestroy()
-    {
+    beforeDestroy() {
       // "dispose" should be called when the component is unmounted to free all the resources used by the chart
       this.chart.dispose()
     },
     watch:
       {
-        chart_info_data()
-        {
+        chart_info_data() {
           this.createLineChart();
         },
-        cursorInfo(val)
-        {
+        cursorInfo(val) {
           this.$emit('cursorInfo', val);
         },
 
-        pointInLcAxis(val)
-        {
-          if (val)
-          {
+        pointInLcAxis(val) {
+          if (val) {
             val["isValid"] = this.isValidTrace(val);
             this.$emit('pointInLcAxis', val);
           }
         },
-        colormap: function (val)
-        {
+        colormap: function (val) {
           this.colormap = val;
           this.createChart();
         },
-        cmin: function (val)
-        {
+        cmin: function (val) {
           this.cmin = val;
           this.createChart();
         },
-        cmax: function (val)
-        {
+        cmax: function (val) {
           this.cmax = val;
           this.createChart();
         },
-        resizeevent: function (val)
-        {
+        resizeevent: function (val) {
           this.resizeevent = val;
           this.createChart();
         },
