@@ -88,8 +88,8 @@
         this.chart = lightningChart().ChartXY({container: `${this.chartId}`})
           .setTitleFillStyle(this.grColor.foreground)
           .setBackgroundFillStyle(this.grColor.background)
-          .setTitle("");
-        // .setTitle(this.title);
+          // .setTitle("");
+        .setTitle(this.title);
 
         // Create LUT and FillStyle
         this.minData = get2dMinData(this.points);
@@ -157,6 +157,8 @@
             .setStrokeStyle(emptyLine)
           );
         // lutRange.setText("vertical")
+
+        this.createLineChart();
       },
 
       createLineChart() {

@@ -37,6 +37,11 @@ export default new Router({
       component: () => import('../views/testing/SeismicView')
     },
     {
+      path: "/test-table",
+      name: "test-table",
+      component: () => import('../views/testing/testSyncfusionTable')
+    },
+    {
       path: "/multiview",
       name: "multiview",
       component: () => import('../views/testing/MultiSeismicViewer')

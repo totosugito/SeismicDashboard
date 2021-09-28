@@ -11,14 +11,17 @@
       <pane class="p-2" min-size="20" max-size="70" style="background: white">
         <div class="group-header">
           <b-row>
-            <b-col md="5" class="my-1">
+            <b-col md="6" class="my-1">
               <ejs-button cssClass='e-outline' class="mr-1"
-                          v-on:click.native="gotoNewProspectPage"><i class="fa fa-plus"/> New Prospect</ejs-button>
+                          v-on:click.native="hideShowMarkerAll"><i
+                class="fa fa-square-o" v-b-tooltip.hover title="Hide show marker"/></ejs-button>
               <ejs-button cssClass='e-outline' class="mr-1"
-                          v-on:click.native="getHttpRefreshProspectProject"><i
+                          v-on:click.native="getHttpRefreshProspectProject" v-b-tooltip.hover title="Refresh data"><i
                 class="fa fa-refresh"/></ejs-button>
+              <ejs-button cssClass='e-outline' class="mr-1"
+                          v-on:click.native="gotoNewProspectPage"><i class="fa fa-plus" v-b-tooltip.hover title="New prospect data"/></ejs-button>
             </b-col>
-            <b-col md="7" class="my-1">
+            <b-col md="6" class="my-1">
               <b-form-group label-cols-lg="4" label-cols-md="3" label-cols-sm="6" class="mb-0">
                 <b-input-group prepend="">
                   <b-form-input v-model="filter" placeholder="Search"/>
@@ -368,6 +371,14 @@
       {},
 
     methods: {
+      hideShowMarkerAll()
+      {
+        for(let i=0; i<this.table_prospect.length; i++)
+        {
+          this.table_prospect[i].dmp.marker.show = false;
+        }
+        this.tmp_array_autoupdate = [];
+      },
       rightClicked (item, index, evt) {
         // Prevent native OS/Browser context menu showing
         evt.preventDefault()

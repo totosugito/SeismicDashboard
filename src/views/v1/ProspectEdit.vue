@@ -1,31 +1,32 @@
 <template>
-<div>
-  <vue-element-loading
-    :spinner="spinLoader.spinner"
-    :color="spinLoader.color"
-    :background-color="spinLoader.background_color"
-    :size="spinLoader.size"
-    :active="showLoader"/>
+  <div>
+    <vue-element-loading
+      :spinner="spinLoader.spinner"
+      :color="spinLoader.color"
+      :background-color="spinLoader.background_color"
+      :size="spinLoader.size"
+      :active="showLoader"/>
 
-  <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
-    <pane class="p-2" min-size="20" max-size="40" style="background: white">
-      <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
-      <!--            <b-card-body>-->
-      <div>
-        <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/> Uncheck All
-        </ejs-button>
-      </div>
-      <b-table
-        responsive
-        sticky-header="50vh"
-        show-empty
-        :small="true"
-        :striped="false"
-        :bordered="true"
-        :outlined="true"
-        :fields="table_prospect_map_heder"
-        :items="table_prospect_map">
-        <template v-slot:cell(show)="row">
+    <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
+      <pane class="p-2" min-size="20" max-size="40" style="background: white">
+        <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
+        <!--            <b-card-body>-->
+        <div>
+          <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/>
+            Uncheck All
+          </ejs-button>
+        </div>
+        <b-table
+          responsive
+          sticky-header="50vh"
+          show-empty
+          :small="true"
+          :striped="false"
+          :bordered="true"
+          :outlined="true"
+          :fields="table_prospect_map_heder"
+          :items="table_prospect_map">
+          <template v-slot:cell(show)="row">
                   <span @click="eventSwitchLayerClicked(row.index, row.item)"
                         :style="eventSelectedLayerCssStyle(row.item)">
                     <template v-if="row.item.show">
@@ -35,93 +36,125 @@
                       <i class="btn_toolbar fa fa-toggle-off"/>
                     </template>
                   </span>
-        </template>
-      </b-table>
-
-      <div>
-        <div class="mb-2">CONFIDENCE RATING</div>
-        <StarRating v-model="proposeProspect.score.star" :rating="proposeProspect.score.star" :star-size="30" :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
-      </div>
-      <div>
-        <div class="mb-2 mt-3">NOTE</div>
-        <b-form-textarea
-          v-model="proposeProspect.score.note"
-          placeholder="Enter something..."
-          rows="3"
-          max-rows="6"/>
-      </div>
-      <div>
-        <span class="mr-5">NPoint : <b>{{proposeProspect.score.np}}</b></span>
-        <span class="mr-5">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
-        <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
-      </div>
-      <div class="mt-2">
-<!--        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score-->
-<!--        </ejs-button>-->
-        <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update</ejs-button>
-        <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather</ejs-button>
-      </div>
-      <!--            </b-card-body>-->
-    </pane>
-    <pane class="p-2" min-size="40" max-size="80" style="background: white">
-
-      <template v-if="showMapProspect">
-        <div class="mb-1">
-<!--          <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"-->
-<!--                      v-on:click.native="markerHideGeojsonEventClick()"><i-->
-<!--            class="fa fa-line-chart"/></ejs-button>-->
-          <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
-                      v-on:click.native="markerLocationEventClick()"><i
-            class="fa fa-map-marker"/></ejs-button>
-        </div>
-        <l-map ref="map" style="width: 100%; height:82vh;" :zoom="map_var.zoom" :center="map_var.center"
-               :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
-               @ready="onMapReady" @click="onMapClickEvent">
-          <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
-
-<!--          <template v-if="show_marker_drag">-->
-<!--            <l-marker :lat-lng="pageParam" :draggable="false" :icon="markerDragIcon">-->
-<!--              <l-popup>-->
-<!--                <div style="width: 100%">-->
-<!--                  Lat (x) : <b>{{pageParam.lng.toFixed(2)}}</b><br>-->
-<!--                  Lon (y) : <b>{{pageParam.lat.toFixed(2)}}</b><br>-->
-<!--                </div>-->
-<!--              </l-popup>-->
-<!--            </l-marker>-->
-<!--          </template>-->
-
-          <!--              <template v-for="item in tmp_array_autoupdate">-->
-          <!--              </template>-->
-
-          <template v-for="layer in table_prospect_map">
-            <template v-if="layer.show===true">
-              <LHeatmap
-                :latLngs="layer.heatmap"
-                :radius="15"
-                :blur="15"
-                :minOpacity="0.1"
-                :max="heatmap_range[layer.cmap].max">
-              </LHeatmap>
-            </template>
           </template>
-        </l-map>
-      </template>
-    </pane>
-  </splitpanes>
+        </b-table>
 
-  <!-- show error dialog -->
-  <vue-simple-dialog
-    ref="dialogMessage"
-    type="warning"
-    :header="retStatus.title" body="Body"
-    btn1_text="Tutup"
-    btn1_style="success"
-    @btn1Click="dialogMessageBtn1Click()">
+        <div>
+          <div class="mb-2">CONFIDENCE RATING</div>
+          <StarRating v-model="proposeProspect.score.star" :rating="proposeProspect.score.star" :star-size="30"
+                      :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
+        </div>
+        <div>
+          <div class="mb-2 mt-3">NOTE</div>
+          <b-form-textarea
+            v-model="proposeProspect.score.note"
+            placeholder="Enter something..."
+            rows="3"
+            max-rows="6"/>
+        </div>
+        <div>
+          <span class="mr-5">NPoint : <b>{{proposeProspect.score.np}}</b></span>
+          <span class="mr-5">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
+          <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
+        </div>
+        <div class="mt-2">
+          <!--        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score-->
+          <!--        </ejs-button>-->
+          <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update</ejs-button>
+          <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather</ejs-button>
+        </div>
+        <!--            </b-card-body>-->
+      </pane>
+      <pane class="p-2" min-size="40" max-size="80" style="background: white">
+
+        <template v-if="showMapProspect">
+          <div class="mb-1">
+            <ejs-button :cssClass='setToggleButtonStyle(show_marker_center)' class="mr-1"
+                        v-on:click.native="markerCenterLocationEventClick()" v-b-tooltip.hover
+                        title="Prospect center location"><i
+              class="fa fa-street-view"/></ejs-button>
+            <ejs-button :cssClass='setToggleButtonStyle(show_marker_drag)' class="mr-1"
+                        v-on:click.native="markerLocationEventClick()" v-b-tooltip.hover title="Map marker position"><i
+              class="fa fa-map-marker"/></ejs-button>
+
+            <template v-if="show_marker_drag">
+              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>
+            </template>
+          </div>
+          <l-map ref="map" style="width: 100%; height:82vh;" :zoom="map_var.zoom" :center="map_var.center"
+                 :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
+                 @ready="onMapReady" @click="onMapClickEvent">
+            <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
+
+            <template v-if="show_marker_center">
+              <l-marker :lat-lng="{lat: proposeProspect.marker.lat, lon: proposeProspect.marker.lng}" :draggable="false"
+                        :icon="markerCenterIcon">
+                <l-popup>
+                  <div style="width: 100%">
+                    Lat (x) : <b>{{proposeProspect.marker.lng.toFixed(2)}}</b><br>
+                    Lon (y) : <b>{{proposeProspect.marker.lat.toFixed(2)}}</b><br>
+                    Area : <b>{{proposeProspect.marker.area}}</b><br>
+                    Layer : <b>{{proposeProspect.marker.layer}}</b><br>
+                    <b>{{proposeProspect.marker.label}}</b>
+                  </div>
+                </l-popup>
+              </l-marker>
+            </template>
+            <template v-if="show_marker_drag">
+              <l-marker :lat-lng="marker_drag_coord" :draggable="false" :icon="markerDragIcon">
+                <l-popup>
+                  <div style="width: 100%">
+                    Lat (x) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
+                    Lon (y) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
+
+                    <template v-if="isValidGatherDataFromMarker()">
+                      Iline : <b>{{marker_drag_coord.gather.iline}}</b><br>
+                      Xline : <b>{{marker_drag_coord.gather.xline}}</b><br>
+                      Z Min : <b>{{marker_drag_coord.gather.z.min.toFixed(2)}}</b><br>
+                      Z Max : <b>{{marker_drag_coord.gather.z.max.toFixed(2)}}</b><br>
+                      <b-button class="btn btn-sm mt-2" variant="success" @click="httpOpenGatherFromMapMarker()">Open
+                        Gather
+                      </b-button>
+                    </template>
+                    <template v-else>
+                      <b-button class="btn btn-sm mt-2" variant="primary" @click="httpFindGatherFromMapMarker()">Find
+                        Gather
+                      </b-button>
+                    </template>
+                  </div>
+                </l-popup>
+              </l-marker>
+            </template>
+
+            <template v-for="layer in table_prospect_map">
+              <template v-if="layer.show===true">
+                <LHeatmap
+                  :latLngs="layer.heatmap"
+                  :radius="15"
+                  :blur="15"
+                  :minOpacity="0.1"
+                  :max="heatmap_range[layer.cmap].max">
+                </LHeatmap>
+              </template>
+            </template>
+          </l-map>
+        </template>
+      </pane>
+    </splitpanes>
+
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogMessage"
+      type="warning"
+      :header="retStatus.title" body="Body"
+      btn1_text="Tutup"
+      btn1_style="success"
+      @btn1Click="dialogMessageBtn1Click()">
               <span slot="slot-body">
                 <h5>{{retStatus.message}}</h5>
               </span>
-  </vue-simple-dialog>
-</div>
+    </vue-simple-dialog>
+  </div>
 </template>
 
 <script>
@@ -138,13 +171,13 @@
   import StarRating from 'MyLibVue/src/views/star-rating/star-rating'
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
-  import { forEach } from 'lodash';
+  import {forEach} from 'lodash';
   import {getColormapAsset, getColormapName} from "../../libs/colormap";
 
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import DynamicInputForMap from "../myview/DynamicInputForMap";
-  import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
+  import {appDemoMode, getMapPinMarker, getWellPinMarker} from "../../_constant/http_api";
   import {rotate} from "../../libs/2d-array-rotation";
   import {
     addPlotDataToProspectEdit, addPlotDataToProspectEditMultiData,
@@ -182,480 +215,548 @@
     shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
   });
 
-    export default {
-        name: "ProspectEdit",
+  export default {
+    name: "ProspectEdit",
 
-      components: {
-        ProposeProspectInfo,
-        DynamicInputForMap,
-        LChartSeismicAreaSelected,
-        EnhancedCheck,
-        bFormSlider,
-        VueSimpleDialog,
-        StarRating,
+    components: {
+      ProposeProspectInfo,
+      DynamicInputForMap,
+      LChartSeismicAreaSelected,
+      EnhancedCheck,
+      bFormSlider,
+      VueSimpleDialog,
+      StarRating,
 
-        Splitpanes, Pane,
+      Splitpanes, Pane,
 
-        LMap,
-        LTileLayer,
-        LMarker,
-        LPolygon,
-        LPopup,
-        LTooltip,
-        LHeatmap
-      },
+      LMap,
+      LTileLayer,
+      LMarker,
+      LPolygon,
+      LPopup,
+      LTooltip,
+      LHeatmap
+    },
 
-      computed: mapState({
-        varRouter: state => state.varRouter,
-        spinLoader: state => state.spinLoader,
-        user: state => state.user,
-      }),
+    computed: mapState({
+      varRouter: state => state.varRouter,
+      spinLoader: state => state.spinLoader,
+      user: state => state.user,
+    }),
 
-      data: () => {
-        return {
-          // confidence_score: 7,
-          // text_note: "",
+    data: () => {
+      return {
+        // confidence_score: 7,
+        // text_note: "",
 
-          bdemo: appDemoMode(),
-          retStatus: {status: 0, title: "", message: "", data: []},
-          showLoader: false,
-          showMapProspect: false,
+        bdemo: appDemoMode(),
+        retStatus: {status: 0, title: "", message: "", data: []},
+        showLoader: false,
+        showMapProspect: false,
 
-          // map variable
-          map_var: {},
-          prospectScore: {score: {np: 0, score: 0, area: 0}},
-          geo_json: {},
+        // map variable
+        map_var: {},
+        prospectScore: {score: {np: 0, score: 0, area: 0}},
+        geo_json: {},
 
-          tabIndex: 0,
-          pageParam: {
-            id: "",
-          },
-          objParam: {},
-          markerDragIcon: L.icon({
-            iconUrl: getMapPinMarker(),
-            iconSize: [32, 36],
-            iconAnchor: [16, 36]
-          }),
-          show_geo_json: true,
-          show_marker_drag: true,
-          refreshChart: false,
-          proposeProspect: {},
-          prospectMap: {ndata: 0, layers: []},
-          heatmap_range: [],
+        tabIndex: 0,
+        pageParam: {
+          id: "",
+        },
+        objParam: {},
+        markerCenterIcon: L.icon({
+          iconUrl: getWellPinMarker(),
+          iconSize: [32, 36],
+          iconAnchor: [16, 36]
+        }),
+        markerDragIcon: L.icon({
+          iconUrl: getMapPinMarker(),
+          iconSize: [32, 36],
+          iconAnchor: [16, 36]
+        }),
+        show_geo_json: true,
 
-          paramInput: createDefaultSectionAreaParameter(),
-          datas: [],
-          seismics: [],
-          boundaryX: [
-            {
-              p1: 0,
-              p2: 0,
-            },
-            {
-              p1: 0,
-              p2: 0,
-            }
-          ],
-          boundaryY: {
+        show_marker_center: true,
+        show_marker_drag: false,
+        marker_drag_coord: {lat: 0, lng: 0, gather: {}},
+        refreshChart: false,
+        proposeProspect: {},
+        prospectMap: {ndata: 0, layers: []},
+        heatmap_range: [],
+
+        paramInput: createDefaultSectionAreaParameter(),
+        datas: [],
+        seismics: [],
+        boundaryX: [
+          {
             p1: 0,
             p2: 0,
           },
-          colormap: {id: 3, reverse: false},
-          perc: 0,
-          reverseColormap: false,
-          cmin: 20,
-          cmax: 20,
-          tmp_cmin: 20,
-          tmp_cmax: 20,
-          tmp_array_autoupdate: [],
+          {
+            p1: 0,
+            p2: 0,
+          }
+        ],
+        boundaryY: {
+          p1: 0,
+          p2: 0,
+        },
+        colormap: {id: 3, reverse: false},
+        perc: 0,
+        reverseColormap: false,
+        cmin: 20,
+        cmax: 20,
+        tmp_cmin: 20,
+        tmp_cmax: 20,
+        tmp_array_autoupdate: [],
 
-          table_prospect_map_heder: createTableProspectMapHeader(),
-          table_prospect_map: [],
-          event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
-          event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
-          event_http_prospect_map: {success: "successProspectMap", fail: "failProspectMap"},
-          event_http_prospect_score: {success: "successProspectScore", fail: "failProspectScore"},
-          event_http_save_prospect: {success: "successSaveProspect", fail: "failSaveProspect"},
-        }
+        table_prospect_map_heder: createTableProspectMapHeader(),
+        table_prospect_map: [],
+        event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
+        event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
+        event_http_prospect_map: {success: "successProspectMap", fail: "failProspectMap"},
+        event_http_prospect_score: {success: "successProspectScore", fail: "failProspectScore"},
+        event_http_save_prospect: {success: "successSaveProspect", fail: "failSaveProspect"},
+        event_http_find_gather_from_latlng: {success: "successFindGatherFromLatLng", fail: "failFindGatherFromLatLng"},
+      }
+    },
+    created() {
+      this.$store.dispatch('createVarRouter').then(); //no selected project
+    },
+
+    beforeMount: function () {
+      this.map_var = createAreaLeafletDemoData();
+      this.map_var.zoom = 14;
+
+      this.pageParam["id"] = this.$route.query.id;
+      this.objParam = readProspectData(this.pageParam["id"]);
+      this.proposeProspect = this.objParam["dmp"];
+      this.geo_json = this.proposeProspect["geojson"];
+      this.marker_drag_coord = {
+        lat: this.proposeProspect["marker"].lat,
+        lng: this.proposeProspect["marker"].lng,
+        gather: {}
+      };
+      this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
+
+      if (this.bdemo) {
+        this.prospectMap = createProspectEditDemoData();
+        this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
+        this.heatmap_range = this.prospectMap.v_min_max;
+
+        this.tabIndex = 1;
+        this.showLoader = false;
+        this.showMapProspect = true;
+      } else {
+        this.httpGetProspectData();
+      }
+    },
+
+    methods: {
+      isValidGatherDataFromMarker() {
+        if (!("gather" in this.marker_drag_coord))
+          return (false);
+
+        if (!("iline" in this.marker_drag_coord["gather"]))
+          return (false);
+
+        return (true);
       },
-      created() {
-        this.$store.dispatch('createVarRouter').then(); //no selected project
+      dialogMessageBtn1Click() {
+        this.$refs.dialogMessage.hideModal();
       },
-
-      beforeMount: function () {
-        this.map_var = createAreaLeafletDemoData();
-        this.map_var.zoom = 14;
-
-        this.pageParam["id"] = this.$route.query.id;
-        this.objParam = readProspectData(this.pageParam["id"]);
-        this.proposeProspect = this.objParam["dmp"];
-        this.geo_json = this.proposeProspect["geojson"];
-
-        // this.confidence_score = this.proposeProspect.score.star;
-        // this.text_note = this.proposeProspect.score.note;
-        // console.log(JSON.stringify(this.proposeProspect))
-
-        this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
-
-        if (this.bdemo) {
-          this.prospectMap = createProspectEditDemoData();
-          this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
-          this.heatmap_range = this.prospectMap.v_min_max;
-
-          this.tabIndex = 1;
-          this.showLoader = false;
-          this.showMapProspect = true;
-        }
-        else {
-          this.httpGetProspectData();
-        }
+      eventSelectedLayerCssStyle(item) {
+        let fg_color = "#808080";
+        if (item.show)
+          fg_color = "#4169E1";
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:100%;";
+        return (strstyle);
       },
+      eventSwitchLayerClicked(index, item) {
+        let status = !item.show;
+        item.show = status;
+        // this.prospectMap.layers[index].show = status;
 
-      methods: {
-        dialogMessageBtn1Click() {
-          this.$refs.dialogMessage.hideModal();
-        },
-        eventSelectedLayerCssStyle(item) {
-          let fg_color = "#808080";
-          if (item.show)
-            fg_color = "#4169E1";
-          let strstyle =
-            "color:" + fg_color + "; " +
-            "font-size:100%;";
-          return (strstyle);
-        },
-        eventSwitchLayerClicked(index, item) {
-          let status = !item.show;
-          item.show = status;
-          // this.prospectMap.layers[index].show = status;
+        // this.tmp_array_autoupdate = [];
+        // console.log(JSON.stringify(this.prospectMap.layers[index]))
+      },
+      convertLayerToLeafletPopup(layer) {
+        let geo_json = layer.toGeoJSON(16);
+        let geom_type = geo_json["geometry"]["type"];
+        let geom_polygon = geo_json["geometry"]["coordinates"];
+        let polygon = turf.polygon(geom_polygon);
+        let area = turf.area(polygon);
+        let line = turf.lineString(geom_polygon[0]);
+        let length_meters = turf.length(line, {units: 'meters'});
+        let length_miles = turf.length(line, {units: 'miles'});
 
-          // this.tmp_array_autoupdate = [];
-          // console.log(JSON.stringify(this.prospectMap.layers[index]))
-        },
-        convertLayerToLeafletPopup(layer) {
-          let geo_json = layer.toGeoJSON(16);
-          let geom_type = geo_json["geometry"]["type"];
-          let geom_polygon = geo_json["geometry"]["coordinates"];
-          let polygon = turf.polygon(geom_polygon);
-          let area = turf.area(polygon);
-          let line = turf.lineString(geom_polygon[0]);
-          let length_meters = turf.length(line, {units: 'meters'});
-          let length_miles = turf.length(line, {units: 'miles'});
+        let html_string = `Type : <b>${geom_type}</b><br>`;
+        html_string = html_string + `Point : <b>${geom_polygon[0].length}</b><br>`;
+        html_string = html_string + `Area : <br>`;
+        html_string = html_string + `<b>${(area).toLocaleString()}</b> m<sup>2</sup><br>`;
+        html_string = html_string + `<b>${(area / (1e+4)).toLocaleString()}</b> ha<br>`;
+        html_string = html_string + `Length : <br>`;
+        html_string = html_string + `<b>${(length_meters).toLocaleString()}</b> meters<br>`;
+        html_string = html_string + `<b>${(length_miles).toLocaleString()}</b> miles<br>`;
+        return (html_string);
+      },
+      onMapReady() {
+        this.map = this.$refs.map.mapObject;
 
-          let html_string = `Type : <b>${geom_type}</b><br>`;
-          html_string = html_string + `Point : <b>${geom_polygon[0].length}</b><br>`;
-          html_string = html_string + `Area : <br>`;
-          html_string = html_string + `<b>${(area).toLocaleString()}</b> m<sup>2</sup><br>`;
-          html_string = html_string + `<b>${(area / (1e+4)).toLocaleString()}</b> ha<br>`;
-          html_string = html_string + `Length : <br>`;
-          html_string = html_string + `<b>${(length_meters).toLocaleString()}</b> meters<br>`;
-          html_string = html_string + `<b>${(length_miles).toLocaleString()}</b> miles<br>`;
-          return (html_string);
-        },
-        onMapReady() {
-          this.map = this.$refs.map.mapObject;
+        // const measureControl = new window.L.Control.Measure({
+        //   position: "topleft",
+        //   activeColor: '#FF0000',
+        //   completedColor: '#FF0000',
+        //   primaryLengthUnit: "meters",
+        //   secondaryLengthUnit: "kilometers",
+        //   primaryAreaUnit: "sqmeters",
+        //   secondaryAreaUnit: "hectares"
+        // });
+        // this.map.addControl(measureControl);
 
-          // const measureControl = new window.L.Control.Measure({
-          //   position: "topleft",
-          //   activeColor: '#FF0000',
-          //   completedColor: '#FF0000',
-          //   primaryLengthUnit: "meters",
-          //   secondaryLengthUnit: "kilometers",
-          //   primaryAreaUnit: "sqmeters",
-          //   secondaryAreaUnit: "hectares"
-          // });
-          // this.map.addControl(measureControl);
+        this.map.pm.addControls({
+          position: 'topleft',
+          drawMarker: false,
+          drawCircleMarker: false,
+          drawPolyline: false,
+          drawRectangle: true,
+          drawCircle: false,
+          cutPolygon: false
+        });
+        this.map.pm.setPathOptions({
+          color: 'orange',
+          fillColor: 'orange',
+          fillOpacity: 0.4,
+        });
 
-          this.map.pm.addControls({
-            position: 'topleft',
-            drawMarker: false,
-            drawCircleMarker: false,
-            drawPolyline: false,
-            drawRectangle: true,
-            drawCircle: false,
-            cutPolygon: false
-          });
-          this.map.pm.setPathOptions({
-            color: 'orange',
+        // listen to events
+        this.map.on('pm:create', this.mapUpdated);
+        this.map.on('pm:remove', this.mapUpdated);
+        this.map.on('pm:cut', this.mapUpdated);
+
+        // this.createLayersFromJson();
+        // function to check if it is a Rectangle
+        var onEachFeature = (feature, layer) => {
+          if (feature.properties.shape === 'Rectangle') {
+            // we need to create a new Rectangle Layer and add it to an array
+            addList.push(L.rectangle(layer.getBounds()));
+            // we add the current layer to the remove list
+            removeList.push(layer)
+          }
+        };
+        L.geoJSON(this.proposeProspect["geojson"], {
+          onEachFeature,
+          style: {
+            color: '#FFA500',
             fillColor: 'orange',
-            fillOpacity: 0.4,
-          });
-
-          // listen to events
-          this.map.on('pm:create', this.mapUpdated);
-          this.map.on('pm:remove', this.mapUpdated);
-          this.map.on('pm:cut', this.mapUpdated);
-
-          // this.createLayersFromJson();
-          // function to check if it is a Rectangle
-          var onEachFeature = (feature, layer) => {
-            if (feature.properties.shape === 'Rectangle')
-            {
-              // we need to create a new Rectangle Layer and add it to an array
-              addList.push(L.rectangle(layer.getBounds()));
-              // we add the current layer to the remove list
-              removeList.push(layer)
-            }
-          };
-          L.geoJSON(this.proposeProspect["geojson"], {
-            onEachFeature,
-            style: {
-              color: 'orange',
-              fillColor: 'orange',
-              fillOpacity: 0.4,
-            }
-          }).addTo(this.map);
-        },
-
-        onMapClickEvent(event) {
-          // if (this.show_marker_drag)
-          //   this.marker_drag_coord = event.latlng;
-        },
-        mapUpdated(event) {
-          // add listeners on creation and delete on removal
-          if (event.type === 'pm:create') {
-            event.layer.on('pm:edit', this.mapUpdated);
-
-            // add data
-            event.layer.properties = {
-              shape: event.shape
-            };
-
-            // radius for circles
-            if (event.shape === 'Circle') {
-              event.layer.properties.radius = event.layer.getRadius();
-            }
-
-            event.layer.internalId = uuidv4();
-            this.geo_json = event.layer.toGeoJSON(16);
-            // console.log(JSON.stringify(this.geo_json))
-
-            event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
-            // console.log("create")
-          } else if (event.type === 'pm:edit') {
-            // console.log("edit")
-            event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
-            this.geo_json = event.layer.toGeoJSON(16);
-            // console.log(JSON.stringify(this.geo_json))
-          } else if (event.type === 'pm:remove') {
-            event.layer.off(); // remove all event listeners
+            weight: 1,
+            fillOpacity: 0.2,
           }
+        }).addTo(this.map);
+      },
 
-          let geo_json_data = this.getDataAsGeoJSON();
-          // for (let i = 0; i < geo_json_data.features.length; i++) {
-          //   let item = geo_json_data.features[i];
-          //   let polygon = turf.polygon(item.geometry.coordinates);
-          //   let area = turf.area(polygon);
-          //   geo_json_data.features.area = area;
-          // }
-          // console.log(JSON.stringify(geo_json_data));
-
-          // emit event
-          this.$emit('change', geo_json_data);
-        },
-        // export data as GeoJSON object
-        getDataAsGeoJSON() {
-          // create FeatureCollection
-          const geoJSON = {
-            type: 'FeatureCollection',
-            features: []
-          };
-
-          // export each layer
-          this.map.eachLayer(function (layer) {
-            if (layer.internalId && (layer instanceof L.Path || layer instanceof L.Marker)) {
-              const geoJSONShape = layer.toGeoJSON(16); // to precise geo shape!
-              geoJSONShape.properties = layer.properties;
-              geoJSONShape.id = layer.internalId;
-              geoJSON.features.push(geoJSONShape);
-
-              // normalize coordinates (> 180/>90)
-              // TODO
-            }
-          });
-
-          this.geoJsonCoord = geoJSON;
-          return geoJSON;
-        },
-
-        markerLocationCssStyle() {
-          if (this.show_marker_drag)
-            return ("e-warning");
-          else
-            return ("e-outline");
-        },
-        markerHideGeojsonEventClick() {
-          this.show_geo_json = !this.show_geo_json;
-        },
-        markerLocationEventClick() {
-          this.show_marker_drag = !this.show_marker_drag;
-        },
-
-        createDefaultBoundaryParameter() {
-          let tstart = 0;
-          let tend = 0;
-          let ns, ntrc, dt;
-          for (let i = 0; i < this.datas.length; i++) {
-            ns = this.seismics[i]["ns"];
-            ntrc = this.seismics[i]["ntrace"];
-            dt = this.seismics[i]["y"]["sampling"];
-            let tmpx1 = Math.floor(this.seismics[i]["idx_st"] + Math.round(ntrc / 2));
-            let tmpx2 = Math.floor(this.seismics[i]["idx_en"] - Math.round(ntrc / 2));
-
-            tstart = this.seismics[i]["y"]["start"] * dt;
-            tend = (this.seismics[i]["ns"] - this.seismics[i]["y"]["start"]) * dt;
-            this.paramInput[i]["min"] = this.seismics[i]["idx_st"];
-            this.paramInput[i]["max"] = this.seismics[i]["idx_en"];
-            this.paramInput[i]["vmin"] = tmpx1;
-            this.paramInput[i]["vmax"] = tmpx2;
-
-
-            this.boundaryX[i]["p1"] = tmpx1;
-            this.boundaryX[i]["p2"] = tmpx2;
-          }
-          let tmpy1 = Math.floor(tstart + Math.round(ns * dt / 3));
-          let tmpy2 = Math.floor(tend - Math.round(ns * dt / 3));
-          this.paramInput[2]["min"] = tstart;
-          this.paramInput[2]["max"] = tend;
-          this.paramInput[2]["vmin"] = tmpy1;
-          this.paramInput[2]["vmax"] = tmpy2;
-          this.boundaryY["p1"] = tmpy1;
-          this.boundaryY["p2"] = tmpy2;
-        },
-        fillDataVariable(tmp) {
-          this.datas = tmp;
-          this.seismics = this.datas;
-          for (let i = 0; i < this.datas.length; i++) {
-            this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
-            this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
-          }
-          this.createDefaultBoundaryParameter();
-        },
-
-        onClickComputeScore() {
-          let param = {
-            user: this.user["user"],
-            data: this.proposeProspect
-          };
-          // console.log(JSON.stringify(param))
-          // param["data"]["polygon"] = this.geo_json[0]["geometry"]["coordinates"][0];
-          // console.log(JSON.stringify(param))
-          this.showLoader = true;
-          this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
-        },
-        onClickSaveProject()
-        {
-          // this.prospectScore.score["confidence"] = this.confidence_score;
-          // this.prospectScore.score["note"] = this.text_note;
-          let param = {
-            user: this.user["user"],
-            data: this.proposeProspect,
-            // score: this.prospectScore.score
-          };
-          // param["data"]["polygon"] = this.geo_json;
-          // console.log(JSON.stringify(param));
-
-          this.showLoader = true;
-          this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-update"), param, this.event_http_save_prospect]).then();
-        },
-        onClickViewGather()
-        {
-          // console.log(JSON.stringify(this.objParam))
-          let routeData = this.$router.resolve({
-            // path: "plot-ava-gather",
-            path: "plot-ava-gather-section",
-            query: {
-              id_area: this.objParam["id_area"],
-              filename: this.objParam["filename"],
-            }
-          });
-          window.open(routeData.href, '_blank');
-        },
-        onUncheckAll()
-        {
-          uncheckAllData(this.table_prospect_map);
-        },
-        httpGetProspectData()
-        {
-          let param = {
-            user: this.user["user"],
-            data: {
-              id_area: this.objParam["id_area"],
-              filename: this.objParam["filename"]
-            }
-          };
-
-          this.showLoader = true;
-          this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-data"), param, this.event_http_prospect_map]).then();
+      onMapClickEvent(event) {
+        if (this.show_marker_drag) {
+          this.marker_drag_coord.lat = event.latlng.lat;
+          this.marker_drag_coord.lng = event.latlng.lng;
+          this.marker_drag_coord.gather = {};
         }
       },
+      mapUpdated(event) {
+        // add listeners on creation and delete on removal
+        if (event.type === 'pm:create') {
+          event.layer.on('pm:edit', this.mapUpdated);
 
-      mounted() {
-        setTimeout(function () {
-          window.dispatchEvent(new Event('resize'))
-        }, 250);
+          // add data
+          event.layer.properties = {
+            shape: event.shape
+          };
 
-        // DO
-        this.$nextTick(() => {
-          //   this.map = this.$refs.map.mapObject; // work as expected
-        });
+          // radius for circles
+          if (event.shape === 'Circle') {
+            event.layer.properties.radius = event.layer.getRadius();
+          }
 
-        EventBus.$on(this.event_http_prospect_score.success, (msg) => {
-          this.prospectScore = msg.data;
-          this.showLoader = false;
-        });
-        EventBus.$on(this.event_http_prospect_score.fail, (msg) => {
-          this.showLoader = false;
-          this.prospectScore = {score: {np: 0, score: 0, area:0}};
-          this.retStatus = msg;
-          this.$refs.dialogMessage.showModal();
-        });
+          event.layer.internalId = uuidv4();
+          this.geo_json = event.layer.toGeoJSON(16);
+          // console.log(JSON.stringify(this.geo_json))
 
-        EventBus.$on(this.event_http_prospect_map.success, (msg) => {
-          this.prospectMap = msg.data;
-          this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
-          this.heatmap_range = this.prospectMap.v_min_max;
+          event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
+          // console.log("create")
+        } else if (event.type === 'pm:edit') {
+          // console.log("edit")
+          event.layer.bindPopup(this.convertLayerToLeafletPopup(event.layer));
+          this.geo_json = event.layer.toGeoJSON(16);
+          // console.log(JSON.stringify(this.geo_json))
+        } else if (event.type === 'pm:remove') {
+          event.layer.off(); // remove all event listeners
+        }
 
-          this.showLoader = false;
-          this.showMapProspect = true;
-        });
-        EventBus.$on(this.event_http_prospect_map.fail, (msg) => {
-          this.showLoader = false;
-          this.prospectMap = {};
-          this.table_prospect_map = [];
-          this.retStatus = msg;
-          this.$refs.dialogMessage.showModal();
-        });
+        let geo_json_data = this.getDataAsGeoJSON();
+        // for (let i = 0; i < geo_json_data.features.length; i++) {
+        //   let item = geo_json_data.features[i];
+        //   let polygon = turf.polygon(item.geometry.coordinates);
+        //   let area = turf.area(polygon);
+        //   geo_json_data.features.area = area;
+        // }
+        // console.log(JSON.stringify(geo_json_data));
 
-        EventBus.$on(this.event_http_save_prospect.success, (msg) => {
-          // this.prospectMap = msg.data;
-          // this.table_prospect_map = addPlotDataToProspectEdit(this.prospectMap);
-
-          saveProspectData(this.objParam);
-          this.showLoader = false;
-
-          this.retStatus.title = "Success";
-          this.retStatus.message = "Update data completed";
-          this.$refs.dialogMessage.showModal();
-          // this.showMapProspect = true;
-        });
-        EventBus.$on(this.event_http_save_prospect.fail, (msg) => {
-          this.showLoader = false;
-          // this.prospectMap = {};
-          // this.table_prospect_map = [];
-          this.retStatus = msg;
-          this.$refs.dialogMessage.showModal();
-        });
+        // emit event
+        this.$emit('change', geo_json_data);
       },
-      beforeDestroy() {
-        EventBus.$off(this.event_http_prospect_score.success);
-        EventBus.$off(this.event_http_prospect_score.fail);
-        EventBus.$off(this.event_http_prospect_map.success);
-        EventBus.$off(this.event_http_prospect_map.fail);
-        EventBus.$off(this.event_http_save_prospect.success);
-        EventBus.$off(this.event_http_save_prospect.fail);
+      // export data as GeoJSON object
+      getDataAsGeoJSON() {
+        // create FeatureCollection
+        const geoJSON = {
+          type: 'FeatureCollection',
+          features: []
+        };
+
+        // export each layer
+        this.map.eachLayer(function (layer) {
+          if (layer.internalId && (layer instanceof L.Path || layer instanceof L.Marker)) {
+            const geoJSONShape = layer.toGeoJSON(16); // to precise geo shape!
+            geoJSONShape.properties = layer.properties;
+            geoJSONShape.id = layer.internalId;
+            geoJSON.features.push(geoJSONShape);
+
+            // normalize coordinates (> 180/>90)
+            // TODO
+          }
+        });
+
+        this.geoJsonCoord = geoJSON;
+        return geoJSON;
       },
-    }
+
+      setToggleButtonStyle(status) {
+        if (status)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      markerCenterLocationEventClick() {
+        this.show_marker_center = !this.show_marker_center;
+      },
+      // markerLocationCssStyle() {
+      //   if (this.show_marker_drag)
+      //     return ("e-warning");
+      //   else
+      //     return ("e-outline");
+      // },
+      // markerHideGeojsonEventClick() {
+      //   this.show_geo_json = !this.show_geo_json;
+      // },
+      markerLocationEventClick() {
+        this.show_marker_drag = !this.show_marker_drag;
+      },
+
+      createDefaultBoundaryParameter() {
+        let tstart = 0;
+        let tend = 0;
+        let ns, ntrc, dt;
+        for (let i = 0; i < this.datas.length; i++) {
+          ns = this.seismics[i]["ns"];
+          ntrc = this.seismics[i]["ntrace"];
+          dt = this.seismics[i]["y"]["sampling"];
+          let tmpx1 = Math.floor(this.seismics[i]["idx_st"] + Math.round(ntrc / 2));
+          let tmpx2 = Math.floor(this.seismics[i]["idx_en"] - Math.round(ntrc / 2));
+
+          tstart = this.seismics[i]["y"]["start"] * dt;
+          tend = (this.seismics[i]["ns"] - this.seismics[i]["y"]["start"]) * dt;
+          this.paramInput[i]["min"] = this.seismics[i]["idx_st"];
+          this.paramInput[i]["max"] = this.seismics[i]["idx_en"];
+          this.paramInput[i]["vmin"] = tmpx1;
+          this.paramInput[i]["vmax"] = tmpx2;
+
+
+          this.boundaryX[i]["p1"] = tmpx1;
+          this.boundaryX[i]["p2"] = tmpx2;
+        }
+        let tmpy1 = Math.floor(tstart + Math.round(ns * dt / 3));
+        let tmpy2 = Math.floor(tend - Math.round(ns * dt / 3));
+        this.paramInput[2]["min"] = tstart;
+        this.paramInput[2]["max"] = tend;
+        this.paramInput[2]["vmin"] = tmpy1;
+        this.paramInput[2]["vmax"] = tmpy2;
+        this.boundaryY["p1"] = tmpy1;
+        this.boundaryY["p2"] = tmpy2;
+      },
+      fillDataVariable(tmp) {
+        this.datas = tmp;
+        this.seismics = this.datas;
+        for (let i = 0; i < this.datas.length; i++) {
+          this.seismics[i]["cdp_data"] = rotate(this.datas[i]["cdp_data"], -90);
+          this.seismics[i]["x"]["data"] = this.seismics[i]["cdp_header"];
+        }
+        this.createDefaultBoundaryParameter();
+      },
+
+      onClickComputeScore() {
+        let param = {
+          user: this.user["user"],
+          data: this.proposeProspect
+        };
+        // console.log(JSON.stringify(param))
+        // param["data"]["polygon"] = this.geo_json[0]["geometry"]["coordinates"][0];
+        // console.log(JSON.stringify(param))
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
+      },
+      onClickSaveProject() {
+        // this.prospectScore.score["confidence"] = this.confidence_score;
+        // this.prospectScore.score["note"] = this.text_note;
+        let param = {
+          user: this.user["user"],
+          data: this.proposeProspect,
+          // score: this.prospectScore.score
+        };
+        // param["data"]["polygon"] = this.geo_json;
+        // console.log(JSON.stringify(param));
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-update"), param, this.event_http_save_prospect]).then();
+      },
+      onClickViewGather() {
+        // console.log(JSON.stringify(this.objParam))
+        let routeData = this.$router.resolve({
+          // path: "plot-ava-gather",
+          path: "plot-ava-gather-section",
+          query: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"],
+          }
+        });
+        window.open(routeData.href, '_blank');
+      },
+      onUncheckAll() {
+        uncheckAllData(this.table_prospect_map);
+      },
+      httpGetProspectData() {
+        let param = {
+          user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"]
+          }
+        };
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-data"), param, this.event_http_prospect_map]).then();
+      },
+      httpFindGatherFromMapMarker() {
+        let param = {
+          user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"],
+            x: this.marker_drag_coord.lat,
+            y: this.marker_drag_coord.lng,
+          }
+        };
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-find-gather-from-latlng"),
+          param, this.event_http_find_gather_from_latlng]).then();
+      },
+      httpOpenGatherFromMapMarker()
+      {
+        // let gather_pos = this.marker_drag_coord["gather"];
+        // gather_pos["id_area"] = this.objParam["id_area"];
+        // gather_pos["filename"] = this.objParam["filename"];
+        // let param = {
+        //   user: this.user["user"],
+        //   data: gather_pos
+        // };
+        let routeData = this.$router.resolve({
+          path: "plot-ava-gather-section",
+          query: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"],
+            iline: this.marker_drag_coord["gather"]["iline"],
+            xline: this.marker_drag_coord["gather"]["xline"],
+            zmin: this.marker_drag_coord["gather"]["z"]["min"],
+            zmax: this.marker_drag_coord["gather"]["z"]["max"],
+          }
+        });
+        window.open(routeData.href, '_blank');
+      }
+    },
+
+    mounted() {
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'))
+      }, 250);
+
+      // DO
+      this.$nextTick(() => {
+        //   this.map = this.$refs.map.mapObject; // work as expected
+      });
+
+      EventBus.$on(this.event_http_prospect_score.success, (msg) => {
+        this.prospectScore = msg.data;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_prospect_score.fail, (msg) => {
+        this.showLoader = false;
+        this.prospectScore = {score: {np: 0, score: 0, area: 0}};
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      EventBus.$on(this.event_http_prospect_map.success, (msg) => {
+        this.prospectMap = msg.data;
+        this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
+        this.heatmap_range = this.prospectMap.v_min_max;
+
+        this.showLoader = false;
+        this.showMapProspect = true;
+      });
+      EventBus.$on(this.event_http_prospect_map.fail, (msg) => {
+        this.showLoader = false;
+        this.prospectMap = {};
+        this.table_prospect_map = [];
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      EventBus.$on(this.event_http_save_prospect.success, (msg) => {
+        saveProspectData(this.objParam);
+        this.showLoader = false;
+
+        this.retStatus.title = "Success";
+        this.retStatus.message = "Update data completed";
+        this.$refs.dialogMessage.showModal();
+      });
+      EventBus.$on(this.event_http_save_prospect.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      EventBus.$on(this.event_http_find_gather_from_latlng.success, (msg) => {
+        this.marker_drag_coord.gather = msg.data;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_find_gather_from_latlng.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+    },
+    beforeDestroy() {
+      EventBus.$off(this.event_http_prospect_score.success);
+      EventBus.$off(this.event_http_prospect_score.fail);
+      EventBus.$off(this.event_http_prospect_map.success);
+      EventBus.$off(this.event_http_prospect_map.fail);
+      EventBus.$off(this.event_http_save_prospect.success);
+      EventBus.$off(this.event_http_save_prospect.fail);
+      EventBus.$off(this.event_http_find_gather_from_latlng.success);
+      EventBus.$off(this.event_http_find_gather_from_latlng.fail);
+    },
+  }
 </script>
 
 <style scoped>

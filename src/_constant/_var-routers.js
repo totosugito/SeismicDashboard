@@ -79,9 +79,11 @@ export default class VarRouter {
     "segy-view-list-ava": "/api/segy/view-list-ava",
     "segy-view-gather": "/api/segy/view-list-gather",
     "segy-view-section": "/api/segy/view-list-section",
+    "segy-find-gather-from-latlng": "/api/segy/find-gather",
 
     "ava-segy-view-gather": "/api/segy/view-gather",
     "ava-segy-view-gather-section": "/api/segy/view-gather-section",
+    "ava-segy-get-gather-section": "/api/segy/get-gather-section",
 
     "mlmodel-list": "/api/mlmodel/file-list",
     "mlmodel-register": "/api/mlmodel/file-register",

@@ -220,6 +220,11 @@
       this.pageParam["id_area"] = this.$route.query.id_area*1;
       this.pageParam["filename"] = this.$route.query.filename;
 
+      let iline_ = this.$route.query.iline*1;
+      let xline_ = this.$route.query.xline*1;
+      let zmin_ = this.$route.query.zmin*1;
+      let zmax_ = this.$route.query.zmax*1;
+      let valid_gather_by_pos = !Number.isNaN(iline_ + xline_ + zmin_ + zmax_);
       if(this.bdemo)
       {
         let tmpdata = createAvaGatherSectionDemoData();
@@ -227,14 +232,32 @@
         this.createChartInfo();
         this.showLoader = false;
       }
-      else {
-        // console.log(JSON.stringify(this.user))
-        let param = {
-          user: this.user["user"],
-          data: this.pageParam
-        };
-        this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("ava-segy-view-gather-section"), param, this.event_http_gather_section]).then();
+      else
+      {
+        if(valid_gather_by_pos)
+        {
+          let tmp_data = this.pageParam;
+          tmp_data["iline"] = iline_;
+          tmp_data["xline"] = xline_;
+          tmp_data["z"] = {min: zmin_, max: zmax_};
+          let param = {
+            user: this.user["user"],
+            data: tmp_data
+          }
+          this.showLoader = true;
+          this.$store.dispatch('http_post', [this.varRouter.getHttpType("ava-segy-get-gather-section"), param, this.event_http_gather_section]).then();
+        }
+        else
+        {
+          let param = {
+            user: this.user["user"],
+            data: this.pageParam
+          };
+
+          this.showLoader = true;
+          this.$store.dispatch('http_post', [this.varRouter.getHttpType("ava-segy-view-gather-section"), param, this.event_http_gather_section]).then();
+        }
+
       }
     },
     methods: {
