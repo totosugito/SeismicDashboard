@@ -74,7 +74,7 @@
               <b-row>
                 <template v-for="(seismic,index) in seismics">
                   <b-col>
-                    <LChartSeismicAreaSelected
+                    <LChartSeismicAreaSelectedV31
                       class="lc_seismic_chart"
                       :id="index"
                       :colormap="colormap"
@@ -154,7 +154,7 @@
             <div class="mt-2">
               <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score
               </ejs-button>
-              <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Save</ejs-button>
+              <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='saveProspectDialogShow'>Save</ejs-button>
             </div>
             <!--            </b-card-body>-->
           </pane>
@@ -225,19 +225,35 @@
                 <h5>{{retStatus.message}}</h5>
               </span>
     </vue-simple-dialog>
+
+    <!-- save prospect dialog -->
+    <vue-form-dialog
+      ref="saveProspectDialog"
+      type="default"
+      header="Save Prospect" body="Body"
+      btn1_text="Close" btn2_text="Save"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="saveProspectDialogBtn1Click()" @btn2Click="saveProspectDialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="save_prospect_schema" :model="save_prospect_model" :options="formOptions" @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
   </div>
 </template>
 
 <script>
   import Vue from 'vue';
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
-
   Vue.use(ButtonPlugin);
+
+  import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
+  import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
 
   import {mapState} from "vuex";
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
   import {createProspectMapData, getSectionData} from "../../libs/data";
-  import LChartSeismicAreaSelected from "../components/LChartSeismicAreaSelected";
   import EnhancedCheck from 'MyLibVue/src/views/vue-enhancedCheck/EnhancedCheck'
   import bFormSlider from 'vue-bootstrap-slider/es/form-slider';
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
@@ -272,7 +288,8 @@
   import "../../_assets/leaflet-measure.css";
   import {v4 as uuidv4} from 'uuid';
   import * as turf from "@turf/turf";
-  import {createTableProspectMapHeader} from "../../libs/libVars";
+  import {createSaveProspectModel, createSaveProspectSchema, createTableProspectMapHeader} from "../../libs/libVars";
+  import LChartSeismicAreaSelectedV31 from "../components/LChartSeismicAreaSelectedV3-1";
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -285,15 +302,18 @@
     name: "SeismicViewerByXY",
 
     components: {
+      LChartSeismicAreaSelectedV31,
       ProposeProspectInfo,
       DynamicInputForMap,
-      LChartSeismicAreaSelected,
       EnhancedCheck,
       bFormSlider,
       VueSimpleDialog,
 
       StarRating,
       Splitpanes, Pane,
+
+      VueFormDialog,
+      "vue-form-generator": VueFormGenerator.component,
 
       LMap,
       LTileLayer,
@@ -312,8 +332,13 @@
 
     data: () => {
       return {
-        confidence_score: 7,
-        text_note: "",
+        bvalidate: false,
+        formOptions: {
+          validateAfterLoad: true,
+          validateAfterChanged: true,
+        },
+        save_prospect_model: createSaveProspectModel(),
+        save_prospect_schema: createSaveProspectSchema(),
 
         bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
@@ -402,6 +427,41 @@
         this.httpGetSection();
     },
     methods: {
+      onValidated(isValid, errors) {
+        this.bvalidate = isValid;
+      },
+      saveProspectDialogShow()
+      {
+        this.$refs.saveProspectDialog.showModal();
+      },
+
+      saveProspectDialogBtn1Click() {
+        this.$refs.saveProspectDialog.hideModal();
+      },
+      saveProspectDialogBtn2Click() {
+        if (!this.bvalidate) return;
+
+        if(this.save_prospect_model["name"].trim().length === 0)
+          return;
+
+        this.onClickSaveProject();
+        this.$refs.saveProspectDialog.hideModal();
+      },
+      onClickSaveProject()
+      {
+        let param = {
+          user: this.user["user"],
+          data: this.proposeProspect,
+          score: this.prospectScore.score,
+          marker: this.pageParam,
+          name: this.save_prospect_model["name"],
+          group: this.save_prospect_model["group"],
+        };
+        param["data"]["geojson"] = this.geo_json;
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
+      },
+
       convertLayerToLeafletPopup(layer) {
         let geo_json = layer.toGeoJSON(16);
         let geom_type = geo_json["geometry"]["type"];
@@ -661,22 +721,6 @@
         // console.log(JSON.stringify(param))
         this.showLoader = true;
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("potprosp-score"), param, this.event_http_prospect_score]).then();
-      },
-      onClickSaveProject()
-      {
-        // this.prospectScore.score["confidence"] = this.confidence_score;
-        // this.prospectScore.score["note"] = this.text_note;
-        let param = {
-          user: this.user["user"],
-          data: this.proposeProspect,
-          score: this.prospectScore.score,
-          marker: this.pageParam
-        };
-        param["data"]["geojson"] = this.geo_json;
-        this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-save"), param, this.event_http_save_prospect]).then();
-
-        // console.log(JSON.stringify(param));
       },
       httpGetSection() {
         let param = {

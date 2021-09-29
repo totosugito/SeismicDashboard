@@ -115,7 +115,8 @@ export default class VarRouter {
     "prospect-list": "/api/prospect/list",
     "prospect-data": "/api/prospect/data",
     "prospect-save": "/api/prospect/save",
-    "prospect-update": "/api/prospect/update"
+    "prospect-update": "/api/prospect/update",
+    "prospect-update-group": "/api/prospect/create-group",
   };
 
   schematype = {

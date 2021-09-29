@@ -39,7 +39,7 @@ export default new Router({
     {
       path: "/test-table",
       name: "test-table",
-      component: () => import('../views/testing/testSyncfusionTable')
+      component: () => import('../views/testing/testTable')
     },
     {
       path: "/multiview",
@@ -115,7 +115,7 @@ export default new Router({
       component: PageLogin
     },
     {
-      path: 'dashboard',
+      path: varRouter.getRoute("dashboard", 1),
       redirect: varRouter.getRoute("dashboard", 1),
       name: varRouter.getRoute("dashboard", 2),
       component: DefaultContainer,

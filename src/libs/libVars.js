@@ -1138,112 +1138,132 @@ export function createTableProspectProjectHeader_V1()
 {
   let table_headers = [
     {
-      key: 'index',
-      label: 'No',
-      sortable: false,
-      thClass: 'text-center',
-      tdClass: 'text-center',
-      thStyle: {'width': '40px', 'min-width': '40px', 'max-width': '40px;', 'background-color': '#1E90FF', 'color': 'white'},
-    },
-    {
-      key: 'marker',
+      field: 'marker',
       label: 'Marker',
+      width: '70px',
       sortable: false,
       thClass: 'text-center',
       tdClass: 'text-center',
-      thStyle: {'width': '50px', 'min-width': '50px', 'max-width': '50px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'id_area',
+      field: 'id_area',
       label: 'Area',
+      width: '70px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
       thClass: 'text-center',
       tdClass: 'text-center',
-      thStyle: {'width': '50px', 'min-width': '50px', 'max-width': '50px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'userId',
+      field: 'userId',
       label: 'User',
+      width: '120px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
       thClass: 'text-center',
-      thStyle: {'width': '120px', 'min-width': '120px', 'max-width': '120px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
-    // {
-    //   key: 'loc',
-    //   label: 'Location',
-    //   sortable: true,
-    //   thClass: 'text-center',
-    //   thStyle: {'background-color': '#1E90FF', 'color': 'white'},
-    // },
     {
-      key: 'filename',
+      field: 'filename',
       label: 'Filename',
+      width: '200px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
       thClass: 'text-center',
-      thStyle: {'width': '200px', 'min-width': '200px', 'max-width': '200px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'group',
+      field: 'group',
       label: 'Group',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
       thClass: 'text-center',
-      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'star',
+      field: 'star',
       label: 'Star',
+      width: '80px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
       thClass: 'text-center',
       tdClass: 'text-center',
-      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'layer',
+      field: 'layer',
       label: 'Layer',
+      width: '80px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
       thClass: 'text-center',
       tdClass: 'text-center',
-      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'np',
+      field: 'np',
       label: 'nPoint',
+      width: '80px',
       sortable: true,
       thClass: 'text-center',
       tdClass: 'text-center',
-      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'score',
+      field: 'score',
       label: 'Score',
+      width: '80px',
       sortable: true,
       thClass: 'text-center',
       tdClass: 'text-right',
-      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'area',
+      field: 'area',
       label: 'Area',
+      width: '80px',
       sortable: true,
       thClass: 'text-center',
       tdClass: 'text-right',
-      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
     {
-      key: 'ctime',
+      field: 'ctime',
       label: 'Time',
+      width: '150px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-right',
-      thStyle: {'width': '150px', 'min-width': '150px', 'max-width': '150px;', 'background-color': '#1E90FF', 'color': 'white'},
+      type: 'date',
+      dateInputFormat: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
+      dateOutputFormat: 'MM/dd/yyyy HH:mm:ss',
     },
     {
-      key: 'action',
+      field: 'action',
       label: 'Action',
+      width: '80px',
       sortable: false,
       thClass: 'text-center',
       tdClass: 'text-right',
-      thStyle: {'width': '80px', 'min-width': '80px', 'max-width': '80px;', 'background-color': '#1E90FF', 'color': 'white'},
     },
   ];
   return (table_headers);
@@ -1350,4 +1370,60 @@ export function createAddUserSchema()
     ]
   };
   return(schema);
+}
+
+export function createSaveProspectModel() {
+  let model = {
+    name: "",
+    group: ""
+  };
+  return(model);
+}
+export function createSaveProspectSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Save As',
+        model: 'name',
+        placeholder: 'Prospect name',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Group',
+        model: 'group',
+        placeholder: 'Set prospect group',
+        featured: true,
+        required: false
+      },
+    ]
+  };
+  return(schema_);
+}
+
+export function createUpdateProspectGroupModel() {
+  let model = {
+    group: ""
+  };
+  return(model);
+}
+export function createUpdateProspectGroupSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'New Group Name',
+        model: 'group',
+        placeholder: 'New prospect group',
+        featured: true,
+        required: false
+      },
+    ]
+  };
+  return(schema_);
 }

@@ -46,6 +46,7 @@
     "vue-apexcharts": "^1.5.3",
     "vue-bootstrap-slider": "^2.1.8",
     "vue-clickaway": "^2.2.2",
+    "vue-good-table": "^2.21.10",
     "vue-material-design-icons": "^3.1.0",
     "vue-perfect-scrollbar": "^0.1.0",
     "vue-router": "^3.0.2",

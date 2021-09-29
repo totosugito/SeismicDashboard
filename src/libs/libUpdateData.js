@@ -253,5 +253,6 @@ export function setDmpMarkerStatus(datas, key_parent, key_child, default_value) 
   {
     if (key_parent in datas[i]["dmp"])
       datas[i]["dmp"][key_parent][key_child] = default_value;
+    // datas[i]["show"] = default_value;
   }
 }

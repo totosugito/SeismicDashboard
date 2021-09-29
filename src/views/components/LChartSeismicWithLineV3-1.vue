@@ -152,6 +152,9 @@
             type: 'max-width',
             maxWidth: 0.80,
           })
+          .setTextFont((font) => font
+            .setSize(10)
+          )
           .setBackground(background => background
             .setFillStyle(emptyFill)
             .setStrokeStyle(emptyLine)
