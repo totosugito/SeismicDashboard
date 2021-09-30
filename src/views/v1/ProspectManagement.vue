@@ -35,6 +35,11 @@
           :line-numbers="true"
           :pagination-options="paginationOptions"
           :select-options="tableSelectAllOptions">
+          <template slot="table-column" slot-scope="props">
+           <span v-if="props.column.label =='Marker'">
+              <i class="fa fa-map-marker"/>
+           </span>
+          </template>
 
           <template slot="table-row" slot-scope="props">
             <span v-if="props.column.field === 'score'">

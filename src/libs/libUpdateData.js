@@ -8,7 +8,7 @@ export function addPlotDataToTableArea(map_var, datas)
     let item = datas[i];
     map_var = fillLeafletAreaVariable(map_var, item["coordinate"], i);
     item.poly = createLeafletAreaPolygon(item["name"], item["coordinate"], i);
-    item.area_show = false;
+    item.layer_show = false;
     item.heatmap_available = false;
     item.heatmap_show = false;
     item.heatmap_data = [];
@@ -254,5 +254,49 @@ export function setDmpMarkerStatus(datas, key_parent, key_child, default_value) 
     if (key_parent in datas[i]["dmp"])
       datas[i]["dmp"][key_parent][key_child] = default_value;
     // datas[i]["show"] = default_value;
+  }
+}
+
+export function fillAreaLayerList(table_area, selected_area, layer_list) {
+  let n_area = table_area.length;
+  for(let i=0; i<n_area; i++)
+  {
+    if(table_area[i]["id_area"] !== selected_area)
+      continue;
+
+    let n_layer = layer_list.length;
+    let tmp_layers = []
+    for(let j=0; j<n_layer; j++)
+    {
+      tmp_layers.push({
+        check: false,
+        isAvailable: false,
+        show: false,
+        isDefault: layer_list[j].isDefault,
+        id_area: layer_list[j].id_area,
+        layer: layer_list[j].layer,
+        label: layer_list[j].label,
+        filename: layer_list[j].filename,
+        heatmap: {}
+      })
+    }
+    table_area[i]["layers"] = tmp_layers;
+    table_area[i]["layer_available"] = true;
+  }
+}
+
+export function fillAreaLayerListWithHeatmapData(table_area, selected_area, data_selected_layer, data_heatmap) {
+  let n_area = table_area.length;
+  for(let i=0; i<n_area; i++) {
+    if (table_area[i]["id_area"] !== selected_area)
+      continue;
+
+    for(let j=0; j<data_selected_layer.length; j++)
+    {
+      let idx_layer = data_selected_layer[j].idx;
+      table_area[i]["layers"][idx_layer]["isAvailable"] = true;
+      table_area[i]["layers"][idx_layer]["heatmap"] = data_heatmap[j];
+    }
+    break;
   }
 }

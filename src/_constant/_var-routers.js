@@ -106,6 +106,7 @@ export default class VarRouter {
     "demo-heatmap-multi": "/api/heatmap/multi",
     "get_section_data": "/api/heatmap/find-sandbox",
 
+    "probmap-get-list": "/api/probmap/get-list/",
     "probmap_multi": "/api/probmap/multi",
     "probmap_sandbox": "/api/probmap/find-sandbox",
     "potprosp-propose": "/api/potprosp/propose",

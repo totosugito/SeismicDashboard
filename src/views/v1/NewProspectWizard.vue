@@ -9,62 +9,99 @@
 
     <splitpanes class="default-theme" style="height: 88vh" vertical>
       <pane class="p-2" min-size="20" max-size="30" style="background: white">
-        <!--          <b-tab title="Data by WELL" :title-link-class="linkClass(1)">Tab contents 2</b-tab>-->
-        <!--          <b-tab title="Well Files" :title-link-class="linkClass(2)">Tab contents 3</b-tab>-->
-        <!--          <b-tab no-body title="Seismic Files" :title-link-class="linkClass(3)">-->
+        <b-table responsive style="height: 90vh"
+                 show-empty
+                 sticky-header="90vh"
+                 :small="true"
+                 :striped="false"
+                 :bordered="true"
+                 :outlined="true"
+                 :current-page="currentPage"
+                 :per-page="perPage"
+                 :filter="filter"
+                 @filtered="onFiltered"
+                 :fields="table_area_headers"
+                 :items="table_area">
 
-        <b-row>
-          <b-col md="12">
-            <b-table responsive style="height: 90vh"
-                     show-empty
-                     sticky-header="90vh"
-                     :small="true"
-                     :striped="false"
-                     :bordered="true"
-                     :outlined="true"
-                     :current-page="currentPage"
-                     :per-page="perPage"
-                     :filter="filter"
-                     @filtered="onFiltered"
-                     :fields="table_area_headers"
-                     :items="table_area">
-
-              <template v-slot:cell(area_show)="row">
+          <template v-slot:cell(layer_show)="row">
                 <span :style="eventSelectedAreaCssStyle(row.item)"
                       @click="eventSelectedAreaClicked(row.item)">
                       <i class="fa fa-map"/>
                 </span>
-              </template>
-              <template v-slot:cell(heatmap_available)="row">
-                <span :style="eventDownloadHeatmapCssStyle(row.item)"
-                      @click="eventDownloadHeatmapClicked(row.index)">
-                      <i class="fa fa-download"/>
-                </span>
-              </template>
-              <template v-slot:cell(heatmap_show)="row">
-                <template v-for="item in row.item.heatmap_data">
-                  <span :style="eventHeatmapShowLayerCssStyle(item)"
-                        @click="eventHeatmapShowLayerClicked(row.item.id_area, row.item.name, item)">
-                    {{item.label}}
-                  </span><br>
-                </template>
-                <!--                <span :style="eventHeatmapShowLayerCssStyle(row.item)"-->
-                <!--                      @click="eventHeatmapShowLayerClicked(row.item)">-->
-                <!--                      <i class="fa fa-clone"/>-->
-                <!--                </span>-->
-                <!--                <multiselect style="width: 200px; height: 20px"-->
-                <!--                             v-model="selected"-->
-                <!--                             :options="options"-->
-                <!--                             :showNoOptions="true"-->
-                <!--                             :showLabels="false"-->
-                <!--                             selectLabel=""-->
-                <!--                             :custom-label="createDropdownLayerListLabel">-->
-                <!--                </multiselect>-->
+          </template>
 
-              </template>
-            </b-table>
-          </b-col>
-        </b-row>
+          <template v-slot:cell(layer_available)="row">
+            <span v-b-tooltip.hover title="Download layer list"
+                  :style="eventDownloadDataCssStyle(row.item)"
+                  @click="eventDownloadDataClicked(row.item)">
+                      <i class="fa fa-cloud-download"/>
+            </span>
+            <template v-if="row.item.layer_available">
+              <span v-b-tooltip.hover title="Show or hide layers list" @click="row.toggleDetails">
+                <template v-if="row.detailsShowing">
+                  <i class="ml-3 fa fa-chevron-circle-up"/>
+                </template>
+                <template v-else>
+                  <i class="ml-3 fa fa-chevron-circle-down"/>
+                </template>
+              </span>
+            </template>
+          </template>
+
+          <template #row-details="row">
+            <div>
+              <div class="mb-1">
+                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(row.item, false)">
+                  <i class="fa fa-square-o" v-b-tooltip.hover title="Unselect all"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(row.item, true)">
+                  <i class="fa fa-check-square" v-b-tooltip.hover title="Select all"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedLayers(row.item)">
+                  <i class="fa fa-download" v-b-tooltip.hover title="Download selected data"/>
+                </ejs-button>
+              </div>
+              <b-table responsive
+                       show-empty
+                       :small="true"
+                       :striped="true"
+                       :bordered="true"
+                       :outlined="true"
+                       :current-page="currentPage"
+                       :per-page="perPage"
+                       :fields="table_layer_headers"
+                       :items="row.item.layers">
+
+                <template v-slot:cell(check)="rowc">
+                  <input type="checkbox" size="sm" v-model="rowc.item.check"/>
+                </template>
+                <template #cell(index)="rowc">
+                  {{ rowc.index + 1 }}
+                </template>
+                <template #cell(label)="rowc">
+                  {{rowc.item.label}}
+                  <template v-if="rowc.item.isDefault">
+                    (Default)
+                  </template>
+                </template>
+                <template v-slot:cell(show)="rowc">
+                  <template v-if="rowc.item.isAvailable">
+                    <span :style="eventHeatmapShowLayerCssStyle(rowc.item)"
+                    @click="eventLayerShowHeatmapClicked(rowc.item)">
+                      <template v-if="rowc.item.show">
+                        <i class="btn_toolbar fa fa-toggle-on"/>
+                      </template>
+                      <template v-else>
+                        <i class="btn_toolbar fa fa-toggle-off"/>
+                      </template>
+                    </span>
+                  </template>
+                </template>
+              </b-table>
+            </div>
+          </template>
+
+        </b-table>
       </pane>
       <pane class="p-2" min-size="70" max-size="80" style="background: white">
         <template v-if="showLoader===false">
@@ -73,8 +110,6 @@
             <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
                         v-on:click.native="markerLocationEventClick()"><i
               class="fa fa-map-marker"/></ejs-button>
-            <!--            <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="httpHeatmapData()"><i-->
-            <!--              class="fa fa-download"/></ejs-button>-->
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>
             </template>
@@ -90,21 +125,21 @@
             </template>
 
             <template v-for="item in table_area">
-              <template v-if="item.area_show===true">
+              <template v-if="item.layer_show===true">
                 <l-polygon :lat-lngs="item.poly.polygon" :color="item.poly.color">
                 </l-polygon>
               </template>
             </template>
 
             <template v-for="area in table_area">
-              <template v-for="layer in area.heatmap_data">
+              <template v-for="(layer, ii) in area.layers">
                 <template v-if="layer.show">
                   <LHeatmap
-                    :latLngs="layer.probmap"
+                    :latLngs="area.layers[ii].heatmap.probmap"
                     :radius="20"
                     :blur="20"
                     :minOpacity="0.1"
-                    :max="layer.sum.max">
+                    :max="area.layers[ii].heatmap.sum.max">
                   </LHeatmap>
                 </template>
               </template>
@@ -136,7 +171,7 @@
       ref="dialogMessage"
       type="warning"
       :header="retStatus.title" body="Body"
-      btn1_text="Tutup"
+      btn1_text="Close"
       btn1_style="success"
       @btn1Click="dialogMessageBtn1Click()">
               <span slot="slot-body">
@@ -154,23 +189,13 @@
   Vue.use(ButtonPlugin);
 
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
-  import ViewProcessWizardButton from "../components/viewProcessWizardButton";
-  import ViewBottomWizardButton from "../components/viewBottomWizardButton";
   import {mapState} from "vuex";
-  import {createTabProcessIconV0, createTabProcessTextV0} from '../../libs/libSeismicUi';
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import VueLeafletMap from "../components/vue-leaflet-map"
   import LHeatmap from "../components/Vue2LeafletHeatmap";
   import {
-    createTableAreaListHeader,
-    createTableAreaListHeader2_V1,
-    createTableAreaListHeader3_V1,
-    createTableAreaListHeader_V1,
-    createTableAreaListHeaderV0,
-    createTableAvaHeaderV0,
-    createTableHeatmapLayerHeader,
-    createTableProspectProjectHeader_V1
+    createTableAreaListHeader_V1, createTableLayerListHeader_V1,
   } from "../../libs/libVars";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
   import {
@@ -185,7 +210,6 @@
     createAreaLeafletDemoData, createDemoProspectProjectList,
     createHeatmapDemoData
   } from "../../libs/demo_data";
-  import Multiselect from 'MyLibVue/src/views/vue-multiselect'
 
 
   import * as L from "leaflet";
@@ -194,18 +218,10 @@
   import 'leaflet/dist/leaflet.css'
   import {
     addPlotDataToTableArea,
-    createTableFromHeatmapFullData,
+    createTableFromHeatmapFullData, fillAreaLayerList, fillAreaLayerListWithHeatmapData,
     getAreaFirstCoordinate, getMaxHeatmapData
   } from "../../libs/libUpdateData";
   import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
-
-  import '@geoman-io/leaflet-geoman-free'
-  import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-  import "../../libs/leaflet-measure";
-  import "../../_assets/leaflet-measure.css";
-  import {v4 as uuidv4} from 'uuid';
-  import {saveProspectData} from "../../_constant/active_user";
-  import {stringToFormattedDate} from "../../_constant/mylib";
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -216,13 +232,9 @@
   export default {
     name: "NewProspectWizard",
     components: {
-      ViewBottomWizardButton,
-      ViewProcessWizardButton,
       Splitpanes, Pane,
       VueLeafletMap,
       VueSimpleDialog,
-      Multiselect,
-
       LMap,
       LTileLayer,
       LMarker,
@@ -267,11 +279,10 @@
 
         tmp_array_autoupdate: [],
         selected_area: -1,
+        selected_id_area: -1,
         table_area_headers: createTableAreaListHeader_V1(),
+        table_layer_headers: createTableLayerListHeader_V1(),
         table_area: [],
-
-        table_prospect_headers: createTableProspectProjectHeader_V1(),
-        table_prospect: [],
 
         heatmap_summary: {min: 0, max: 0},
 
@@ -285,10 +296,9 @@
         totalRows: 0,
         filter: null,
 
-        table_headers3: createTableAreaListHeader3_V1(),
-        table_headers4: createTableAvaHeaderV0(),
         selected_data: {},
         tmp_datas: [],
+        list_selected_layer: [],
 
         formOptions: {
           validateAfterLoad: true,
@@ -296,8 +306,8 @@
         },
 
         event_http_area_list: {success: "successAreaList", fail: "failAreaList"},
-        event_http_heatmap_data: {success: "successHeatmapData", fail: "failHeatmapData"},
-        event_http_prospect_list: {success: "successProspectList", fail: "failProspectList"},
+        event_http_probmap_get_list: {success: "successProbmapGetList", fail: "failProbmapGetList"},
+        event_http_layer_download: {success: "successLayerDownload", fail: "failLayerDownload"},
       }
     },
 
@@ -306,10 +316,8 @@
       if (this.bdemo) {
         this.table_area = createAreaDemoData();
         this.table_area = addPlotDataToTableArea(this.map_var, this.table_area);
-        this.table_area[0].heatmap_data = addShowKeyToLayer(createHeatmapDemoData());
-        this.table_area[0].heatmap_available = true;
-        this.table_prospect = createDemoProspectProjectList();
-
+        // this.table_area[0].heatmap_data = addShowKeyToLayer(createHeatmapDemoData());
+        // this.table_area[0].layer_available = false;
         this.marker_drag_coord = getAreaFirstCoordinate(this.table_area);
         this.showLoader = false;
       } else
@@ -320,111 +328,10 @@
       {},
 
     methods: {
-      createFormattedTime(sstr) {
-        return (stringToFormattedDate(sstr));
-      },
       mapUpdated(event) {
-        // // add listeners on creation and delete on removal
-        // if (event.type === 'pm:create') {
-        //   event.layer.on('pm:edit', this.mapUpdated);
-        //
-        //   // add data
-        //   event.layer.properties = {
-        //     shape: event.shape
-        //   };
-        //
-        //   // radius for circles
-        //   if (event.shape === 'Circle') {
-        //     event.layer.properties.radius = event.layer.getRadius();
-        //   }
-        //
-        //   event.layer.internalId = uuidv4();
-        // }
-        // if (event.type === 'pm:remove') {
-        //   event.layer.off(); // remove all event listeners
-        // }
-        //
-        // // emit event
-        // this.$emit('change', this.getDataAsGeoJSON());
       },
-      // export data as GeoJSON object
-      getDataAsGeoJSON() {
-        // // create FeatureCollection
-        // const geoJSON = {
-        //   type: 'FeatureCollection',
-        //   features: []
-        // };
-        //
-        // // export each layer
-        // this.map.eachLayer(function (layer) {
-        //   if (layer.internalId && (layer instanceof L.Path || layer instanceof L.Marker)) {
-        //     const geoJSONShape = layer.toGeoJSON(16); // to precise geo shape!
-        //     geoJSONShape.properties = layer.properties;
-        //     geoJSONShape.id = layer.internalId;
-        //     geoJSON.features.push(geoJSONShape);
-        //
-        //     // normalize coordinates (> 180/>90)
-        //     // TODO
-        //   }
-        // });
-        //
-        // this.geoJsonCoord = geoJSON;
-        // return geoJSON;
-      },
-
-      // onFinishCreateArea(evt)
-      // {
-      //   this.area_info = {
-      //     area: evt.area,
-      //     areaDisplay: evt.areaDisplay,
-      //     lastCoord: evt.lastCoord,
-      //     length: evt.length,
-      //     lengthDisplay: evt.lengthDisplay,
-      //     pointCount: evt.pointCount,
-      //     points: evt.points
-      //   };
-      // },
       onMapReady() {
         this.map = this.$refs.map.mapObject;
-
-        // const measureControl = new window.L.Control.Measure({
-        //   position: "topleft",
-        //   activeColor: '#FF0000',
-        //   completedColor: '#FF0000',
-        //   primaryLengthUnit: "meters",
-        //   secondaryLengthUnit: "kilometers",
-        //   primaryAreaUnit: "sqmeters",
-        //   secondaryAreaUnit: "hectares"
-        // });
-        // this.map.addControl(measureControl);
-        //
-        // this.map.pm.addControls({
-        //   position: 'topleft',
-        //   drawMarker: false,
-        //   drawCircleMarker: false,
-        //   drawPolyline: false,
-        //   drawRectangle: false,
-        //   drawCircle: false
-        // });
-        // this.map.pm.setPathOptions({
-        //   color: 'orange',
-        //   fillColor: 'orange',
-        //   fillOpacity: 0.4,
-        // });
-        //
-        // // listen to events
-        // this.map.on('pm:create', this.mapUpdated);
-        // this.map.on('pm:remove', this.mapUpdated);
-        // this.map.on('pm:cut', this.mapUpdated);
-
-      },
-
-      linkClass(idx) {
-        if (this.tabIndex === idx) {
-          return ['bg-primary', 'text-light']
-        } else {
-          return ['bg-light', 'text-info']
-        }
       },
 
       //MESSAGE HTTP I/O
@@ -460,11 +367,58 @@
       },
 
       // ------------------------------------------------
-      //
+      // checked/unchecked layer area
       // ------------------------------------------------
+      setCheckedLayerStatus(item_area, status)
+      {
+        let nl = item_area["layers"].length;
+        for(let i=0; i<nl; i++)
+        {
+          item_area["layers"][i]["check"] = status;
+        }
+      },
+      downloadSelectedLayers(item_area)
+      {
+        let layers = item_area["layers"];
+        let nl = layers.length;
+        this.selected_id_area = item_area.id_area;
+        this.list_selected_layer = [];
+        for(let i=0; i<nl; i++)
+        {
+          let item = layers[i];
+          if(!item.check)
+            continue;
+
+          this.list_selected_layer.push({
+            idx: i,
+            id_area: item.id_area,
+            layer: item.layer,
+            filename: item.filename,
+            label: item.label,
+          })
+        }
+
+        if(this.list_selected_layer.length === 0) {
+          this.retStatus["title"] = "Information";
+          this.retStatus["message"] = "No data selected";
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+        // console.log(JSON.stringify(this.list_selected_layer))
+        this.httpDownloadLayerData();
+      },
+      httpDownloadLayerData() {
+        this.showLoader = true;
+        let param = {
+          user: this.user["user"],
+          data: this.list_selected_layer
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_multi"), param, this.event_http_layer_download]).then();
+      },
+
       eventSelectedAreaCssStyle(item) {
         let fg_color = "#808080";
-        if (item.area_show)
+        if (item.layer_show)
           fg_color = item["poly"]["color"];
 
         let strstyle =
@@ -473,25 +427,33 @@
         return (strstyle);
       },
       eventSelectedAreaClicked(item) {
+        let status = !item.layer_show; // select/unselect
+        item.layer_show = status;
         this.tmp_array_autoupdate = [];
-        item.area_show = !item.area_show; // select/unselect
       },
-      eventDownloadHeatmapCssStyle(item) {
+      eventDownloadDataCssStyle(item) {
         let fg_color = "#808080";
-        if (item.heatmap_available)
+        if (item.layer_available)
           fg_color = "#4169E1";
         let strstyle =
           "color:" + fg_color + "; " +
           "font-size:100%;";
         return (strstyle);
       },
-      eventDownloadHeatmapClicked(idx) {
-        this.selected_area = idx;
-        if (this.bdemo === true) {
-          this.table_area[this.selected_area].heatmap_data = createHeatmapDemoData();
-          this.table_area[this.selected_area].heatmap_available = true;
-        } else
-          this.httpHeatmapDataByIdx();
+      eventDownloadDataClicked(item) {
+        this.showLoader = true;
+        this.selected_id_area = item["id_area"];
+        let url_area_layer_list = this.varRouter.getHttpType("probmap-get-list") + this.selected_id_area;
+        this.$store.dispatch('http_get', [url_area_layer_list, {}, this.event_http_probmap_get_list]).then();
+      },
+      eventDownloadHeatmapCssStyle(item) {
+        let fg_color = "#808080";
+        if (item.layer_available)
+          fg_color = "#4169E1";
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:100%;";
+        return (strstyle);
       },
       eventHeatmapShowLayerCssStyle(item) {
         let fg_color = "#808080";
@@ -502,28 +464,10 @@
           "font-size:100%;";
         return (strstyle);
       },
-      eventHeatmapShowLayerClicked(id_area_, area_name_, item) {
-        // if(item.heatmap_available === false)
-        // {
-        //   this.retStatus.title = "Informasi";
-        //   this.retStatus.status = 0;
-        //   this.retStatus.message = "Silahkan melakukan download data sebelum menampilkan di peta !";
-        //   this.$refs.dialogMessage.showModal();
-        //   return;
-        // }
-        this.tmp_array_autoupdate = [];
+      eventLayerShowHeatmapClicked(item)
+      {
         item.show = !item.show;
-        if (item.show === false) {
-          // this.selectedLayer["area"] = -1;
-          // this.selectedLayer["area_name"] = "";
-          // this.selectedLayer["layer"] = -1;
-          // this.selectedLayer["layer_name"] = "";
-        } else {
-          this.selectedLayer["area"] = id_area_;
-          this.selectedLayer["area_name"] = area_name_;
-          this.selectedLayer["layer"] = item["layer"];
-          this.selectedLayer["layer_name"] = item["label"];
-        }
+        this.tmp_array_autoupdate = [];
       },
 
       openSectionByCoord() {
@@ -562,134 +506,14 @@
         this.totalRows = filteredItems.length;
         this.currentPage = 1;
       },
-      //-----------------------------------------------------
-      openGeobodyPage(item) {
-        this.selected_data = item;
-        this.selected_data["view_mode"] = 0;
-        this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
-        this.$router.push({
-          path: "process-wizard2-0",
-          // query: {mode:0}
-        });
-      },
-      openXYZPage(item) {
-        this.selected_data = item;
-        this.selected_data["view_mode"] = 0;
-        this.$store.dispatch('actionSaveSelectedArea', this.selected_data); //set selected project
-        this.$router.push({
-          path: "process-wizard2-1",
-          query: {mode: 1}
-        });
-      },
-
-      getTabIcon() {
-        return (createTabProcessIconV0(0))
-      },
-      getTabText() {
-        return (createTabProcessTextV0(0))
-      },
-      wizardButtonClicked(str_router) {
-        return (this.varRouter.getRoute(str_router, 1))
-      },
-
       httpListArea() {
         this.showLoader = true;
         let param = {
           user: this.user["user"],
           data: {}
-        }
+        };
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), param, this.event_http_area_list]).then();
       },
-      httpHeatmapDataByIdx() {
-        if (this.selected_area < 0)
-          return;
-
-        this.showLoader = true;
-        // let list_file = [
-        //   "heatmap_TUNU95_v30_cal_prob_0500_0600.csv",
-        //   "heatmap_TUNU95_v30_cal_prob_0600_0700.csv",
-        //   "heatmap_TUNU95_v30_cal_prob_0700_0800.csv",
-        //   "heatmap_TUNU95_v30_cal_prob_0800_0900.csv",
-        //   "heatmap_TUNU95_v30_cal_prob_0900_1000.csv"
-        // ];
-
-        let param = {
-          "state": 0,
-          "type": "/api/probmap/multi",
-          "mesg": "",
-          "user": this.user["user"],
-          "data": {
-            "id_area": this.table_area[this.selected_area]["id_area"],
-            "feature": "sum",
-          }
-        };
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_multi"), param, this.event_http_heatmap_data]).then();
-      },
-
-      httpHeatmapData() {
-        this.showLoader = true;
-        // let param = {
-        //   "state": 0,
-        //   "type": "/api/heatmap/get",
-        //   "mesg": "",
-        //   "data": {
-        //     "id_area": 2,
-        //     "file_loc": "TUNU95/08_heatmap",
-        //     "feature": "sum",
-        //     "heatmap_TUNU95_v30_cal_prob_0500_0600.csv",
-        //     "heatmap_TUNU95_v30_cal_prob_0600_0700.csv"
-        //   }
-        // };
-        let param = {
-          "state": 0,
-          "type": "/api/heatmap/multi",
-          "mesg": "",
-          "user": this.user["user"],
-          "data": {
-            "id_area": 2,
-            "file_loc": "TUNU95/08_heatmap",
-            "feature": "sum",
-            "file_name": [
-              "heatmap_TUNU95_v30_cal_prob_0500_0600.csv",
-              "heatmap_TUNU95_v30_cal_prob_0600_0700.csv",
-              "heatmap_TUNU95_v30_cal_prob_0700_0800.csv",
-              "heatmap_TUNU95_v30_cal_prob_0800_0900.csv",
-              "heatmap_TUNU95_v30_cal_prob_0900_1000.csv"
-            ]
-          }
-        };
-        // this.$store.dispatch('http_post', [this.varRouter.getHttpType("demo-heatmap"), param, this.event_http_heatmap_data]).then();
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("demo-heatmap-multi"), param, this.event_http_heatmap_data]).then();
-      },
-
-      createDemoCss(cc) {
-        return ('<span class="map-marker3" style="background-color:' + cc + '"/>');
-      },
-      createCustomMarkerPopup(item) {
-        let sstr = 'Area : <b>' + item.area + '</b><br>';
-        sstr = sstr + 'Lat : <b>' + item.lat + '</b><br>';
-        sstr = sstr + 'Lon : <b>' + item.lon + '</b>';
-        return (sstr);
-      },
-
-      eventEditProspectProjectClicked(item) {
-        saveProspectData(item);
-
-        let routeData = this.$router.resolve({
-          path: "prospect-edit",
-          query: {
-            id: item["id"],
-          }
-        });
-        window.open(routeData.href, '_blank');
-      },
-      getHttpRefreshProspectProject() {
-        let param = {
-          user: this.user["user"],
-          data: {}
-        }
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("prospect-list"), param, this.event_http_prospect_list]).then();
-      }
     },
     mounted() {
       setTimeout(function () {
@@ -720,32 +544,26 @@
       });
 
       //-----------------------------------------------------------------
-      // HEATMAP DATA
+      // LAYER HEATMAP DATA DOWNLOAD
       //-----------------------------------------------------------------
-      EventBus.$on(this.event_http_heatmap_data.success, (msg) => {
-        this.table_area[this.selected_area].heatmap_data = addShowKeyToLayer(msg.data);
-        this.table_area[this.selected_area].heatmap_available = true;
+      EventBus.$on(this.event_http_layer_download.success, (msg) => {
+        fillAreaLayerListWithHeatmapData(this.table_area, this.selected_id_area, this.list_selected_layer, msg.data)
         this.showLoader = false;
-        this.tmp_array_autoupdate = [];
       });
-      EventBus.$on(this.event_http_heatmap_data.fail, (msg) => {
-        this.table_area[this.selected_area].heatmap_data = [];
-        this.table_area[this.selected_area].heatmap_available = false;
+      EventBus.$on(this.event_http_layer_download.fail, (msg) => {
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
 
       //-----------------------------------------------------------------
-      // PROSPECT LIST
+      // PROBMAP GET LIST
       //-----------------------------------------------------------------
-      EventBus.$on(this.event_http_prospect_list.success, (msg) => {
-        this.table_prospect = msg.data;
+      EventBus.$on(this.event_http_probmap_get_list.success, (msg) => {
+        fillAreaLayerList(this.table_area, this.selected_id_area, msg.data);
         this.showLoader = false;
-        this.tmp_array_autoupdate = [];
       });
-      EventBus.$on(this.event_http_prospect_list.fail, (msg) => {
-        this.table_prospect = [];
+      EventBus.$on(this.event_http_probmap_get_list.fail, (msg) => {
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
@@ -755,10 +573,10 @@
     beforeDestroy() {
       EventBus.$off(this.event_http_area_list.success);
       EventBus.$off(this.event_http_area_list.fail);
-      EventBus.$off(this.event_http_heatmap_data.success);
-      EventBus.$off(this.event_http_heatmap_data.fail);
-      EventBus.$off(this.event_http_prospect_list.success);
-      EventBus.$off(this.event_http_prospect_list.fail);
+      EventBus.$off(this.event_http_probmap_get_list.success);
+      EventBus.$off(this.event_http_probmap_get_list.fail);
+      EventBus.$off(this.event_http_layer_download.success);
+      EventBus.$off(this.event_http_layer_download.fail);
 
       this.showLoader = false;
     },
@@ -766,8 +584,4 @@
 </script>
 
 <style>
-  .e-grid .e-headercell.area_table_header {
-    background-color: #6495ED;
-    color: white;
-  }
 </style>

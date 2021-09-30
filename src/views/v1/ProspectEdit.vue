@@ -652,8 +652,8 @@
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"],
-            x: this.marker_drag_coord.lat,
-            y: this.marker_drag_coord.lng,
+            x: this.marker_drag_coord.lng,
+            y: this.marker_drag_coord.lat,
           }
         };
 

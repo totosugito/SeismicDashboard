@@ -960,42 +960,47 @@ export function createTableAreaListHeader_V1()
   let table_headers = [
     {
       key: 'id_area',
+      field: 'id_area',
       label: 'ID',
+      width: '50px',
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-center',
-      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
     },
     {
       key: 'name',
+      field: 'name',
       label: 'Area Name',
       sortable: true,
-      thClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
     },
     {
-      key: 'area_show',
-      label: 'Area',
+      key: 'layer_show',
+      field: 'layer_show',
+      label: 'Show',
       sortable: false,
-      thClass: 'text-center',
+      width: '60px',
+      thClass: 'text-center vue-good-table-header-style',
       tdClass: 'text-center',
-      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
     },
     {
-      key: 'heatmap_available',
+      key: 'layer_available',
+      field: 'layer_available',
       label: 'Data',
       sortable: false,
-      thClass: 'text-center',
+      width: '60px',
+      thClass: 'text-center vue-good-table-header-style',
       tdClass: 'text-center',
-      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
     },
-    {
-      key: 'heatmap_show',
-      label: 'Layer',
-      sortable: false,
-      thClass: 'text-center',
-      tdClass: 'text-left',
-      thStyle: '{width: 30px; min-width: 20px; max-width: 30px;}',
-    },
+    // {
+    //   key: 'heatmap_show',
+    //   field: 'heatmap_show',
+    //   label: 'Layer',
+    //   sortable: false,
+    //   thClass: 'text-center vue-good-table-header-style',
+    //   tdClass: 'text-left vue-good-table-td-style',
+    // },
   ];
   return (table_headers);
 }
@@ -1140,10 +1145,22 @@ export function createTableProspectProjectHeader_V1()
     {
       field: 'marker',
       label: 'Marker',
-      width: '70px',
+      width: '45px',
       sortable: false,
-      thClass: 'text-center',
+      thClass: 'text-center ',
       tdClass: 'text-center',
+    },
+    {
+      field: 'name',
+      label: 'Name',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
     },
     {
       field: 'id_area',
@@ -1155,8 +1172,8 @@ export function createTableProspectProjectHeader_V1()
         trigger: 'enter',
       },
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
     },
     {
       field: 'userId',
@@ -1168,7 +1185,8 @@ export function createTableProspectProjectHeader_V1()
         trigger: 'enter',
       },
       sortable: true,
-      thClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
     },
     {
       field: 'filename',
@@ -1180,7 +1198,8 @@ export function createTableProspectProjectHeader_V1()
         trigger: 'enter',
       },
       sortable: true,
-      thClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
     },
     {
       field: 'group',
@@ -1191,7 +1210,8 @@ export function createTableProspectProjectHeader_V1()
         trigger: 'enter',
       },
       sortable: true,
-      thClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
     },
     {
       field: 'star',
@@ -1203,8 +1223,8 @@ export function createTableProspectProjectHeader_V1()
         trigger: 'enter',
       },
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
     },
     {
       field: 'layer',
@@ -1216,32 +1236,32 @@ export function createTableProspectProjectHeader_V1()
         trigger: 'enter',
       },
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
     },
     {
       field: 'np',
       label: 'nPoint',
       width: '80px',
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-center',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
     },
     {
       field: 'score',
       label: 'Score',
       width: '80px',
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-right',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-right vue-good-table-td-style',
     },
     {
       field: 'area',
       label: 'Area',
       width: '80px',
       sortable: true,
-      thClass: 'text-center',
-      tdClass: 'text-right',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-right vue-good-table-td-style',
     },
     {
       field: 'ctime',
@@ -1256,14 +1276,16 @@ export function createTableProspectProjectHeader_V1()
       type: 'date',
       dateInputFormat: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
       dateOutputFormat: 'MM/dd/yyyy HH:mm:ss',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-right vue-good-table-td-style',
     },
     {
       field: 'action',
       label: 'Action',
       width: '80px',
       sortable: false,
-      thClass: 'text-center',
-      tdClass: 'text-right',
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-right vue-good-table-td-style',
     },
   ];
   return (table_headers);
@@ -1426,4 +1448,38 @@ export function createUpdateProspectGroupSchema() {
     ]
   };
   return(schema_);
+}
+
+export function createTableLayerListHeader_V1()
+{
+  let table_headers = [
+    {
+      key: 'check',
+      label: '',
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'index',
+      label: '#',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'label',
+      label: 'Label',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-left',
+    },
+    {
+      key: 'show',
+      label: 'show',
+      sortable: false,
+      thClass: 'text-center',
+      tdClass: 'text-center',
+    },
+  ];
+  return (table_headers);
 }
