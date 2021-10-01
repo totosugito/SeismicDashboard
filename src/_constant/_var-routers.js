@@ -53,6 +53,7 @@ export default class VarRouter {
 
     'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer"],
     'prospect-edit': ["prospect-edit", "/prospect-edit", "Prospect Edit"],
+    'prospect-analysis': ["prospect-analysis", "/prospect-analysis", "Prospect Analysis"],
     'plot-ava-gather': ["plot-ava-gather", "/plot-ava-gather", "Ava Gather"],
     'plot-ava-gather-section': ["plot-ava-gather-section", "/plot-ava-gather-section", "Ava Gather Section"],
 
@@ -118,6 +119,7 @@ export default class VarRouter {
     "prospect-save": "/api/prospect/save",
     "prospect-update": "/api/prospect/update",
     "prospect-update-group": "/api/prospect/create-group",
+    "prospect-analysis": "/api/prospect/analysis",
   };
 
   schematype = {

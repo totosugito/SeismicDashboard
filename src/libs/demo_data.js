@@ -142,55 +142,17 @@ export function createDemoGeobodySectionList() {
 
 export function createDemoProposeProspect()
 {
-  let data = {
-    "id_area": 2,
-    "layer": 2,
-    "exca": {
-      "iline": {
-        "min": 1762,
-        "max": 1908
-      },
-      "xline": {
-        "min": 3677,
-        "max": 3819
-      },
-      "z": {
-        "min": 943.2111436950153,
-        "max": 1017.387096774194
-      }
-    },
-    "boxa": {
-      "p1": {
-        "iline": 1762,
-        "xline": 3677,
-        "x": 547906.3,
-        "y": 9907613.58
-      },
-      "p2": {
-        "iline": 1762,
-        "xline": 3819,
-        "x": 545418.07,
-        "y": 9910145.62
-      },
-      "p3": {
-        "iline": 1908,
-        "xline": 3677,
-        "x": 550509.66,
-        "y": 9910171.9
-      },
-      "p4": {
-        "iline": 1908,
-        "xline": 3819,
-        "x": 548021.43,
-        "y": 9912703.94
-      }
-    }
-  };
+  let data = {};
   return(data);
 }
 
 export function createDemoProspectProjectList()
 {
   let data = [];
+  return(data);
+}
+
+export function createProspectAnalysisDemoData() {
+  let data = {};
   return(data);
 }

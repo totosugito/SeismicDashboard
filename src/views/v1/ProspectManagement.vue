@@ -8,7 +8,7 @@
       :active="showLoader"/>
 
     <splitpanes class="default-theme" style="height: 88vh" vertical>
-      <pane class="p-2" min-size="20" max-size="70" style="background: white">
+      <pane class="scrollable p-2" min-size="20" max-size="70" style="background: white">
         <div class="group-header">
           <ejs-button cssClass='e-outline' class="mr-1"
                       v-on:click.native="showOrHideTableCheckbox"><i
@@ -48,6 +48,8 @@
             <span v-else-if="props.column.field === 'action'">
               <ejs-button cssClass='e-success'
                           v-on:click.native="eventEditProspectProjectClicked(props.row)">Edit</ejs-button>
+              <ejs-button cssClass='e-success mt-1'
+                          v-on:click.native="eventProspectAnalysisClicked(props.row)">Analysis</ejs-button>
             </span>
             <span v-else-if="props.column.field === 'star'">
               {{props.row.dmp.score.star}}
@@ -403,7 +405,18 @@
         saveProspectData(item);
 
         let routeData = this.$router.resolve({
-          path: "prospect-edit",
+          path: this.varRouter.getRoute("prospect-edit", 1),
+          query: {
+            id: item["id"],
+          }
+        });
+        window.open(routeData.href, '_blank');
+      },
+      eventProspectAnalysisClicked(item) {
+        saveProspectData(item);
+
+        let routeData = this.$router.resolve({
+          path: this.varRouter.getRoute("prospect-analysis", 1),
           query: {
             id: item["id"],
           }
@@ -494,5 +507,8 @@
 </script>
 
 <style>
-
+  .scrollable {
+    overflow-y: auto;
+    max-height: 100%;
+  }
 </style>

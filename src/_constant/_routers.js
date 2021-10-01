@@ -212,6 +212,11 @@ export default new Router({
               name: varRouter.getRoute("plot-ava-gather-section", 2),
               component: () => import('../views/v1/ViewerGatherSection')
             },
+            {
+              path: varRouter.getRoute("prospect-analysis", 1),
+              name: varRouter.getRoute("prospect-analysis", 2),
+              component: () => import('../views/v1/ProspectAnalysis')
+            },
           ]
         }
         ]

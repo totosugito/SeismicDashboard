@@ -182,11 +182,11 @@
                      @ready="onMapReady" @click="onMapClickEvent">
                 <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
                 <template v-if="show_marker_drag">
-                  <l-marker :lat-lng="pageParam" :draggable="false" :icon="markerDragIcon">
+                  <l-marker :lat-lng="{lat: pageParam.lng, lng: pageParam.lat}" :draggable="false" :icon="markerDragIcon">
                     <l-popup>
                       <div style="width: 100%">
-                        Lat (x) : <b>{{pageParam.lng.toFixed(2)}}</b><br>
-                        Lon (y) : <b>{{pageParam.lat.toFixed(2)}}</b><br>
+                        Lat (x) : <b>{{pageParam.lat.toFixed(2)}}</b><br>
+                        Lon (y) : <b>{{pageParam.lng.toFixed(2)}}</b><br>
                       </div>
                     </l-popup>
                   </l-marker>
@@ -731,8 +731,8 @@
           "data": {
             "id_area": this.pageParam["area"],
             "layer": this.pageParam["layer"],
-            "x": this.pageParam["lng"],
-            "y": this.pageParam["lat"],
+            "x": this.pageParam["lat"],
+            "y": this.pageParam["lng"],
             // "x": 550766.97,
             // "y": 9912090.44
           }

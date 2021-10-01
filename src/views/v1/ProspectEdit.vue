@@ -78,7 +78,7 @@
               class="fa fa-map-marker"/></ejs-button>
 
             <template v-if="show_marker_drag">
-              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>
+              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
             </template>
           </div>
           <l-map ref="map" style="width: 100%; height:82vh;" :zoom="map_var.zoom" :center="map_var.center"
@@ -87,12 +87,12 @@
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
             <template v-if="show_marker_center">
-              <l-marker :lat-lng="{lat: proposeProspect.marker.lat, lon: proposeProspect.marker.lng}" :draggable="false"
+              <l-marker :lat-lng="{lat: proposeProspect.marker.lng, lng: proposeProspect.marker.lat}" :draggable="false"
                         :icon="markerCenterIcon">
                 <l-popup>
                   <div style="width: 100%">
-                    Lat (x) : <b>{{proposeProspect.marker.lng.toFixed(2)}}</b><br>
-                    Lon (y) : <b>{{proposeProspect.marker.lat.toFixed(2)}}</b><br>
+                    Lat (x) : <b>{{proposeProspect.marker.lat.toFixed(2)}}</b><br>
+                    Lon (y) : <b>{{proposeProspect.marker.lng.toFixed(2)}}</b><br>
                     Area : <b>{{proposeProspect.marker.area}}</b><br>
                     Layer : <b>{{proposeProspect.marker.layer}}</b><br>
                     <b>{{proposeProspect.marker.label}}</b>
@@ -101,11 +101,11 @@
               </l-marker>
             </template>
             <template v-if="show_marker_drag">
-              <l-marker :lat-lng="marker_drag_coord" :draggable="false" :icon="markerDragIcon">
+              <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false" :icon="markerDragIcon">
                 <l-popup>
                   <div style="width: 100%">
-                    Lat (x) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
-                    Lon (y) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
+                    Lat (x) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
+                    Lon (y) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
 
                     <template v-if="isValidGatherDataFromMarker()">
                       Iline : <b>{{marker_drag_coord.gather.iline}}</b><br>
@@ -246,9 +246,6 @@
 
     data: () => {
       return {
-        // confidence_score: 7,
-        // text_note: "",
-
         bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: false,
@@ -459,8 +456,7 @@
 
       onMapClickEvent(event) {
         if (this.show_marker_drag) {
-          this.marker_drag_coord.lat = event.latlng.lat;
-          this.marker_drag_coord.lng = event.latlng.lng;
+          this.marker_drag_coord = {lat: event.latlng.lng, lng: event.latlng.lat};
           this.marker_drag_coord.gather = {};
         }
       },
@@ -652,8 +648,8 @@
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"],
-            x: this.marker_drag_coord.lng,
-            y: this.marker_drag_coord.lat,
+            x: this.marker_drag_coord.lat,
+            y: this.marker_drag_coord.lng,
           }
         };
 

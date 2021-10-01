@@ -87,7 +87,7 @@
                 <template v-slot:cell(show)="rowc">
                   <template v-if="rowc.item.isAvailable">
                     <span :style="eventHeatmapShowLayerCssStyle(rowc.item)"
-                    @click="eventLayerShowHeatmapClicked(rowc.item)">
+                    @click="eventLayerShowHeatmapClicked(row.item, rowc.item)">
                       <template v-if="rowc.item.show">
                         <i class="btn_toolbar fa fa-toggle-on"/>
                       </template>
@@ -111,7 +111,7 @@
                         v-on:click.native="markerLocationEventClick()"><i
               class="fa fa-map-marker"/></ejs-button>
             <template v-if="show_marker_drag">
-              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lng.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lat.toFixed(2)}}</span>
+              <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
             </template>
           </div>
 
@@ -146,16 +146,16 @@
             </template>
 
             <template v-if="show_marker_drag">
-              <l-marker :lat-lng="marker_drag_coord" :draggable="false" :icon="markerDragIcon">
+              <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false" :icon="markerDragIcon">
                 <l-popup>
                   <div style="width: 100%">
-                    Lat (x) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
-                    Lon (y) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
+                    Lat (x) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
+                    Lon (y) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
                     Area : <b>{{selectedLayer.area_name}}</b><br>
                     Layer : <b>{{selectedLayer.layer_name}}</b>
                     <!--                    <b-form-select v-model="selected" :options="options" size="sm" class="mt-3"></b-form-select>-->
                   </div>
-                  <b-button class="btn btn-sm mt-1" variant="primary" @click="openSectionByCoord()">Section
+                  <b-button class="btn btn-sm mt-1" variant="primary" @click="openSectionByCoord()">Prospect
                   </b-button>
                 </l-popup>
               </l-marker>
@@ -352,8 +352,9 @@
       // marker drag
       // ------------------------------------------------
       onMapClickEvent(event) {
-        if (this.show_marker_drag)
-          this.marker_drag_coord = event.latlng;
+        if (this.show_marker_drag) {
+          this.marker_drag_coord = {lat: event.latlng.lng, lng: event.latlng.lat};
+        }
       },
 
       markerLocationCssStyle() {
@@ -464,9 +465,16 @@
           "font-size:100%;";
         return (strstyle);
       },
-      eventLayerShowHeatmapClicked(item)
+      eventLayerShowHeatmapClicked(item_area, item)
       {
         item.show = !item.show;
+        if (item.show)
+        {
+          this.selectedLayer["area"] = item_area.id_area;
+          this.selectedLayer["area_name"] = item_area.name;
+          this.selectedLayer["layer"] = item["layer"];
+          this.selectedLayer["layer_name"] = item["label"];
+        }
         this.tmp_array_autoupdate = [];
       },
 

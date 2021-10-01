@@ -19,8 +19,8 @@ export function addPlotDataToTableArea(map_var, datas)
 export function getAreaFirstCoordinate(datas)
 {
   let coord = {
-    lat: datas[0]["coordinate"]["p1"]["y"],
-    lng: datas[0]["coordinate"]["p1"]["x"]};
+    lat: datas[0]["coordinate"]["p1"]["x"],
+    lng: datas[0]["coordinate"]["p1"]["y"]};
   return(coord);
 }
 
