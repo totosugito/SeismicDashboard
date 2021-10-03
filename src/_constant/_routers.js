@@ -32,11 +32,6 @@ export default new Router({
     // TESTING PAGE
     // ---------------------------------------------------------------
     {
-      path: varRouter.getRoute("start", 1),
-      name: varRouter.getRoute("start", 2),
-      component: () => import('../views/testing/SeismicView')
-    },
-    {
       path: "/test-table",
       name: "test-table",
       component: () => import('../views/testing/testTable')
@@ -140,6 +135,11 @@ export default new Router({
             }
           },
           children: [
+            {
+              path: varRouter.getRoute("start", 1),
+              name: varRouter.getRoute("start", 2),
+              component: () => import('../views/v1/LandingPage')
+            },
             // ---------------------------------------------------------
             //                    Dashboard
             // ---------------------------------------------------------

@@ -127,6 +127,7 @@
         },
 
         event_http_prospect_analysis: {success: "successProspectAnalysis", fail: "failProspectAnalysis"},
+        event_http_prospect_update_star: {success: "successProspectUpdateStar", fail: "failProspectUpdateStar"},
       }
     },
     created() {
@@ -161,15 +162,20 @@
         this.showLoader = true;
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-analysis"), param, this.event_http_prospect_analysis]).then();
       },
-      // updateParamProbabilty(val)
-      // {
-      //   this.prospectAnalysis.dmp.probability = val;
-      //   console.log(JSON.stringify(val))
-      //   console.log(JSON.stringify(this.prospectAnalysis))
-      // },
       updateProspectAnalysisValue()
       {
-        console.log(JSON.stringify(this.prospectAnalysis))
+        let param = {
+          user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"],
+            analysis: this.prospectAnalysis["dmp"]["analysis"]
+          }
+        };
+
+        // console.log(JSON.stringify(this.prospectAnalysis))
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-update-star"), param, this.event_http_prospect_update_star]).then();
       }
     },
     mounted() {
@@ -183,10 +189,26 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      EventBus.$on(this.event_http_prospect_update_star.success, (msg) => {
+        this.prospectAnalysis = msg.data;
+        this.showLoader = false;
+        this.retStatus["title"] = "Information";
+        this.retStatus["message"] = msg.mesg;
+        this.$refs.dialogMessage.showModal();
+      });
+      EventBus.$on(this.event_http_prospect_update_star.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
     beforeDestroy() {
       EventBus.$off(this.event_http_prospect_analysis.success);
       EventBus.$off(this.event_http_prospect_analysis.fail);
+      EventBus.$off(this.event_http_prospect_update_star.success);
+      EventBus.$off(this.event_http_prospect_update_star.fail);
+
     }
   }
 </script>

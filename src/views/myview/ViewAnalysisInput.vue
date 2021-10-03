@@ -13,14 +13,14 @@
         rows="3"
         max-rows="6"/>
     </div>
-    <div>
-      <div class="mb-2 mt-3">WEIGHT</div>
-      <div><strong>{{param.weight}}</strong></div>
-    </div>
-    <div>
-      <div class="mb-2 mt-3">SCORE</div>
-      <div><strong>{{param.weight}}</strong></div>
-    </div>
+<!--    <div>-->
+<!--      <div class="mb-2 mt-3">WEIGHT</div>-->
+<!--      <div><strong>{{param.weight}}</strong></div>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--      <div class="mb-2 mt-3">SCORE</div>-->
+<!--      <div><strong>{{param.weight}}</strong></div>-->
+<!--    </div>-->
 <!--    <div class="mt-2">-->
 <!--      <ejs-button cssClass='e-success' v-on:click.native='onClickUpdateButton'>Update</ejs-button>-->
 <!--    </div>-->

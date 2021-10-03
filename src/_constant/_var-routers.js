@@ -120,6 +120,7 @@ export default class VarRouter {
     "prospect-update": "/api/prospect/update",
     "prospect-update-group": "/api/prospect/create-group",
     "prospect-analysis": "/api/prospect/analysis",
+    "prospect-update-star": "/api/prospect/update-star",
   };
 
   schematype = {
