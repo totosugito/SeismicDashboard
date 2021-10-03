@@ -82,12 +82,12 @@
             <template v-for="prospect in table_prospect">
               <template v-if="'marker' in prospect.dmp">
                 <template v-if="prospect.dmp.marker.show">
-                  <l-marker :lat-lng="{lat: prospect.dmp.marker.lat, lng: prospect.dmp.marker.lng}" :draggable="false"
+                  <l-marker :lat-lng="{lat: prospect.dmp.marker.lng, lng: prospect.dmp.marker.lat}" :draggable="false"
                             :icon="markerDragIcon">
                     <l-popup>
                       <div style="width: 100%;">
-                        Lat (x) : <b>{{prospect.dmp.marker.lng.toFixed(2)}}</b><br>
-                        Lon (y) : <b>{{prospect.dmp.marker.lat.toFixed(2)}}</b><br>
+                        Lat (x) : <b>{{prospect.dmp.marker.lat.toFixed(2)}}</b><br>
+                        Lon (y) : <b>{{prospect.dmp.marker.lng.toFixed(2)}}</b><br>
                         Area : <b>{{prospect.dmp.marker.area}}</b><br>
                         Layer : <b>{{prospect.dmp.marker.layer}}</b><br>
                         <b>{{prospect.dmp.marker.label}}</b>
