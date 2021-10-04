@@ -74,6 +74,7 @@
           <l-map ref="map" style="width: 100%; height:100%;" :zoom="map_var.zoom" :center="map_var.center"
                  :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
                  @ready="onMapReady">
+
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
             <template v-for="item in tmp_array_autoupdate">
@@ -97,7 +98,6 @@
                 </template>
               </template>
             </template>
-
           </l-map>
         </template>
       </pane>

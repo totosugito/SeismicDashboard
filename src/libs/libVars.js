@@ -1151,8 +1151,9 @@ export function createTableProspectProjectHeader_V1()
       tdClass: 'text-center',
     },
     {
-      field: 'name',
-      label: 'Name',
+      field: 'id_area',
+      label: 'Area',
+      width: '70px',
       filterOptions: {
         enabled: true,
         placeholder: '',
@@ -1163,9 +1164,8 @@ export function createTableProspectProjectHeader_V1()
       tdClass: 'text-center vue-good-table-td-style',
     },
     {
-      field: 'id_area',
-      label: 'Area',
-      width: '70px',
+      field: 'name',
+      label: 'Name',
       filterOptions: {
         enabled: true,
         placeholder: '',
@@ -1214,9 +1214,61 @@ export function createTableProspectProjectHeader_V1()
       tdClass: 'vue-good-table-td-style',
     },
     {
-      field: 'star',
-      label: 'Star',
-      width: '80px',
+      field: 'dmp.analysis.probability.star',
+      label: 'Probability',
+      width: '110px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'dmp.analysis.substack.star',
+      label: 'Substack',
+      width: '110px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'dmp.analysis.AVA.star',
+      label: 'AVA',
+      width: '110px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'dmp.analysis.sweetness.star',
+      label: 'Sweetness',
+      width: '110px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'dmp.analysis.well_analogy.star',
+      label: 'Well Analogy',
+      width: '110px',
       filterOptions: {
         enabled: true,
         placeholder: '',

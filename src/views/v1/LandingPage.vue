@@ -1,19 +1,19 @@
 <template>
   <div class="flex-row align-items-center container-fluid" style="background-color:lightblue; height: 100%">
 
-    <button class="btn btn-light" @click="openPageProspectFinder">
+    <button class="btn btn-light m-2" @click="openPageProspectFinder">
       <img class="img-responsive" src="../../_assets/images/asset03@2x.png"/>
       <div class="menu_landing_page_text">Prospect Finder</div>
     </button>
 
-    <button class="btn btn-light  m-4" @click="openPageProspectManagement">
-      <img class="img-responsive" src="../../_assets/images/asset01@2x.png"/>
-      <div class="menu_landing_page_text">Prospect Management</div>
+    <button class="btn btn-light m-2" @click="openPageProspectAnalysis">
+      <img class="img-responsive" src="../../_assets/images/asset02@2x.png"/>
+      <div class="menu_landing_page_text">Prospect Analysis</div>
     </button>
 
-    <button class="btn btn-light" @click="openPageProspectAnalysis">
-      <img class="gray_image img-responsive" src="../../_assets/images/asset02@2x.png"/>
-      <div class="menu_landing_page_text">Prospect Analysis</div>
+    <button class="btn btn-light m-2" @click="openPageProspectManagement">
+      <img class="gray_image img-responsive" src="../../_assets/images/asset01@2x.png"/>
+      <div class="menu_landing_page_text">Prospect Management</div>
     </button>
   </div>
 </template>
@@ -40,10 +40,7 @@
     methods: {
       openPageProspectManagement()
       {
-        let routeData = this.$router.resolve({
-          path: this.varRouter.getRoute("prospect-management", 1),
-        });
-        window.open(routeData.href, '_blank');
+
       },
       openPageProspectFinder()
       {
@@ -54,7 +51,10 @@
       },
       openPageProspectAnalysis()
       {
-
+        let routeData = this.$router.resolve({
+          path: this.varRouter.getRoute("prospect-management", 1),
+        });
+        window.open(routeData.href, '_blank');
       },
     }
   }
