@@ -43,3 +43,7 @@ $header-size : "180px";
 {
   font-size: 80%;
 }
+
+.options { position: absolute; top: 0; right: 0; padding: 3px; background: rgba(255,255,255,0.6);
+  border-bottom: 1px solid #ccc; border-left: 1px solid #ccc; line-height: 1; }
+.options label { width: 60px; float: left; text-align: left; margin-right: 10px; padding-left: 5px; color: #555; }

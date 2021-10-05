@@ -60,6 +60,9 @@
                 <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedLayers(row.item)">
                   <i class="fa fa-download" v-b-tooltip.hover title="Download selected data"/>
                 </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="downloadSelectedWell(row.item)">
+                  <i class="fa fa-podcast" v-b-tooltip.hover title="Download well"/>
+                </ejs-button>
               </div>
               <b-table responsive
                        show-empty
@@ -109,7 +112,10 @@
             <!-- map button -->
             <ejs-button :cssClass='markerLocationCssStyle()' class="mr-1"
                         v-on:click.native="markerLocationEventClick()"><i
-              class="fa fa-map-marker"/></ejs-button>
+              class="fa fa-map-marker" v-b-tooltip.hover title="Show or hide marker"/></ejs-button>
+            <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"
+                        v-on:click.native="markerWellEventClick()"><i
+              class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
             </template>
@@ -119,6 +125,20 @@
           <l-map ref="map" style="width: 100%; height:96%;" :zoom="map_var.zoom" :center="map_var.center"
                  :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
                  @ready="onMapReady" @click="onMapClickEvent">
+
+            <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
+            <l-control position="topright" style="margin-top: 30px">
+              <div class="options">
+                <label>Radius </label><br/>
+                <vue-range-slider width="150px" tooltip="hover"
+                                  v-model="heatmapScale.radius.value" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"/><br/>
+
+                <label>Blur </label><br/>
+                <vue-range-slider width="150px" tooltip="hover"
+                                  v-model="heatmapScale.blur.value" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"/>
+              </div>
+            </l-control>
+
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
             <template v-for="item in tmp_array_autoupdate">
@@ -136,8 +156,8 @@
                 <template v-if="layer.show">
                   <LHeatmap
                     :latLngs="area.layers[ii].heatmap.probmap"
-                    :radius="20"
-                    :blur="20"
+                    :radius="heatmapScale.radius.value"
+                    :blur="heatmapScale.blur.value"
                     :minOpacity="0.1"
                     :max="area.layers[ii].heatmap.sum.max">
                   </LHeatmap>
@@ -161,6 +181,13 @@
               </l-marker>
             </template>
 
+            <template v-if="show_well_marker">
+              <template v-for="wellmarker in well_marker">
+                <l-polyline :lat-lngs="wellmarker.data" color="red" :weight="2">
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}</l-tooltip>
+                </l-polyline>
+              </template>
+            </template>
           </l-map>
         </template>
       </pane>
@@ -185,7 +212,8 @@
   import Vue from 'vue';
 
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
-
+  import 'vue-range-component/dist/vue-range-slider.css'
+  import VueRangeSlider from 'vue-range-component'
   Vue.use(ButtonPlugin);
 
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
@@ -213,7 +241,7 @@
 
 
   import * as L from "leaflet";
-  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip} from 'vue2-leaflet'
+  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip, LControlScale, LControl, LPolyline} from 'vue2-leaflet'
   import {CRS} from "leaflet";
   import 'leaflet/dist/leaflet.css'
   import {
@@ -235,13 +263,19 @@
       Splitpanes, Pane,
       VueLeafletMap,
       VueSimpleDialog,
+
+      VueRangeSlider,
+
       LMap,
       LTileLayer,
       LMarker,
       LPolygon,
       LPopup,
       LTooltip,
-      LHeatmap
+      LHeatmap,
+      LControlScale,
+      LControl,
+      LPolyline
     },
     computed: mapState({
       varRouter: state => state.varRouter,
@@ -257,6 +291,24 @@
         bdemo: appDemoMode(),
         showLoader: true,
         retStatus: {status: 0, title: "", message: "", data: []},
+
+        polyline: {
+          latlngs: [[9907792.13, 549186.55], [9908547.4, 548998.18]],
+          color: 'red'
+        },
+
+        heatmapScale :{
+          radius: {
+            min: 5,
+            max: 50,
+            value: 15
+          },
+          blur: {
+            min: 5,
+            max: 50,
+            value: 15
+          }
+        },
 
         selectedLayer: {
           area: -1,
@@ -305,9 +357,13 @@
           validateAfterChanged: true,
         },
 
+        show_well_marker: false,
+        well_marker: [],
+
         event_http_area_list: {success: "successAreaList", fail: "failAreaList"},
         event_http_probmap_get_list: {success: "successProbmapGetList", fail: "failProbmapGetList"},
         event_http_layer_download: {success: "successLayerDownload", fail: "failLayerDownload"},
+        event_http_well_download: {success: "successWellDownload", fail: "failWellDownload"},
       }
     },
 
@@ -367,6 +423,16 @@
         this.show_marker_drag = !this.show_marker_drag;
       },
 
+      markerWellCssStyle() {
+        if (this.show_well_marker)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      markerWellEventClick() {
+        this.show_well_marker = !this.show_well_marker;
+      },
+
       // ------------------------------------------------
       // checked/unchecked layer area
       // ------------------------------------------------
@@ -398,7 +464,6 @@
             label: item.label,
           })
         }
-
         if(this.list_selected_layer.length === 0) {
           this.retStatus["title"] = "Information";
           this.retStatus["message"] = "No data selected";
@@ -407,6 +472,12 @@
         }
         // console.log(JSON.stringify(this.list_selected_layer))
         this.httpDownloadLayerData();
+      },
+      downloadSelectedWell(item_area)
+      {
+        this.showLoader = true;
+        let str_url = this.varRouter.getHttpType("well-list-info") + item_area["id_area"];
+        this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_download]).then();
       },
       httpDownloadLayerData() {
         this.showLoader = true;
@@ -576,6 +647,29 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-----------------------------------------------------------------
+      // WELL GET LIST
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_well_download.success, (msg) => {
+        let n = msg.data.length;
+        this.well_marker = [];
+        for(let i=0; i<n; i++)
+        {
+          let item = msg.data[i];
+          this.well_marker.push({
+            data: [[item.yst, item.xst], [item.yen, item.xen]],
+            name: item["well_id"]
+          })
+        }
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_well_download.fail, (msg) => {
+        this.well_marker = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy() {
@@ -585,6 +679,8 @@
       EventBus.$off(this.event_http_probmap_get_list.fail);
       EventBus.$off(this.event_http_layer_download.success);
       EventBus.$off(this.event_http_layer_download.fail);
+      EventBus.$off(this.event_http_well_download.success);
+      EventBus.$off(this.event_http_well_download.fail);
 
       this.showLoader = false;
     },
@@ -592,4 +688,13 @@
 </script>
 
 <style>
+  /* remove label background elements */
+  .leaflet-tooltip.my-labels {
+    background-color: transparent;
+    border: transparent;
+    box-shadow: none;
+    font-size: 12px;
+    font-weight: bold;
+    color: black;
+  }
 </style>

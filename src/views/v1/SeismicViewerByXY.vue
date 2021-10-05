@@ -180,6 +180,19 @@
               <l-map ref="map" style="width: 100%; height:72vh;" :zoom="map_var.zoom" :center="map_var.center"
                      :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
                      @ready="onMapReady" @click="onMapClickEvent">
+                <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
+                <l-control position="topright" style="margin-top: 30px">
+                  <div class="options">
+                    <label>Radius </label><br/>
+                    <vue-range-slider width="150px" tooltip="hover"
+                                      v-model="heatmapScale.radius.value" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"/><br/>
+
+                    <label>Blur </label><br/>
+                    <vue-range-slider width="150px" tooltip="hover"
+                                      v-model="heatmapScale.blur.value" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"/>
+                  </div>
+                </l-control>
+
                 <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
                 <template v-if="show_marker_drag">
                   <l-marker :lat-lng="{lat: pageParam.lng, lng: pageParam.lat}" :draggable="false" :icon="markerDragIcon">
@@ -199,8 +212,8 @@
                   <template v-if="layer.show===true">
                     <LHeatmap
                       :latLngs="layer.heatmap"
-                      :radius="15"
-                      :blur="15"
+                      :radius="heatmapScale.radius.value"
+                      :blur="heatmapScale.blur.value"
                       :minOpacity="0.1"
                       :max="1.0">
                     </LHeatmap>
@@ -247,7 +260,8 @@
   import Vue from 'vue';
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
   Vue.use(ButtonPlugin);
-
+  import 'vue-range-component/dist/vue-range-slider.css'
+  import VueRangeSlider from 'vue-range-component'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
 
@@ -279,7 +293,7 @@
   import VueLeafletMap from "../components/vue-leaflet-map"
   import LHeatmap from "../components/Vue2LeafletHeatmap";
   import * as L from "leaflet";
-  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip} from 'vue2-leaflet'
+  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip, LControlScale, LControl} from 'vue2-leaflet'
   import {CRS} from "leaflet";
   import 'leaflet/dist/leaflet.css'
   import '@geoman-io/leaflet-geoman-free'
@@ -311,6 +325,7 @@
 
       StarRating,
       Splitpanes, Pane,
+      VueRangeSlider,
 
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,
@@ -321,7 +336,9 @@
       LPolygon,
       LPopup,
       LTooltip,
-      LHeatmap
+      LHeatmap,
+      LControlScale,
+      LControl
     },
 
     computed: mapState({
@@ -337,6 +354,19 @@
           validateAfterLoad: true,
           validateAfterChanged: true,
         },
+        heatmapScale :{
+          radius: {
+            min: 5,
+            max: 50,
+            value: 15
+          },
+          blur: {
+            min: 5,
+            max: 50,
+            value: 15
+          }
+        },
+
         save_prospect_model: createSaveProspectModel(),
         save_prospect_schema: createSaveProspectSchema(),
 
