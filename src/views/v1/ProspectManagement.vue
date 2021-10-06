@@ -75,6 +75,8 @@
                  :crs="map_var.crs" :minZoom="map_var.minZoom" :maxZoom="map_var.maxZoom"
                  @ready="onMapReady">
 
+            <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
+
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
             <template v-for="item in tmp_array_autoupdate">
@@ -162,7 +164,7 @@
   } from "../../libs/demo_data";
 
   import * as L from "leaflet";
-  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip} from 'vue2-leaflet'
+  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip, LControlScale} from 'vue2-leaflet'
   import {CRS} from "leaflet";
   import 'leaflet/dist/leaflet.css'
   import {
@@ -193,6 +195,7 @@
       LPolygon,
       LPopup,
       LTooltip,
+      LControlScale,
 
       VueGoodTable,
       VueFormDialog,
