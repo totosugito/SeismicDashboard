@@ -9,8 +9,6 @@
 
     <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
       <pane class="p-2" min-size="20" max-size="40" style="background: white">
-        <!--            <b-card-header header-tag="header" class="p-0" role="tab">Layer List</b-card-header>-->
-        <!--            <b-card-body>-->
         <div>
           <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/>
             Uncheck All
@@ -58,15 +56,11 @@
           <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
         </div>
         <div class="mt-2">
-          <!--        <ejs-button cssClass='e-danger' class="mr-2 mb-2" v-on:click.native='onClickComputeScore'>Compute Score-->
-          <!--        </ejs-button>-->
           <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update</ejs-button>
           <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather</ejs-button>
         </div>
-        <!--            </b-card-body>-->
       </pane>
       <pane class="p-2" min-size="40" max-size="80" style="background: white">
-
         <template v-if="showMapProspect">
           <div class="mb-1">
             <ejs-button :cssClass='setToggleButtonStyle(show_marker_center)' class="mr-1"
@@ -76,6 +70,13 @@
             <ejs-button :cssClass='setToggleButtonStyle(show_marker_drag)' class="mr-1"
                         v-on:click.native="markerLocationEventClick()" v-b-tooltip.hover title="Map marker position"><i
               class="fa fa-map-marker"/></ejs-button>
+
+            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedWell()">
+              <i class="fa fa-podcast" v-b-tooltip.hover title="Download well"/>
+            </ejs-button>
+            <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"
+                        v-on:click.native="markerWellEventClick()"><i
+              class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>
 
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
@@ -88,13 +89,10 @@
             <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
             <l-control position="topright" style="margin-top: 30px">
                 <div class="options">
-                  <label>Radius </label><br/>
-                  <vue-range-slider width="150px" tooltip="hover"
-                                    v-model="heatmapScale.radius.value" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"/><br/>
-
-                  <label>Blur </label><br/>
-                  <vue-range-slider width="150px" tooltip="hover"
-                                    v-model="heatmapScale.blur.value" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"/>
+                  <label>Radius ({{heatmapScale.radius.value}})</label><br/>
+                  <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
+                  <label>Blur ({{heatmapScale.blur.value}})</label><br/>
+                  <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
                 </div>
             </l-control>
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
@@ -115,7 +113,7 @@
             </template>
             <template v-if="show_marker_drag">
               <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false" :icon="markerDragIcon">
-                <l-popup>
+                <l-popup :options="{className: 'customPopup'}" >
                   <div style="width: 100%">
                     Lat (x) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
                     Lon (y) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
@@ -123,11 +121,18 @@
                     <template v-if="isValidGatherDataFromMarker()">
                       Iline : <b>{{marker_drag_coord.gather.iline}}</b><br>
                       Xline : <b>{{marker_drag_coord.gather.xline}}</b><br>
-                      Z Min : <b>{{marker_drag_coord.gather.z.min.toFixed(2)}}</b><br>
-                      Z Max : <b>{{marker_drag_coord.gather.z.max.toFixed(2)}}</b><br>
-                      <b-button class="btn btn-sm mt-2" variant="success" @click="httpOpenGatherFromMapMarker()">Open
+                      <b-input-group prepend="Z Min" size="sm">
+                        <b-form-input v-model="marker_drag_coord.gather.z.min"/>
+                      </b-input-group>
+                      <b-input-group prepend="Z Max" size="sm">
+                        <b-form-input v-model="marker_drag_coord.gather.z.max"/>
+                      </b-input-group>
+
+                      <b-button class="btn btn-sm mt-2 mr-2" variant="success" @click="httpOpenGatherFromMapMarker()">Open
                         Gather
                       </b-button>
+<!--                    <b-button class="btn btn-sm mt-2" variant="warning" @click="editOpenGatherDialogShow()">Edit-->
+<!--                    </b-button>-->
                     </template>
                     <template v-else>
                       <b-button class="btn btn-sm mt-2" variant="primary" @click="httpFindGatherFromMapMarker()">Find
@@ -143,11 +148,19 @@
               <template v-if="layer.show===true">
                 <LHeatmap
                   :latLngs="layer.heatmap"
-                  :radius="heatmapScale.radius.value"
-                  :blur="heatmapScale.blur.value"
+                  :radius="heatmapScale.radius.value*1"
+                  :blur="heatmapScale.blur.value*1"
                   :minOpacity="0.1"
                   :max="heatmap_range[layer.cmap].max">
                 </LHeatmap>
+              </template>
+            </template>
+
+            <template v-if="show_well_marker">
+              <template v-for="wellmarker in well_marker">
+                <l-polyline :lat-lngs="wellmarker.data" color="red" :weight="2">
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}</l-tooltip>
+                </l-polyline>
               </template>
             </template>
           </l-map>
@@ -167,6 +180,21 @@
                 <h5>{{retStatus.message}}</h5>
               </span>
     </vue-simple-dialog>
+
+    <!-- edit find gather parameter -->
+<!--    <vue-form-dialog-->
+<!--      ref="editOpenGathertDialog"-->
+<!--      type="default"-->
+<!--      header="Edit Parameter" body="Body"-->
+<!--      btn1_text="Close" btn2_text="Save"-->
+<!--      btn1_style="danger" btn2_style="primary"-->
+<!--      @btn1Click="editOpenGatherDialogBtn1Click()" @btn2Click="editOpenGatherDialogBtn2Click()">-->
+
+<!--      &lt;!&ndash; body slot &ndash;&gt;-->
+<!--      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">-->
+<!--              <vue-form-generator :schema="edit_open_gather_schema" :model="edit_open_gather_model" :options="formOptions" @validated="onValidated"/>-->
+<!--            </span>-->
+<!--    </vue-form-dialog>-->
   </div>
 </template>
 
@@ -186,6 +214,9 @@
   import 'bootstrap-slider/dist/css/bootstrap-slider.css'
   import {forEach} from 'lodash';
   import {getColormapAsset, getColormapName} from "../../libs/colormap";
+
+  // import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
+  // import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
 
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
@@ -209,7 +240,7 @@
   import VueLeafletMap from "../components/vue-leaflet-map"
   import LHeatmap from "../components/Vue2LeafletHeatmap";
   import * as L from "leaflet";
-  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip, LControlScale, LControl} from 'vue2-leaflet'
+  import {LMap, LTileLayer, LMarker, LPolygon, LPopup, LTooltip, LControlScale, LControl, LPolyline} from 'vue2-leaflet'
   import {CRS} from "leaflet";
   import 'leaflet/dist/leaflet.css'
   import '@geoman-io/leaflet-geoman-free'
@@ -218,11 +249,8 @@
   import "../../_assets/leaflet-measure.css";
   import {v4 as uuidv4} from 'uuid';
   import * as turf from "@turf/turf";
-  import {createTableProspectMapHeader} from "../../libs/libVars";
+  import {createEditOpenGatherSchema, createTableProspectMapHeader} from "../../libs/libVars";
   import {readProspectData, saveProspectData} from "../../_constant/active_user";
-
-  import 'vue-range-component/dist/vue-range-slider.css'
-  import VueRangeSlider from 'vue-range-component'
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -244,7 +272,9 @@
       StarRating,
 
       Splitpanes, Pane,
-      VueRangeSlider,
+
+      // VueFormDialog,
+      // "vue-form-generator": VueFormGenerator.component,
 
       LMap,
       LTileLayer,
@@ -254,7 +284,8 @@
       LTooltip,
       LHeatmap,
       LControlScale,
-      LControl
+      LControl,
+      LPolyline
     },
 
     computed: mapState({
@@ -265,10 +296,14 @@
 
     data: () => {
       return {
+        bvalidate: false,
         bdemo: appDemoMode(),
         retStatus: {status: 0, title: "", message: "", data: []},
         showLoader: false,
         showMapProspect: false,
+
+        show_well_marker: false,
+        well_marker: [],
 
         heatmapScale :{
           radius: {
@@ -306,7 +341,7 @@
 
         show_marker_center: true,
         show_marker_drag: false,
-        marker_drag_coord: {lat: 0, lng: 0, gather: {}},
+        marker_drag_coord: {lat: 0, lng: 0, gather: {z: {min: 0, max:0}}},
         refreshChart: false,
         proposeProspect: {},
         prospectMap: {ndata: 0, layers: []},
@@ -340,12 +375,21 @@
 
         table_prospect_map_heder: createTableProspectMapHeader(),
         table_prospect_map: [],
+
+        edit_open_gather_schema: createEditOpenGatherSchema(),
+        edit_open_gather_model: {},
+        formOptions: {
+          validateAfterLoad: true,
+          validateAfterChanged: true,
+        },
+
         event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
         event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
         event_http_prospect_map: {success: "successProspectMap", fail: "failProspectMap"},
         event_http_prospect_score: {success: "successProspectScore", fail: "failProspectScore"},
         event_http_save_prospect: {success: "successSaveProspect", fail: "failSaveProspect"},
         event_http_find_gather_from_latlng: {success: "successFindGatherFromLatLng", fail: "failFindGatherFromLatLng"},
+        event_http_well_download: {success: "successWellDownload", fail: "failWellDownload"},
       }
     },
     created() {
@@ -363,7 +407,7 @@
       this.marker_drag_coord = {
         lat: this.proposeProspect["marker"].lat,
         lng: this.proposeProspect["marker"].lng,
-        gather: {}
+        gather: {z: {min:0, max:0}}
       };
       this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
 
@@ -381,6 +425,33 @@
     },
 
     methods: {
+      // onValidated(isValid, errors) {
+      //   this.bvalidate = isValid;
+      // },
+      // editOpenGatherDialogShow()
+      // {
+      //   // this.edit_open_gather_model = {
+      //   //   zmin: this.marker_drag_coord["gather"]["z"]["min"],
+      //   //   zmax: this.marker_drag_coord["gather"]["z"]["max"],
+      //   // };
+      //   this.edit_open_gather_model = {
+      //     zmin: 100,
+      //     zmax: 200
+      //   }
+      //   this.$refs.editOpenGathertDialog.showModal();
+      // },
+      //
+      // editOpenGatherDialogBtn1Click() {
+      //   this.$refs.editOpenGathertDialog.hideModal();
+      // },
+      // editOpenGatherDialogBtn2Click() {
+      //   if (!this.bvalidate) return;
+      //
+      //   this.marker_drag_coord["gather"]["z"]["min"] = this.edit_open_gather_model["zmin"];
+      //   this.marker_drag_coord["gather"]["z"]["max"] = this.edit_open_gather_model["zmax"];
+      //   this.$refs.editOpenGathertDialog.hideModal();
+      // },
+
       isValidGatherDataFromMarker() {
         if (!("gather" in this.marker_drag_coord))
           return (false);
@@ -488,6 +559,7 @@
       onMapClickEvent(event) {
         if (this.show_marker_drag) {
           this.marker_drag_coord = {lat: event.latlng.lng, lng: event.latlng.lat};
+          //TODO CEK INI
           this.marker_drag_coord.gather = {};
         }
       },
@@ -579,7 +651,22 @@
       markerLocationEventClick() {
         this.show_marker_drag = !this.show_marker_drag;
       },
-
+      markerWellEventClick() {
+        this.show_well_marker = !this.show_well_marker;
+        this.editOpenGatherDialogShow();
+      },
+      markerWellCssStyle() {
+        if (this.show_well_marker)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      downloadSelectedWell()
+      {
+        this.showLoader = true;
+        let str_url = this.varRouter.getHttpType("well-list-info") + this.objParam["id_area"];
+        this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_download]).then();
+      },
       createDefaultBoundaryParameter() {
         let tstart = 0;
         let tend = 0;
@@ -679,8 +766,8 @@
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"],
-            x: this.marker_drag_coord.lat,
-            y: this.marker_drag_coord.lng,
+            x: this.marker_drag_coord.lat*1.0,
+            y: this.marker_drag_coord.lng*1.0,
           }
         };
 
@@ -690,13 +777,8 @@
       },
       httpOpenGatherFromMapMarker()
       {
-        // let gather_pos = this.marker_drag_coord["gather"];
-        // gather_pos["id_area"] = this.objParam["id_area"];
-        // gather_pos["filename"] = this.objParam["filename"];
-        // let param = {
-        //   user: this.user["user"],
-        //   data: gather_pos
-        // };
+        this.marker_drag_coord["gather"]["z"]["min"] = this.marker_drag_coord["gather"]["z"]["min"]*1.0;
+        this.marker_drag_coord["gather"]["z"]["max"] = this.marker_drag_coord["gather"]["z"]["max"]*1.0;
         let routeData = this.$router.resolve({
           path: "plot-ava-gather-section",
           query: {
@@ -708,6 +790,7 @@
             zmax: this.marker_drag_coord["gather"]["z"]["max"],
           }
         });
+        // console.log(JSON.stringify(this.marker_drag_coord))
         window.open(routeData.href, '_blank');
       },
     },
@@ -772,6 +855,29 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-----------------------------------------------------------------
+      // WELL GET LIST
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_well_download.success, (msg) => {
+        let n = msg.data.length;
+        this.well_marker = [];
+        for(let i=0; i<n; i++)
+        {
+          let item = msg.data[i];
+          this.well_marker.push({
+            data: [[item.yst, item.xst], [item.yen, item.xen]],
+            name: item["well_id"]
+          })
+        }
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_well_download.fail, (msg) => {
+        this.well_marker = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
     beforeDestroy() {
       EventBus.$off(this.event_http_prospect_score.success);
@@ -782,6 +888,8 @@
       EventBus.$off(this.event_http_save_prospect.fail);
       EventBus.$off(this.event_http_find_gather_from_latlng.success);
       EventBus.$off(this.event_http_find_gather_from_latlng.fail);
+      EventBus.$off(this.event_http_well_download.success);
+      EventBus.$off(this.event_http_well_download.fail);
     },
   }
 </script>

@@ -129,13 +129,10 @@
             <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
             <l-control position="topright" style="margin-top: 30px">
               <div class="options">
-                <label>Radius </label><br/>
-                <vue-range-slider width="150px" tooltip="hover"
-                                  v-model="heatmapScale.radius.value" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"/><br/>
-
-                <label>Blur </label><br/>
-                <vue-range-slider width="150px" tooltip="hover"
-                                  v-model="heatmapScale.blur.value" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"/>
+                <label>Radius ({{heatmapScale.radius.value}})</label><br/>
+                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
+                <label>Blur ({{heatmapScale.blur.value}})</label><br/>
+                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
               </div>
             </l-control>
 
@@ -212,8 +209,6 @@
   import Vue from 'vue';
 
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
-  import 'vue-range-component/dist/vue-range-slider.css'
-  import VueRangeSlider from 'vue-range-component'
   Vue.use(ButtonPlugin);
 
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
@@ -263,8 +258,6 @@
       Splitpanes, Pane,
       VueLeafletMap,
       VueSimpleDialog,
-
-      VueRangeSlider,
 
       LMap,
       LTileLayer,
@@ -688,13 +681,4 @@
 </script>
 
 <style>
-  /* remove label background elements */
-  .leaflet-tooltip.my-labels {
-    background-color: transparent;
-    border: transparent;
-    box-shadow: none;
-    font-size: 12px;
-    font-weight: bold;
-    color: black;
-  }
 </style>

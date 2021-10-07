@@ -183,13 +183,10 @@
                 <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
                 <l-control position="topright" style="margin-top: 30px">
                   <div class="options">
-                    <label>Radius </label><br/>
-                    <vue-range-slider width="150px" tooltip="hover"
-                                      v-model="heatmapScale.radius.value" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"/><br/>
-
-                    <label>Blur </label><br/>
-                    <vue-range-slider width="150px" tooltip="hover"
-                                      v-model="heatmapScale.blur.value" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"/>
+                    <label>Radius ({{heatmapScale.radius.value}})</label><br/>
+                    <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
+                    <label>Blur ({{heatmapScale.blur.value}})</label><br/>
+                    <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
                   </div>
                 </l-control>
 
@@ -260,8 +257,6 @@
   import Vue from 'vue';
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
   Vue.use(ButtonPlugin);
-  import 'vue-range-component/dist/vue-range-slider.css'
-  import VueRangeSlider from 'vue-range-component'
   import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
   import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
 
@@ -325,7 +320,6 @@
 
       StarRating,
       Splitpanes, Pane,
-      VueRangeSlider,
 
       VueFormDialog,
       "vue-form-generator": VueFormGenerator.component,

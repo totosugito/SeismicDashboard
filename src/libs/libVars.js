@@ -1535,3 +1535,27 @@ export function createTableLayerListHeader_V1()
   ];
   return (table_headers);
 }
+
+export function createEditOpenGatherSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Z Min',
+        model: 'zmin',
+        placeholder: '',
+        featured: true,
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Z Max',
+        model: 'zmax',
+        placeholder: '',
+        featured: true,
+      },
+    ]
+  };
+  return(schema_);
+}
