@@ -653,7 +653,6 @@
       },
       markerWellEventClick() {
         this.show_well_marker = !this.show_well_marker;
-        this.editOpenGatherDialogShow();
       },
       markerWellCssStyle() {
         if (this.show_well_marker)
