@@ -9,22 +9,26 @@
 
     <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
       <pane class="p-2" min-size="20" max-size="40" style="background: white">
-        <div>
-          <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/>
-            Uncheck All
-          </ejs-button>
-        </div>
-        <b-table
-          responsive
-          sticky-header="50vh"
-          show-empty
-          :small="true"
-          :striped="false"
-          :bordered="true"
-          :outlined="true"
-          :fields="table_prospect_map_heder"
-          :items="table_prospect_map">
-          <template v-slot:cell(show)="row">
+
+        <b-tabs v-model="tabIndex">
+          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">
+            <div>
+              <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i
+                class="fa fa-square-o"/>
+                Uncheck All
+              </ejs-button>
+            </div>
+            <b-table
+              responsive
+              sticky-header="60vh"
+              show-empty
+              :small="true"
+              :striped="false"
+              :bordered="true"
+              :outlined="true"
+              :fields="table_prospect_map_heder"
+              :items="table_prospect_map">
+              <template v-slot:cell(show)="row">
                   <span @click="eventSwitchLayerClicked(row.index, row.item)"
                         :style="eventSelectedLayerCssStyle(row.item)">
                     <template v-if="row.item.show">
@@ -34,31 +38,92 @@
                       <i class="btn_toolbar fa fa-toggle-off"/>
                     </template>
                   </span>
-          </template>
-        </b-table>
+              </template>
+            </b-table>
 
-        <div>
-          <div class="mb-2">CONFIDENCE RATING</div>
-          <StarRating v-model="proposeProspect.score.star" :rating="proposeProspect.score.star" :star-size="30"
-                      :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>
-        </div>
-        <div>
-          <div class="mb-2 mt-3">NOTE</div>
-          <b-form-textarea
-            v-model="proposeProspect.score.note"
-            placeholder="Enter something..."
-            rows="3"
-            max-rows="6"/>
-        </div>
-        <div>
-          <span class="mr-5">NPoint : <b>{{proposeProspect.score.np}}</b></span>
-          <span class="mr-5">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
-          <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
-        </div>
-        <div class="mt-2">
-          <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update</ejs-button>
-          <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather</ejs-button>
-        </div>
+<!--            <div>-->
+<!--              <div class="mb-2">CONFIDENCE RATING</div>-->
+<!--              <StarRating v-model="proposeProspect.score.star" :rating="proposeProspect.score.star" :star-size="30"-->
+<!--                          :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>-->
+<!--            </div>-->
+<!--            <div>-->
+<!--              <div class="mb-2 mt-3">NOTE</div>-->
+<!--              <b-form-textarea-->
+<!--                v-model="proposeProspect.score.note"-->
+<!--                placeholder="Enter something..."-->
+<!--                rows="3"-->
+<!--                max-rows="6"/>-->
+<!--            </div>-->
+            <div>
+              <span class="mr-5">NPoint : <b>{{proposeProspect.score.np}}</b></span>
+              <span class="mr-5">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
+              <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
+            </div>
+            <div class="mt-2">
+              <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update
+              </ejs-button>
+              <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather
+              </ejs-button>
+            </div>
+          </b-tab>
+
+          <b-tab title="Probability List" :title-link-class="linkClass(1)">
+            <div>
+              <div class="mb-1">
+                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(obj_area[0],false)">
+                  <i class="fa fa-square-o" v-b-tooltip.hover title="Unselect all"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(obj_area[0],true)">
+                  <i class="fa fa-check-square" v-b-tooltip.hover title="Select all"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="eventDownloadLayerListClicked()">
+                  <i class="fa fa-cloud-download" v-b-tooltip.hover title="Download layer list"/>
+                </ejs-button>
+
+                <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedLayers(obj_area[0])">
+                  <i class="fa fa-download" v-b-tooltip.hover title="Download selected data"/>
+                </ejs-button>
+              </div>
+              <b-table responsive
+                       show-empty
+                       :small="true"
+                       :striped="true"
+                       :bordered="true"
+                       :outlined="true"
+                       :current-page="currentPage"
+                       :per-page="perPage"
+                       :fields="table_layer_headers"
+                       :items="obj_area[0].layers">
+
+                <template v-slot:cell(check)="rowc">
+                  <input type="checkbox" size="sm" v-model="rowc.item.check"/>
+                </template>
+                <template #cell(index)="rowc">
+                  {{ rowc.index + 1 }}
+                </template>
+                <template #cell(label)="rowc">
+                  {{rowc.item.label}}
+                  <template v-if="rowc.item.isDefault">
+                    (Default)
+                  </template>
+                </template>
+                <template v-slot:cell(show)="rowc">
+                  <template v-if="rowc.item.isAvailable">
+                    <span :style="eventHeatmapShowLayerCssStyle(rowc.item)"
+                          @click="eventLayerShowHeatmapClicked(obj_area[0], rowc.item)">
+                      <template v-if="rowc.item.show">
+                        <i class="btn_toolbar fa fa-toggle-on"/>
+                      </template>
+                      <template v-else>
+                        <i class="btn_toolbar fa fa-toggle-off"/>
+                      </template>
+                    </span>
+                  </template>
+                </template>
+              </b-table>
+            </div>
+          </b-tab>
+        </b-tabs>
       </pane>
       <pane class="p-2" min-size="40" max-size="80" style="background: white">
         <template v-if="showMapProspect">
@@ -88,12 +153,14 @@
 
             <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
             <l-control position="topright" style="margin-top: 30px">
-                <div class="options">
-                  <label>Radius ({{heatmapScale.radius.value}})</label><br/>
-                  <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
-                  <label>Blur ({{heatmapScale.blur.value}})</label><br/>
-                  <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
-                </div>
+              <div class="options">
+                <label>Radius ({{heatmapScale.radius.value}})</label><br/>
+                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range"
+                              :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
+                <label>Blur ({{heatmapScale.blur.value}})</label><br/>
+                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range"
+                              :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
+              </div>
             </l-control>
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
@@ -112,8 +179,9 @@
               </l-marker>
             </template>
             <template v-if="show_marker_drag">
-              <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false" :icon="markerDragIcon">
-                <l-popup :options="{className: 'customPopup'}" >
+              <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false"
+                        :icon="markerDragIcon">
+                <l-popup :options="{className: 'customPopup'}">
                   <div style="width: 100%">
                     Lat (x) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
                     Lon (y) : <b>{{marker_drag_coord.lng.toFixed(2)}}</b><br>
@@ -128,11 +196,12 @@
                         <b-form-input v-model="marker_drag_coord.gather.z.max"/>
                       </b-input-group>
 
-                      <b-button class="btn btn-sm mt-2 mr-2" variant="success" @click="httpOpenGatherFromMapMarker()">Open
+                      <b-button class="btn btn-sm mt-2 mr-2" variant="success" @click="httpOpenGatherFromMapMarker()">
+                        Open
                         Gather
                       </b-button>
-<!--                    <b-button class="btn btn-sm mt-2" variant="warning" @click="editOpenGatherDialogShow()">Edit-->
-<!--                    </b-button>-->
+                      <!--                    <b-button class="btn btn-sm mt-2" variant="warning" @click="editOpenGatherDialogShow()">Edit-->
+                      <!--                    </b-button>-->
                     </template>
                     <template v-else>
                       <b-button class="btn btn-sm mt-2" variant="primary" @click="httpFindGatherFromMapMarker()">Find
@@ -159,8 +228,23 @@
             <template v-if="show_well_marker">
               <template v-for="wellmarker in well_marker">
                 <l-polyline :lat-lngs="wellmarker.data" color="red" :weight="2">
-                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}</l-tooltip>
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}
+                  </l-tooltip>
                 </l-polyline>
+              </template>
+            </template>
+
+            <template v-for="area in obj_area">
+              <template v-for="(layer, ii) in area.layers">
+                <template v-if="layer.show">
+                  <LHeatmap
+                    :latLngs="area.layers[ii].heatmap.probmap"
+                    :radius="heatmapScale.radius.value"
+                    :blur="heatmapScale.blur.value"
+                    :minOpacity="0.1"
+                    :max="area.layers[ii].heatmap.sum.max">
+                  </LHeatmap>
+                </template>
               </template>
             </template>
           </l-map>
@@ -180,21 +264,6 @@
                 <h5>{{retStatus.message}}</h5>
               </span>
     </vue-simple-dialog>
-
-    <!-- edit find gather parameter -->
-<!--    <vue-form-dialog-->
-<!--      ref="editOpenGathertDialog"-->
-<!--      type="default"-->
-<!--      header="Edit Parameter" body="Body"-->
-<!--      btn1_text="Close" btn2_text="Save"-->
-<!--      btn1_style="danger" btn2_style="primary"-->
-<!--      @btn1Click="editOpenGatherDialogBtn1Click()" @btn2Click="editOpenGatherDialogBtn2Click()">-->
-
-<!--      &lt;!&ndash; body slot &ndash;&gt;-->
-<!--      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">-->
-<!--              <vue-form-generator :schema="edit_open_gather_schema" :model="edit_open_gather_model" :options="formOptions" @validated="onValidated"/>-->
-<!--            </span>-->
-<!--    </vue-form-dialog>-->
   </div>
 </template>
 
@@ -215,18 +284,20 @@
   import {forEach} from 'lodash';
   import {getColormapAsset, getColormapName} from "../../libs/colormap";
 
-  // import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
-  // import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
-
   import {Splitpanes, Pane} from 'splitpanes'
   import 'splitpanes/dist/splitpanes.css'
   import DynamicInputForMap from "../myview/DynamicInputForMap";
   import {appDemoMode, getMapPinMarker, getWellPinMarker} from "../../_constant/http_api";
   import {rotate} from "../../libs/2d-array-rotation";
   import {
-    addPlotDataToProspectEdit, addPlotDataToProspectEditMultiData,
+    addPlotDataToProspectEdit,
+    addPlotDataToProspectEditMultiData,
     addPlotDataToProspectMap,
-    createDefaultSectionAreaParameter, fillLeafletProspectMapVariable, uncheckAllData
+    createDefaultSectionAreaParameter,
+    fillAreaLayerList,
+    fillAreaLayerListWithHeatmapData,
+    fillLeafletProspectMapVariable,
+    uncheckAllData
   } from "../../libs/libUpdateData";
   import {
     addShowKeyToLayer,
@@ -249,7 +320,11 @@
   import "../../_assets/leaflet-measure.css";
   import {v4 as uuidv4} from 'uuid';
   import * as turf from "@turf/turf";
-  import {createEditOpenGatherSchema, createTableProspectMapHeader} from "../../libs/libVars";
+  import {
+    createEditOpenGatherSchema,
+    createTableLayerListHeader_V1,
+    createTableProspectMapHeader
+  } from "../../libs/libVars";
   import {readProspectData, saveProspectData} from "../../_constant/active_user";
 
   delete L.Icon.Default.prototype._getIconUrl;
@@ -302,10 +377,23 @@
         showLoader: false,
         showMapProspect: false,
 
+        table_layer_headers: createTableLayerListHeader_V1(),
+        obj_area: [],
+        selectedLayer: {
+          area: -1,
+          area_name: "",
+          layer: -1,
+          layer_name: ""
+        },
+        list_selected_layer: [],
+
+        perPage: 100,
+        currentPage: 1,
+        tabIndex: 0,
         show_well_marker: false,
         well_marker: [],
 
-        heatmapScale :{
+        heatmapScale: {
           radius: {
             min: 5,
             max: 50,
@@ -341,7 +429,7 @@
 
         show_marker_center: true,
         show_marker_drag: false,
-        marker_drag_coord: {lat: 0, lng: 0, gather: {z: {min: 0, max:0}}},
+        marker_drag_coord: {lat: 0, lng: 0, gather: {z: {min: 0, max: 0}}},
         refreshChart: false,
         proposeProspect: {},
         prospectMap: {ndata: 0, layers: []},
@@ -390,6 +478,8 @@
         event_http_save_prospect: {success: "successSaveProspect", fail: "failSaveProspect"},
         event_http_find_gather_from_latlng: {success: "successFindGatherFromLatLng", fail: "failFindGatherFromLatLng"},
         event_http_well_download: {success: "successWellDownload", fail: "failWellDownload"},
+        event_http_probmap_get_list: {success: "successProbmapGetList", fail: "failProbmapGetList"},
+        event_http_layer_download: {success: "successLayerDownload", fail: "failLayerDownload"},
       }
     },
     created() {
@@ -407,10 +497,15 @@
       this.marker_drag_coord = {
         lat: this.proposeProspect["marker"].lat,
         lng: this.proposeProspect["marker"].lng,
-        gather: {z: {min:0, max:0}}
+        gather: {z: {min: 0, max: 0}}
       };
       this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
 
+      this.obj_area = [];
+      this.obj_area.push({
+        id_area: this.objParam["id_area"],
+        layers: []
+      });
       if (this.bdemo) {
         this.prospectMap = createProspectEditDemoData();
         this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
@@ -425,32 +520,86 @@
     },
 
     methods: {
-      // onValidated(isValid, errors) {
-      //   this.bvalidate = isValid;
-      // },
-      // editOpenGatherDialogShow()
-      // {
-      //   // this.edit_open_gather_model = {
-      //   //   zmin: this.marker_drag_coord["gather"]["z"]["min"],
-      //   //   zmax: this.marker_drag_coord["gather"]["z"]["max"],
-      //   // };
-      //   this.edit_open_gather_model = {
-      //     zmin: 100,
-      //     zmax: 200
-      //   }
-      //   this.$refs.editOpenGathertDialog.showModal();
-      // },
-      //
-      // editOpenGatherDialogBtn1Click() {
-      //   this.$refs.editOpenGathertDialog.hideModal();
-      // },
-      // editOpenGatherDialogBtn2Click() {
-      //   if (!this.bvalidate) return;
-      //
-      //   this.marker_drag_coord["gather"]["z"]["min"] = this.edit_open_gather_model["zmin"];
-      //   this.marker_drag_coord["gather"]["z"]["max"] = this.edit_open_gather_model["zmax"];
-      //   this.$refs.editOpenGathertDialog.hideModal();
-      // },
+      linkClass(idx) {
+        if (this.tabIndex === idx) {
+          return ['bg-primary', 'text-light']
+        } else {
+          return ['bg-light', 'text-info']
+        }
+      },
+      // ------------------------------------------------
+      // checked/unchecked layer area
+      // ------------------------------------------------
+      setCheckedLayerStatus(item_area, status)
+      {
+        let nl = item_area["layers"].length;
+        for(let i=0; i<nl; i++)
+        {
+          item_area["layers"][i]["check"] = status;
+        }
+      },
+      eventDownloadLayerListClicked() {
+        this.showLoader = true;
+        let url_area_layer_list = this.varRouter.getHttpType("probmap-get-list") + this.objParam["id_area"];
+        this.$store.dispatch('http_get', [url_area_layer_list, {}, this.event_http_probmap_get_list]).then();
+      },
+      eventHeatmapShowLayerCssStyle(item) {
+        let fg_color = "#808080";
+        if (item.show)
+          fg_color = "#4169E1";
+        let strstyle =
+          "color:" + fg_color + "; " +
+          "font-size:100%;";
+        return (strstyle);
+      },
+      eventLayerShowHeatmapClicked(item_area, item)
+      {
+        item.show = !item.show;
+        if (item.show)
+        {
+          this.selectedLayer["area"] = item_area.id_area;
+          this.selectedLayer["area_name"] = item_area.name;
+          this.selectedLayer["layer"] = item["layer"];
+          this.selectedLayer["layer_name"] = item["label"];
+        }
+        this.tmp_array_autoupdate = [];
+      },
+      downloadSelectedLayers(item_area)
+      {
+        let layers = item_area["layers"];
+        let nl = layers.length;
+        this.list_selected_layer = [];
+        for(let i=0; i<nl; i++)
+        {
+          let item = layers[i];
+          if(!item.check)
+            continue;
+
+          this.list_selected_layer.push({
+            idx: i,
+            id_area: item.id_area,
+            layer: item.layer,
+            filename: item.filename,
+            label: item.label,
+          })
+        }
+        if(this.list_selected_layer.length === 0) {
+          this.retStatus["title"] = "Information";
+          this.retStatus["message"] = "No data selected";
+          this.$refs.dialogMessage.showModal();
+          return;
+        }
+        // console.log(JSON.stringify(this.list_selected_layer))
+        this.httpDownloadLayerData();
+      },
+      httpDownloadLayerData() {
+        this.showLoader = true;
+        let param = {
+          user: this.user["user"],
+          data: this.list_selected_layer
+        };
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_multi"), param, this.event_http_layer_download]).then();
+      },
 
       isValidGatherDataFromMarker() {
         if (!("gather" in this.marker_drag_coord))
@@ -660,8 +809,7 @@
         else
           return ("e-outline");
       },
-      downloadSelectedWell()
-      {
+      downloadSelectedWell() {
         this.showLoader = true;
         let str_url = this.varRouter.getHttpType("well-list-info") + this.objParam["id_area"];
         this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_download]).then();
@@ -765,8 +913,8 @@
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"],
-            x: this.marker_drag_coord.lat*1.0,
-            y: this.marker_drag_coord.lng*1.0,
+            x: this.marker_drag_coord.lat * 1.0,
+            y: this.marker_drag_coord.lng * 1.0,
           }
         };
 
@@ -774,10 +922,9 @@
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("segy-find-gather-from-latlng"),
           param, this.event_http_find_gather_from_latlng]).then();
       },
-      httpOpenGatherFromMapMarker()
-      {
-        this.marker_drag_coord["gather"]["z"]["min"] = this.marker_drag_coord["gather"]["z"]["min"]*1.0;
-        this.marker_drag_coord["gather"]["z"]["max"] = this.marker_drag_coord["gather"]["z"]["max"]*1.0;
+      httpOpenGatherFromMapMarker() {
+        this.marker_drag_coord["gather"]["z"]["min"] = this.marker_drag_coord["gather"]["z"]["min"] * 1.0;
+        this.marker_drag_coord["gather"]["z"]["max"] = this.marker_drag_coord["gather"]["z"]["max"] * 1.0;
         let routeData = this.$router.resolve({
           path: "plot-ava-gather-section",
           query: {
@@ -861,8 +1008,7 @@
       EventBus.$on(this.event_http_well_download.success, (msg) => {
         let n = msg.data.length;
         this.well_marker = [];
-        for(let i=0; i<n; i++)
-        {
+        for (let i = 0; i < n; i++) {
           let item = msg.data[i];
           this.well_marker.push({
             data: [[item.yst, item.xst], [item.yen, item.xen]],
@@ -873,6 +1019,33 @@
       });
       EventBus.$on(this.event_http_well_download.fail, (msg) => {
         this.well_marker = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      //-----------------------------------------------------------------
+      // PROBMAP GET LIST
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_probmap_get_list.success, (msg) => {
+        fillAreaLayerList(this.obj_area, this.objParam["id_area"], msg.data);
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_probmap_get_list.fail, (msg) => {
+        this.obj_area = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      //-----------------------------------------------------------------
+      // LAYER HEATMAP DATA DOWNLOAD
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_layer_download.success, (msg) => {
+        fillAreaLayerListWithHeatmapData(this.obj_area, this.objParam["id_area"], this.list_selected_layer, msg.data)
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_layer_download.fail, (msg) => {
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
@@ -889,6 +1062,10 @@
       EventBus.$off(this.event_http_find_gather_from_latlng.fail);
       EventBus.$off(this.event_http_well_download.success);
       EventBus.$off(this.event_http_well_download.fail);
+      EventBus.$off(this.event_http_probmap_get_list.success);
+      EventBus.$off(this.event_http_probmap_get_list.fail);
+      EventBus.$off(this.event_http_layer_download.success);
+      EventBus.$off(this.event_http_layer_download.fail);
     },
   }
 </script>
