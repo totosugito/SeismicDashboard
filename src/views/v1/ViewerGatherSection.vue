@@ -9,7 +9,7 @@
 
     <div>
       <b-button-toolbar aria-label="Toolbar with button groups and input groups" class="mb-1">
-
+        <b-button size="sm" class="ml-1 mr-2" @click="saveWADialogShow()" variant="success">Save</b-button>
 
         <b-input-group size="sm" :prepend="YAxis.label">
           <b-form-input v-model="timePos" class="text-right" style="width: 80px"></b-form-input>
@@ -102,14 +102,14 @@
       <span class="box_shadow pl-1 pr-1">dt : {{dt}}</span>
       <span class="box_shadow pl-1 pr-1">Y Start : {{ystart}}</span>
 
-<!--      <span class="box_shadow ml-3 pl-1 pr-1">Target : {{cursorinfo.x}}</span>-->
+      <span class="box_shadow ml-3 pl-1 pr-1">Label : {{data_label}}</span>
 <!--      <span class="box_shadow pl-1 pr-1">{{cursorinfo.y}}</span>-->
     </div>
 
     <!-- show error dialog -->
     <vue-simple-dialog
       ref="dialogMessage"
-      type="danger"
+      type="primary"
       :header="retStatus.title" body="Body"
       btn1_text="Tutup"
       btn1_style="success"
@@ -118,6 +118,21 @@
                 <h5>{{retStatus.message}}</h5>
               </span>
     </vue-simple-dialog>
+
+    <!-- save prospect dialog -->
+    <vue-form-dialog
+      ref="saveWellAnalogy"
+      type="default"
+      header="Update Group" body="Body"
+      btn1_text="Close" btn2_text="Save"
+      btn1_style="danger" btn2_style="primary"
+      @btn1Click="saveWADialogBtn1Click()" @btn2Click="saveWADialogBtn2Click()">
+
+      <!-- body slot -->
+      <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
+              <vue-form-generator :schema="wa_save_schema" :model="wa_save_model" :options="formOptions" @validated="onValidated"/>
+            </span>
+    </vue-form-dialog>
   </div>
 </template>
 
@@ -146,6 +161,10 @@
   import {appDemoMode} from "../../_constant/http_api";
   import LChartSeismicWithLineV31 from "../components/LChartSeismicWithLineV3-1";
 
+  import VueFormDialog from 'MyLibVue/src/components/vue-form-dialog'
+  import VueFormGenerator from "MyLibVue/src/views/vue-form-generator";
+  import {createWellAnalogySaveModel, createWellAnalogySaveSchema} from "../../libs/libVars";
+
   export default {
     name: 'ViewerGatherSection',
     computed: mapState({
@@ -163,6 +182,9 @@
       Splitpanes, Pane,
       bFormSlider,
       EnhancedCheck,
+
+      VueFormDialog,
+      "vue-form-generator": VueFormGenerator.component,
     },
 
     data: () =>
@@ -192,6 +214,10 @@
         ns: 0,
         ystart: 0,
         dt: 1.0,
+        data_label: "",
+        iline: 0,
+        xline: 0,
+        data_neigh_mode: [],
 
         fixedDec: 3,
         cursorinfo: {x: 0, y: 0},
@@ -207,7 +233,16 @@
         lineChartTitle: '',
         lineSeries: [],
         lineChartOptions: {},
+
+        wa_save_schema: createWellAnalogySaveSchema(),
+        wa_save_model: createWellAnalogySaveModel(),
+        bvalidate: false,
+        formOptions: {
+          validateAfterLoad: true,
+          validateAfterChanged: true,
+        },
         event_http_gather_section: {success: "successGatherSection", fail: "failGatherSection"},
+        event_http_wa_add: {success: "successWaAddEl", fail: "failWaAddEl"},
       }
     },
     created()
@@ -224,6 +259,8 @@
       let xline_ = this.$route.query.xline*1;
       let zmin_ = this.$route.query.zmin*1;
       let zmax_ = this.$route.query.zmax*1;
+      let label_ = this.$route.query.label;
+      this.wa_save_model["label"] = label_;
       let valid_gather_by_pos = !Number.isNaN(iline_ + xline_ + zmin_ + zmax_);
       if(this.bdemo)
       {
@@ -240,10 +277,11 @@
           tmp_data["iline"] = iline_;
           tmp_data["xline"] = xline_;
           tmp_data["z"] = {min: zmin_, max: zmax_};
+          tmp_data["label"] = label_;
           let param = {
             user: this.user["user"],
             data: tmp_data
-          }
+          };
           this.showLoader = true;
           this.$store.dispatch('http_post', [this.varRouter.getHttpType("ava-segy-get-gather-section"), param, this.event_http_gather_section]).then();
         }
@@ -261,6 +299,24 @@
       }
     },
     methods: {
+      onValidated(isValid, errors) {
+        this.bvalidate = isValid;
+      },
+      saveWADialogShow()
+      {
+        this.$refs.saveWellAnalogy.showModal();
+      },
+
+      saveWADialogBtn1Click() {
+        this.$refs.saveWellAnalogy.hideModal();
+      },
+      saveWADialogBtn2Click() {
+        if (!this.bvalidate) return;
+
+        this.saveWellAnalogy();
+        this.$refs.saveWellAnalogy.hideModal();
+      },
+
       parseLcSeismicData(obj)
       {
         this.ns = obj.ava[0].length;
@@ -268,6 +324,7 @@
         this.dt = obj.interval;
         this.ystart = obj.z_st;
         this.timePos = obj.z_c;
+        this.data_label = obj.label;
 
         this.points = [];
         for (let i = this.ns - 1; i >= 0; i--)
@@ -289,6 +346,8 @@
           sampling: this.dt
         };
         this.dataTitle = "IL-" + obj.iline + "/XL-" + obj.xline;
+        this.iline = obj.iline;
+        this.xline = obj.xline;
       },
       createChartInfo()
       {
@@ -325,14 +384,15 @@
 
         // plot min max data
         this.seriesSeismicInfo = null;
-        if (this.modeMinMax !== 'off')
-        {
+        this.data_neigh_mode = [];
+        if (this.modeMinMax !== 'off') {
           let opt_data = matrix_col_optimum_v2(t2 - t1 + 1, this.ntrc, this.modeMinMax, ArrModeMinMax, t1, this.XAxis["data"], this.dt, this.ystart);
           this.lineSeries.push({
             type: 'line',
             name: "Mode : " + this.modeMinMax,
             data: opt_data["opt"]
           });
+          this.data_neigh_mode = opt_data["opt"];
           this.seriesSeismicInfo = opt_data["info"];
         }
 
@@ -420,6 +480,33 @@
           this.$refs.dialogMessage.hideModal();
         }
       },
+
+      saveWellAnalogy()
+      {
+        let tmp_data = {
+          id_area: this.pageParam["id_area"],
+          filename: this.pageParam["filename"],
+          wa_el: {
+            neigh: this.nNeighbor,
+            z: this.timePos * 1.0,
+            mode: this.modeMinMax,
+            iline: this.iline,
+            xline: this.xline,
+            label: this.wa_save_model["label"],
+            header: this.XAxis["data"],
+            value: this.data_neigh_mode
+          }
+        };
+        let param = {
+          user: this.user["user"],
+          data: tmp_data
+        };
+        // console.log(JSON.stringify(param))
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("wa-add-el"), param,
+          this.event_http_wa_add]).then();
+      }
     },
 
     mounted()
@@ -437,11 +524,28 @@
         this.$refs.dialogMessage.showModal();
       });
 
+      EventBus.$on(this.event_http_wa_add.success, (msg) =>
+      {
+        this.retStatus.title = "Information";
+        this.retStatus.message = msg.mesg;
+        this.$refs.dialogMessage.showModal();
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_wa_add.fail, (msg) =>
+      {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
     },
     beforeDestroy()
     {
       EventBus.$off(this.event_http_gather_section.success);
       EventBus.$off(this.event_http_gather_section.fail);
+      EventBus.$off(this.event_http_wa_add.success);
+      EventBus.$off(this.event_http_wa_add.fail);
+
     },
 
     watch:

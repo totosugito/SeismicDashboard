@@ -67,3 +67,8 @@ $header-size : "180px";
   font-weight: bold;
   color: black;
 }
+
+.scrollable {
+  overflow-y: auto;
+  max-height: 100%;
+}

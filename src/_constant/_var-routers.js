@@ -59,6 +59,8 @@ export default class VarRouter {
 
     'prospect-management': ["prospect-management", "/prospect-management", "Prospect Management"],
     'new-prospect-wizard': ["new-prospect-wizard", "/new-prospect-wizard", "New Prospect Wizard"],
+
+    'view-well-analogy': ["view-well-analogy", "/view-well-analogy", "Well Analogy"],
   };
 
   httptype = {
@@ -123,6 +125,10 @@ export default class VarRouter {
     "prospect-update-star": "/api/prospect/update-star",
 
     "well-list-info": "/api/well/list-info/",
+
+    "wa-data": "/api/prospect/wa-data",
+    "wa-delete": "/api/prospect/wa-delete",
+    "wa-add-el": "/api/prospect/wa-add-el",
   };
 
   schematype = {

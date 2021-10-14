@@ -217,6 +217,11 @@ export default new Router({
               name: varRouter.getRoute("prospect-analysis", 2),
               component: () => import('../views/v1/ProspectAnalysis')
             },
+            {
+              path: varRouter.getRoute("view-well-analogy", 1),
+              name: varRouter.getRoute("view-well-analogy", 2),
+              component: () => import('../views/v1/ViewerWellAnalogy')
+            },
           ]
         }
         ]

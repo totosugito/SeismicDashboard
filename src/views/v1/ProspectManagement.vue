@@ -510,8 +510,5 @@
 </script>
 
 <style>
-  .scrollable {
-    overflow-y: auto;
-    max-height: 100%;
-  }
+
 </style>

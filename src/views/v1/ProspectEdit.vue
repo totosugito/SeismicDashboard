@@ -8,27 +8,39 @@
       :active="showLoader"/>
 
     <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
-      <pane class="p-2" min-size="20" max-size="40" style="background: white">
+      <pane class="p-2" min-size="20" max-size="50" style="background: white">
 
         <b-tabs v-model="tabIndex">
-          <b-tab title="Data by FIELD" :title-link-class="linkClass(0)">
+          <b-tab class="scrollable" title="Data by FIELD" :title-link-class="linkClass(0)">
             <div>
-              <ejs-button cssClass='e-light' class="mr-2 mb-2" v-on:click.native='onUncheckAll'><i
-                class="fa fa-square-o"/>
-                Uncheck All
-              </ejs-button>
-            </div>
-            <b-table
-              responsive
-              sticky-header="60vh"
-              show-empty
-              :small="true"
-              :striped="false"
-              :bordered="true"
-              :outlined="true"
-              :fields="table_prospect_map_heder"
-              :items="table_prospect_map">
-              <template v-slot:cell(show)="row">
+              <div>
+                <ejs-button cssClass='e-outline' class="mr-2 mb-2" v-b-tooltip.hover title="Remove all heatmap view"
+                            v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-2 mb-2" v-b-tooltip.hover title="Update prospect data"
+                            v-on:click.native='onClickSaveProject'><i class="fa fa-edit"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-2 mb-2" v-b-tooltip.hover title="Open gather in the new page"
+                            v-on:click.native='onClickViewGather'><i class="fa fa-image"/>
+                </ejs-button>
+              </div>
+              <div>
+                <span class="mr-3">NPoint : <b>{{proposeProspect.score.np}}</b></span>
+                <span class="mr-3">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
+                <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
+              </div>
+
+              <b-table
+                responsive
+                sticky-header="30vh"
+                show-empty
+                :small="true"
+                :striped="false"
+                :bordered="true"
+                :outlined="true"
+                :fields="table_prospect_map_heder"
+                :items="table_prospect_map">
+                <template v-slot:cell(show)="row">
                   <span @click="eventSwitchLayerClicked(row.index, row.item)"
                         :style="eventSelectedLayerCssStyle(row.item)">
                     <template v-if="row.item.show">
@@ -38,49 +50,59 @@
                       <i class="btn_toolbar fa fa-toggle-off"/>
                     </template>
                   </span>
-              </template>
-            </b-table>
+                </template>
+              </b-table>
+            </div>
+            <b-card no-body class="text-center" >
+              <b-card-header no-body><strong>Well Analogy</strong></b-card-header>
+              <div class="p-1">
+                <div>
+                  <ejs-button cssClass='e-outline' class="mr-2 mb-1" v-b-tooltip.hover title="Delete all well analogy"
+                              v-on:click.native='dialogClearWellAnalogyShow'><i class="fa fa-trash"/>
+                  </ejs-button>
+                  <ejs-button cssClass='e-outline' class="mr-2 mb-1" v-b-tooltip.hover title="Refresh well analogy data"
+                              v-on:click.native='httpGetListWellAnalogyData'><i class="fa fa-refresh"/>
+                  </ejs-button>
 
-<!--            <div>-->
-<!--              <div class="mb-2">CONFIDENCE RATING</div>-->
-<!--              <StarRating v-model="proposeProspect.score.star" :rating="proposeProspect.score.star" :star-size="30"-->
-<!--                          :show-rating="false" :maxRating="10" activeColor="#FF8C00"/>-->
-<!--            </div>-->
-<!--            <div>-->
-<!--              <div class="mb-2 mt-3">NOTE</div>-->
-<!--              <b-form-textarea-->
-<!--                v-model="proposeProspect.score.note"-->
-<!--                placeholder="Enter something..."-->
-<!--                rows="3"-->
-<!--                max-rows="6"/>-->
-<!--            </div>-->
-            <div>
-              <span class="mr-5">NPoint : <b>{{proposeProspect.score.np}}</b></span>
-              <span class="mr-5">Score : <b>{{proposeProspect.score.score.toFixed(3)}}</b></span>
-              <span>Area : <b>{{proposeProspect.score.area.toFixed(3)}}</b></span>
-            </div>
-            <div class="mt-2">
-              <ejs-button cssClass='e-success' class="mr-2 mb-2" v-on:click.native='onClickSaveProject'>Update
-              </ejs-button>
-              <ejs-button cssClass='e-info' class="mr-2 mb-2" v-on:click.native='onClickViewGather'>View Gather
-              </ejs-button>
-            </div>
+                  <ejs-button cssClass='e-outline' class="ml-2 mr-2 mb-1" v-b-tooltip.hover title="Show well analogy chart"
+                              v-on:click.native='viewWellAnalogy'><i class="fa fa-line-chart"/>
+                  </ejs-button>
+                </div>
+                <b-table
+                  responsive
+                  sticky-header="28vh"
+                  show-empty
+                  :small="true"
+                  :striped="false"
+                  :bordered="true"
+                  :outlined="true"
+                  :fields="table_wa_header"
+                  :items="table_wa">
+                  <template #cell(index)="row">
+                    {{ row.index + 1 }}
+                  </template>
+                </b-table>
+              </div>
+            </b-card>
           </b-tab>
 
           <b-tab title="Probability List" :title-link-class="linkClass(1)">
             <div>
               <div class="mb-1">
-                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(obj_area[0],false)">
+                <ejs-button cssClass='e-outline' class="mr-1"
+                            v-on:click.native="setCheckedLayerStatus(obj_area[0],false)">
                   <i class="fa fa-square-o" v-b-tooltip.hover title="Unselect all"/>
                 </ejs-button>
-                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(obj_area[0],true)">
+                <ejs-button cssClass='e-outline' class="mr-1"
+                            v-on:click.native="setCheckedLayerStatus(obj_area[0],true)">
                   <i class="fa fa-check-square" v-b-tooltip.hover title="Select all"/>
                 </ejs-button>
                 <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="eventDownloadLayerListClicked()">
                   <i class="fa fa-cloud-download" v-b-tooltip.hover title="Download layer list"/>
                 </ejs-button>
 
-                <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedLayers(obj_area[0])">
+                <ejs-button cssClass='e-outline' class="ml-3 mr-1"
+                            v-on:click.native="downloadSelectedLayers(obj_area[0])">
                   <i class="fa fa-download" v-b-tooltip.hover title="Download selected data"/>
                 </ejs-button>
               </div>
@@ -125,7 +147,7 @@
           </b-tab>
         </b-tabs>
       </pane>
-      <pane class="p-2" min-size="40" max-size="80" style="background: white">
+      <pane class="p-2" min-size="50" max-size="80" style="background: white">
         <template v-if="showMapProspect">
           <div class="mb-1">
             <ejs-button :cssClass='setToggleButtonStyle(show_marker_center)' class="mr-1"
@@ -194,6 +216,9 @@
                       </b-input-group>
                       <b-input-group prepend="Z Max" size="sm">
                         <b-form-input v-model="marker_drag_coord.gather.z.max"/>
+                      </b-input-group>
+                      <b-input-group prepend="Label" size="sm">
+                        <b-form-input v-model="marker_drag_coord.label"/>
                       </b-input-group>
 
                       <b-button class="btn btn-sm mt-2 mr-2" variant="success" @click="httpOpenGatherFromMapMarker()">
@@ -264,6 +289,20 @@
                 <h5>{{retStatus.message}}</h5>
               </span>
     </vue-simple-dialog>
+    <!-- show error dialog -->
+    <vue-simple-dialog
+      ref="dialogWellAnalogy"
+      type="primary"
+      header="Question" body="Body"
+      btn1_text="No"
+      btn1_style="danger"
+      btn2_text="Yes"
+      btn2_style="success"
+      @btn1Click="dialogClearWellAnalogyBtn1Click()" @btn2Click="dialogClearWellAnalogyBtn2Click()">
+              <span slot="slot-body">
+                <h5>Do you want to delete all well analogy data ?</h5>
+              </span>
+    </vue-simple-dialog>
   </div>
 </template>
 
@@ -323,7 +362,7 @@
   import {
     createEditOpenGatherSchema,
     createTableLayerListHeader_V1,
-    createTableProspectMapHeader
+    createTableProspectMapHeader, createTableWellAnalogyHeader
   } from "../../libs/libVars";
   import {readProspectData, saveProspectData} from "../../_constant/active_user";
 
@@ -387,7 +426,7 @@
         },
         list_selected_layer: [],
 
-        perPage: 100,
+        perPage: 500,
         currentPage: 1,
         tabIndex: 0,
         show_well_marker: false,
@@ -429,7 +468,7 @@
 
         show_marker_center: true,
         show_marker_drag: false,
-        marker_drag_coord: {lat: 0, lng: 0, gather: {z: {min: 0, max: 0}}},
+        marker_drag_coord: {lat: 0, lng: 0, label:"", gather: {z: {min: 0, max: 0}}},
         refreshChart: false,
         proposeProspect: {},
         prospectMap: {ndata: 0, layers: []},
@@ -464,6 +503,9 @@
         table_prospect_map_heder: createTableProspectMapHeader(),
         table_prospect_map: [],
 
+        table_wa_header: createTableWellAnalogyHeader(),
+        table_wa: [],
+
         edit_open_gather_schema: createEditOpenGatherSchema(),
         edit_open_gather_model: {},
         formOptions: {
@@ -480,6 +522,8 @@
         event_http_well_download: {success: "successWellDownload", fail: "failWellDownload"},
         event_http_probmap_get_list: {success: "successProbmapGetList", fail: "failProbmapGetList"},
         event_http_layer_download: {success: "successLayerDownload", fail: "failLayerDownload"},
+        event_http_wa_data: {success: "successWaData", fail: "failWaData"},
+        event_http_wa_delete: {success: "successWaDelete", fail: "failWaDelete"},
       }
     },
     created() {
@@ -497,6 +541,7 @@
       this.marker_drag_coord = {
         lat: this.proposeProspect["marker"].lat,
         lng: this.proposeProspect["marker"].lng,
+        label: "",
         gather: {z: {min: 0, max: 0}}
       };
       this.map_var = fillLeafletProspectMapVariable(this.map_var, this.proposeProspect, 0);
@@ -511,7 +556,7 @@
         this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
         this.heatmap_range = this.prospectMap.v_min_max;
 
-        this.tabIndex = 1;
+        this.tabIndex = 0;
         this.showLoader = false;
         this.showMapProspect = true;
       } else {
@@ -530,11 +575,9 @@
       // ------------------------------------------------
       // checked/unchecked layer area
       // ------------------------------------------------
-      setCheckedLayerStatus(item_area, status)
-      {
+      setCheckedLayerStatus(item_area, status) {
         let nl = item_area["layers"].length;
-        for(let i=0; i<nl; i++)
-        {
+        for (let i = 0; i < nl; i++) {
           item_area["layers"][i]["check"] = status;
         }
       },
@@ -552,11 +595,9 @@
           "font-size:100%;";
         return (strstyle);
       },
-      eventLayerShowHeatmapClicked(item_area, item)
-      {
+      eventLayerShowHeatmapClicked(item_area, item) {
         item.show = !item.show;
-        if (item.show)
-        {
+        if (item.show) {
           this.selectedLayer["area"] = item_area.id_area;
           this.selectedLayer["area_name"] = item_area.name;
           this.selectedLayer["layer"] = item["layer"];
@@ -564,15 +605,13 @@
         }
         this.tmp_array_autoupdate = [];
       },
-      downloadSelectedLayers(item_area)
-      {
+      downloadSelectedLayers(item_area) {
         let layers = item_area["layers"];
         let nl = layers.length;
         this.list_selected_layer = [];
-        for(let i=0; i<nl; i++)
-        {
+        for (let i = 0; i < nl; i++) {
           let item = layers[i];
-          if(!item.check)
+          if (!item.check)
             continue;
 
           this.list_selected_layer.push({
@@ -583,7 +622,7 @@
             label: item.label,
           })
         }
-        if(this.list_selected_layer.length === 0) {
+        if (this.list_selected_layer.length === 0) {
           this.retStatus["title"] = "Information";
           this.retStatus["message"] = "No data selected";
           this.$refs.dialogMessage.showModal();
@@ -892,6 +931,15 @@
         });
         window.open(routeData.href, '_blank');
       },
+      viewWellAnalogy() {
+        let routeData = this.$router.resolve({
+          path: this.varRouter.getRoute("view-well-analogy", 1),
+          query: {
+            id: this.pageParam["id"],
+          }
+        });
+        window.open(routeData.href, '_blank');
+      },
       onUncheckAll() {
         uncheckAllData(this.table_prospect_map);
       },
@@ -905,8 +953,50 @@
         };
 
         this.showLoader = true;
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-data"), param, this.event_http_prospect_map]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-data"), param,
+          this.event_http_prospect_map]).then();
       },
+      httpGetListWellAnalogyData() {
+        let param = {
+          user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"]
+          }
+        };
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("wa-data"), param,
+          this.event_http_wa_data]).then();
+      },
+
+      dialogClearWellAnalogyShow()
+      {
+        this.$refs.dialogWellAnalogy.showModal();
+      },
+      dialogClearWellAnalogyBtn1Click()
+      {
+        this.$refs.dialogWellAnalogy.hideModal();
+      },
+      dialogClearWellAnalogyBtn2Click()
+      {
+        this.httpClearListWellAnalogyData();
+        this.$refs.dialogWellAnalogy.hideModal();
+      },
+      httpClearListWellAnalogyData() {
+        let param = {
+          user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"]
+          }
+        };
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("wa-delete"), param,
+          this.event_http_wa_delete]).then();
+      },
+
       httpFindGatherFromMapMarker() {
         let param = {
           user: this.user["user"],
@@ -934,6 +1024,7 @@
             xline: this.marker_drag_coord["gather"]["xline"],
             zmin: this.marker_drag_coord["gather"]["z"]["min"],
             zmax: this.marker_drag_coord["gather"]["z"]["max"],
+            label: this.marker_drag_coord["label"]
           }
         });
         // console.log(JSON.stringify(this.marker_drag_coord))
@@ -967,7 +1058,8 @@
         this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
         this.heatmap_range = this.prospectMap.v_min_max;
 
-        this.showLoader = false;
+        this.httpGetListWellAnalogyData();
+        // this.showLoader = false;
         this.showMapProspect = true;
       });
       EventBus.$on(this.event_http_prospect_map.fail, (msg) => {
@@ -1050,6 +1142,32 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-----------------------------------------------------------------
+      // Well Analogy Data
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_wa_data.success, (msg) => {
+        this.table_wa = msg.data;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_wa_data.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      //-----------------------------------------------------------------
+      // Clear Well Analogy Data
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_wa_delete.success, (msg) => {
+        this.table_wa = [];
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_wa_delete.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
     beforeDestroy() {
       EventBus.$off(this.event_http_prospect_score.success);
@@ -1066,6 +1184,10 @@
       EventBus.$off(this.event_http_probmap_get_list.fail);
       EventBus.$off(this.event_http_layer_download.success);
       EventBus.$off(this.event_http_layer_download.fail);
+      EventBus.$off(this.event_http_wa_data.success);
+      EventBus.$off(this.event_http_wa_data.fail);
+      EventBus.$off(this.event_http_wa_delete.success);
+      EventBus.$off(this.event_http_wa_delete.fail);
     },
   }
 </script>

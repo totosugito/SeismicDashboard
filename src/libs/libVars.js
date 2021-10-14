@@ -1559,3 +1559,82 @@ export function createEditOpenGatherSchema() {
   };
   return(schema_);
 }
+
+export function createTableWellAnalogyHeader() {
+  let table_headers = [
+    {
+      key: 'index',
+      label: 'No',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '40px', 'min-width': '40px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'label',
+      label: 'Label',
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '130px', 'min-width': '130px'},
+      thClass: 'text-center',
+      tdClass: 'text-left',
+    },
+    {
+      key: 'mode',
+      label: 'Mode',
+      sortable: true,
+      thStyle: {'background-color': '#1E90FF', 'color': 'white'},
+      thClass: 'text-center',
+    },
+    {
+      key: 'neigh',
+      label: 'Neigh',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '70px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'iline',
+      label: 'InLine',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '70px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'xline',
+      label: 'XLine',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '70px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+    {
+      key: 'z',
+      label: 'Z',
+      thStyle: {'background-color': '#1E90FF', 'color': 'white', 'width': '70px'},
+      thClass: 'text-center',
+      tdClass: 'text-center'
+    },
+  ];
+  return (table_headers);
+}
+
+export function createWellAnalogySaveModel() {
+  let model = {
+    label: ""
+  };
+  return(model);
+}
+export function createWellAnalogySaveSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Well Analogy Label',
+        model: 'label',
+        placeholder: '',
+        featured: true,
+        required: false
+      },
+    ]
+  };
+  return(schema_);
+}
