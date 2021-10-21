@@ -398,7 +398,7 @@
       httpListArea() {
         this.showLoader = true;
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: {}
         };
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), param, this.event_http_area_list]).then();
@@ -428,7 +428,7 @@
       },
       getHttpRefreshProspectProject() {
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: {}
         };
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("prospect-list"), param, this.event_http_prospect_list]).then();

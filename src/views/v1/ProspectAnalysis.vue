@@ -152,7 +152,7 @@
       },
       httpGetProspectAnalysisData() {
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"]

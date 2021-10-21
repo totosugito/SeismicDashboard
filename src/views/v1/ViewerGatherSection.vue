@@ -279,7 +279,7 @@
           tmp_data["z"] = {min: zmin_, max: zmax_};
           tmp_data["label"] = label_;
           let param = {
-            user: this.user["user"],
+            // user: this.user["user"],
             data: tmp_data
           };
           this.showLoader = true;
@@ -288,7 +288,7 @@
         else
         {
           let param = {
-            user: this.user["user"],
+            // user: this.user["user"],
             data: this.pageParam
           };
 
@@ -498,7 +498,7 @@
           }
         };
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: tmp_data
         };
         // console.log(JSON.stringify(param))

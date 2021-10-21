@@ -644,7 +644,7 @@
       httpListArea() {
         this.showLoader = true;
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: {
           }
         }
@@ -667,7 +667,7 @@
           "state": 0,
           "type": "/api/probmap/multi",
           "mesg": "",
-          "user": this.user["user"],
+          // "user": this.user["user"],
           "data": {
             "id_area": this.table_area[this.selected_area]["id_area"],
             "feature": "sum",
@@ -694,7 +694,7 @@
           "state": 0,
           "type": "/api/heatmap/multi",
           "mesg": "",
-          "user": this.user["user"],
+          // "user": this.user["user"],
           "data": {
             "id_area": 2,
             "file_loc": "TUNU95/08_heatmap",
@@ -737,7 +737,7 @@
       getHttpRefreshProspectProject()
       {
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: {
           }
         }

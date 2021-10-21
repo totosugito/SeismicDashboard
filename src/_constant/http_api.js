@@ -85,6 +85,15 @@ export function create_auth_header()
   };
   return(auth_headers);
 }
+export function create_auth_header_v1(user)
+{
+  let auth_headers = {
+    'x-access-token': user['token'],
+    // 'Authorization': 'Bearer ' + user['token'],
+    'Content-Type': 'application/json'
+  };
+  return(auth_headers);
+}
 
 export function auto_error_message_parse(error)
 {
@@ -104,16 +113,18 @@ export function auto_error_message_parse(error)
 
 export function url_http_post_with_header(url_api, header, userData)
 {
+  axios.defaults.headers = header;
   return axios.post(getApronServerAPI() + url_api, userData,
     {
-      headers: header
+      // headers: header
     });
 }
 
 export function url_http_get_with_header(url_api, header, userData)
 {
+  axios.defaults.headers = header;
   return axios.get(getApronServerAPI() + url_api, userData,
     {
-      headers: header
+      // headers: header
     });
 }

@@ -8,7 +8,7 @@ import {isEmpty, printJson} from "MyLibVue/src/libs/simple_lib";
 import VarRouter from "./_var-routers";
 import {
   appDebugMode, auto_error_message_parse,
-  create_auth_header,
+  create_auth_header, create_auth_header_v1,
   getDefaultUserIcon,
   url_http_get_with_header,
   url_http_post, url_http_post_with_header
@@ -167,7 +167,8 @@ const actions = {
   {
     printJson("IPOST --> ", appDebugMode(), http_param_);
     let event_ = http_param_[2];
-    let header = create_auth_header();
+    // let header = create_auth_header();
+    let header = create_auth_header_v1(state.user["user"]);
     return (url_http_post_with_header(http_param_[0], header, http_param_[1]))
       .then(response => {
         const response_ = JSON.parse(JSON.stringify(response));
@@ -194,7 +195,7 @@ const actions = {
   {
     printJson("IGET --> ", appDebugMode(), http_param_);
     let event_ = http_param_[2];
-    let header = create_auth_header();
+    let header = create_auth_header_v1(state.user["user"]);
     return (url_http_get_with_header(http_param_[0], header, http_param_[1]))
       .then(response =>
       {

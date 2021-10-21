@@ -116,6 +116,14 @@
             <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"
                         v-on:click.native="markerWellEventClick()"><i
               class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>
+
+            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadWellPoly()">
+              <i class="fa fa-cloud-download" v-b-tooltip.hover title="Download well poly"/>
+            </ejs-button>
+            <ejs-button :cssClass='markerWellPolyCssStyle()' class="mr-1"
+                        v-on:click.native="markerWellPolyEventClick()"><i
+              class="fa fa-map-signs" v-b-tooltip.hover title="Show or hide well polyline"/></ejs-button>
+
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
             </template>
@@ -185,6 +193,15 @@
                 </l-polyline>
               </template>
             </template>
+
+            <template v-if="show_well_poly_marker">
+              <template v-for="wellmarker in well_poly_marker">
+                <l-polyline :lat-lngs="wellmarker.data" color="orange" :weight="2">
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}</l-tooltip>
+                </l-polyline>
+              </template>
+            </template>
+
           </l-map>
         </template>
       </pane>
@@ -353,10 +370,14 @@
         show_well_marker: false,
         well_marker: [],
 
+        show_well_poly_marker: false,
+        well_poly_marker: [],
+
         event_http_area_list: {success: "successAreaList", fail: "failAreaList"},
         event_http_probmap_get_list: {success: "successProbmapGetList", fail: "failProbmapGetList"},
         event_http_layer_download: {success: "successLayerDownload", fail: "failLayerDownload"},
         event_http_well_download: {success: "successWellDownload", fail: "failWellDownload"},
+        event_http_well_poly_download: {success: "successWellPolyDownload", fail: "failWellPolyDownload"},
       }
     },
 
@@ -426,6 +447,16 @@
         this.show_well_marker = !this.show_well_marker;
       },
 
+      markerWellPolyCssStyle() {
+        if (this.show_well_poly_marker)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      markerWellPolyEventClick() {
+        this.show_well_poly_marker = !this.show_well_poly_marker;
+      },
+
       // ------------------------------------------------
       // checked/unchecked layer area
       // ------------------------------------------------
@@ -472,10 +503,17 @@
         let str_url = this.varRouter.getHttpType("well-list-info") + item_area["id_area"];
         this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_download]).then();
       },
+      downloadWellPoly()
+      {
+        this.showLoader = true;
+        let str_url = this.varRouter.getHttpType("well-poly-download");
+        this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_poly_download]).then();
+      },
+
       httpDownloadLayerData() {
         this.showLoader = true;
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: this.list_selected_layer
         };
         this.$store.dispatch('http_post', [this.varRouter.getHttpType("probmap_multi"), param, this.event_http_layer_download]).then();
@@ -581,10 +619,11 @@
       httpListArea() {
         this.showLoader = true;
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: {}
         };
         this.$store.dispatch('http_get', [this.varRouter.getHttpType("area-list"), param, this.event_http_area_list]).then();
+        // this.$store.dispatch('http_get', ["/api/test/auth", param, this.event_http_area_list]).then();
       },
     },
     mounted() {
@@ -610,7 +649,6 @@
       });
       EventBus.$on(this.event_http_area_list.fail, (msg) => {
         this.showLoader = false;
-        this.table_area = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
@@ -624,6 +662,7 @@
       });
       EventBus.$on(this.event_http_layer_download.fail, (msg) => {
         this.showLoader = false;
+        this.table_area = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
@@ -663,6 +702,34 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-----------------------------------------------------------------
+      // WELL POLY GET LIST
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_well_poly_download.success, (msg) => {
+        let n = msg.data.length;
+        this.well_poly_marker = [];
+        for(let i=0; i<n; i++)
+        {
+          let item = msg.data[i];
+          let tmp = [];
+          let dmp_polyline = item["dmp"]["polyline"];
+          for(let j=0; j<dmp_polyline.length; j++)
+            tmp.push([dmp_polyline[j][1], dmp_polyline[j][0]]);
+
+          this.well_poly_marker.push({
+            data: tmp,
+            name: item["label"]
+          })
+        }
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_well_poly_download.fail, (msg) => {
+        this.well_poly_marker = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
 
     beforeDestroy() {
@@ -674,6 +741,8 @@
       EventBus.$off(this.event_http_layer_download.fail);
       EventBus.$off(this.event_http_well_download.success);
       EventBus.$off(this.event_http_well_download.fail);
+      EventBus.$off(this.event_http_well_poly_download.success);
+      EventBus.$off(this.event_http_well_poly_download.fail);
 
       this.showLoader = false;
     },

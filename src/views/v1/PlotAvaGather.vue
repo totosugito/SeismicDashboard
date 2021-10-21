@@ -85,7 +85,7 @@
         this.proc_plot_ava = false;
 
         let param = {
-          user: this.user["user"],
+          // user: this.user["user"],
           data: this.pageParam
         };
         this.showLoader = true;

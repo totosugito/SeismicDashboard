@@ -125,6 +125,7 @@ export default class VarRouter {
     "prospect-update-star": "/api/prospect/update-star",
 
     "well-list-info": "/api/well/list-info/",
+    "well-poly-download": "/api/well/list",
 
     "wa-data": "/api/prospect/wa-data",
     "wa-delete": "/api/prospect/wa-delete",
