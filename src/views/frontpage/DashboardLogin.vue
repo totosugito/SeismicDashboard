@@ -121,7 +121,7 @@ export default {
           password: user_password
         },
       };
-      this.$store.dispatch('http_post', [this.varRouter.getHttpType("user-login"), param, this.event_http]).then();
+      this.$store.dispatch('http_post_no_auth', [this.varRouter.getHttpType("user-login"), param, this.event_http]).then();
     },
   },
   mounted () {

@@ -85,7 +85,7 @@ const actions = {
   //--------------------------------
   login(context, http_param_)
   {
-    printJson("IPOST --> ", appDebugMode(), http_param_);
+    printJson("LOGIN --> ", appDebugMode(), http_param_);
     let event_ = http_param_[2];
     let header = create_auth_header();
     return (url_http_post_with_header(http_param_[0], header, http_param_[1]))
@@ -160,6 +160,34 @@ const actions = {
       .catch(error => {
         logOut(); //remove existing data
         state.user = {};
+      })
+  },
+
+  http_post_no_auth(context, http_param_)
+  {
+    printJson("IPOST --> ", appDebugMode(), http_param_);
+    let event_ = http_param_[2];
+    let header = create_auth_header();
+    // let header = create_auth_header_v1(state.user["user"]);
+    return (url_http_post_with_header(http_param_[0], header, http_param_[1]))
+      .then(response => {
+        const response_ = JSON.parse(JSON.stringify(response));
+        let data = response_.data;
+
+        // printJson("OUTPUT --> ", data);
+        //cek return data dari server
+        if (response_.status !== 200)
+        {
+          EventBus.$emit(event_.fail, data);
+          return;
+        }
+        EventBus.$emit(event_.success, data);
+      })
+      .catch(error =>
+      {
+        console.log('Error : ', error);
+        let str_msg = auto_error_message_parse(error);
+        EventBus.$emit(event_.fail, {status: 0, title: 'Fail', message: str_msg});
       })
   },
 

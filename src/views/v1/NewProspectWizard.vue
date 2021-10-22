@@ -51,7 +51,8 @@
           <template #row-details="row">
             <div>
               <div class="mb-1">
-                <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(row.item, false)">
+                <ejs-button cssClass='e-outline' class="mr-1"
+                            v-on:click.native="setCheckedLayerStatus(row.item, false)">
                   <i class="fa fa-square-o" v-b-tooltip.hover title="Unselect all"/>
                 </ejs-button>
                 <ejs-button cssClass='e-outline' class="mr-1" v-on:click.native="setCheckedLayerStatus(row.item, true)">
@@ -90,7 +91,7 @@
                 <template v-slot:cell(show)="rowc">
                   <template v-if="rowc.item.isAvailable">
                     <span :style="eventHeatmapShowLayerCssStyle(rowc.item)"
-                    @click="eventLayerShowHeatmapClicked(row.item, rowc.item)">
+                          @click="eventLayerShowHeatmapClicked(row.item, rowc.item)">
                       <template v-if="rowc.item.show">
                         <i class="btn_toolbar fa fa-toggle-on"/>
                       </template>
@@ -138,9 +139,11 @@
             <l-control position="topright" style="margin-top: 30px">
               <div class="options">
                 <label>Radius ({{heatmapScale.radius.value}})</label><br/>
-                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range" :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
+                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range"
+                              :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
                 <label>Blur ({{heatmapScale.blur.value}})</label><br/>
-                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range" :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
+                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range"
+                              :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
               </div>
             </l-control>
 
@@ -171,7 +174,8 @@
             </template>
 
             <template v-if="show_marker_drag">
-              <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false" :icon="markerDragIcon">
+              <l-marker :lat-lng="{lat: marker_drag_coord.lng, lng: marker_drag_coord.lat}" :draggable="false"
+                        :icon="markerDragIcon">
                 <l-popup>
                   <div style="width: 100%">
                     Lat (x) : <b>{{marker_drag_coord.lat.toFixed(2)}}</b><br>
@@ -189,7 +193,8 @@
             <template v-if="show_well_marker">
               <template v-for="wellmarker in well_marker">
                 <l-polyline :lat-lngs="wellmarker.data" color="red" :weight="2">
-                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}</l-tooltip>
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}
+                  </l-tooltip>
                 </l-polyline>
               </template>
             </template>
@@ -197,8 +202,21 @@
             <template v-if="show_well_poly_marker">
               <template v-for="wellmarker in well_poly_marker">
                 <l-polyline :lat-lngs="wellmarker.data" color="orange" :weight="2">
-                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}</l-tooltip>
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}
+                  </l-tooltip>
                 </l-polyline>
+
+                <template v-for="marker in wellmarker.marker">
+                  <l-marker :lat-lng="{lat: marker.y, lng: marker.x}" :draggable="false"
+                            :icon="markerWellIcon">
+                    <l-popup>
+                      <div style="width: 100%">
+                        Name : <b>{{marker.PD_Reservoir}}</b><br>
+                        Z : <b>{{marker.z.toFixed(2)}}</b><br>
+                      </div>
+                    </l-popup>
+                  </l-marker>
+                </template>
               </template>
             </template>
 
@@ -226,6 +244,7 @@
   import Vue from 'vue';
 
   import {ButtonPlugin} from '@syncfusion/ej2-vue-buttons';
+
   Vue.use(ButtonPlugin);
 
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
@@ -262,6 +281,9 @@
     getAreaFirstCoordinate, getMaxHeatmapData
   } from "../../libs/libUpdateData";
   import {appDemoMode, getMapPinMarker} from "../../_constant/http_api";
+
+  import '../components/LeafletAwesomeMarker/leaflet.awesome-markers.css'
+  import '../components/LeafletAwesomeMarker/leaflet.awesome-markers'
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -307,7 +329,7 @@
           color: 'red'
         },
 
-        heatmapScale :{
+        heatmapScale: {
           radius: {
             min: 5,
             max: 50,
@@ -333,10 +355,15 @@
         // marker drag
         show_marker_drag: false,
         marker_drag_coord: {lat: 0, lng: 0},
-        markerDragIcon: L.icon({
-          iconUrl: getMapPinMarker(),
-          iconSize: [32, 36],
-          iconAnchor: [16, 36]
+        markerDragIcon: L.AwesomeMarkers.icon({
+          icon: 'map-marker',
+          prefix: 'fa',
+          markerColor: 'red'
+        }),
+        markerWellIcon: L.AwesomeMarkers.icon({
+          icon: 'map-signs',
+          prefix: 'fa',
+          markerColor: 'orange'
         }),
 
         tmp_array_autoupdate: [],
@@ -460,24 +487,20 @@
       // ------------------------------------------------
       // checked/unchecked layer area
       // ------------------------------------------------
-      setCheckedLayerStatus(item_area, status)
-      {
+      setCheckedLayerStatus(item_area, status) {
         let nl = item_area["layers"].length;
-        for(let i=0; i<nl; i++)
-        {
+        for (let i = 0; i < nl; i++) {
           item_area["layers"][i]["check"] = status;
         }
       },
-      downloadSelectedLayers(item_area)
-      {
+      downloadSelectedLayers(item_area) {
         let layers = item_area["layers"];
         let nl = layers.length;
         this.selected_id_area = item_area.id_area;
         this.list_selected_layer = [];
-        for(let i=0; i<nl; i++)
-        {
+        for (let i = 0; i < nl; i++) {
           let item = layers[i];
-          if(!item.check)
+          if (!item.check)
             continue;
 
           this.list_selected_layer.push({
@@ -488,7 +511,7 @@
             label: item.label,
           })
         }
-        if(this.list_selected_layer.length === 0) {
+        if (this.list_selected_layer.length === 0) {
           this.retStatus["title"] = "Information";
           this.retStatus["message"] = "No data selected";
           this.$refs.dialogMessage.showModal();
@@ -497,14 +520,12 @@
         // console.log(JSON.stringify(this.list_selected_layer))
         this.httpDownloadLayerData();
       },
-      downloadSelectedWell(item_area)
-      {
+      downloadSelectedWell(item_area) {
         this.showLoader = true;
         let str_url = this.varRouter.getHttpType("well-list-info") + item_area["id_area"];
         this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_download]).then();
       },
-      downloadWellPoly()
-      {
+      downloadWellPoly() {
         this.showLoader = true;
         let str_url = this.varRouter.getHttpType("well-poly-download");
         this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_poly_download]).then();
@@ -567,11 +588,9 @@
           "font-size:100%;";
         return (strstyle);
       },
-      eventLayerShowHeatmapClicked(item_area, item)
-      {
+      eventLayerShowHeatmapClicked(item_area, item) {
         item.show = !item.show;
-        if (item.show)
-        {
+        if (item.show) {
           this.selectedLayer["area"] = item_area.id_area;
           this.selectedLayer["area_name"] = item_area.name;
           this.selectedLayer["layer"] = item["layer"];
@@ -686,8 +705,7 @@
       EventBus.$on(this.event_http_well_download.success, (msg) => {
         let n = msg.data.length;
         this.well_marker = [];
-        for(let i=0; i<n; i++)
-        {
+        for (let i = 0; i < n; i++) {
           let item = msg.data[i];
           this.well_marker.push({
             data: [[item.yst, item.xst], [item.yen, item.xen]],
@@ -709,16 +727,16 @@
       EventBus.$on(this.event_http_well_poly_download.success, (msg) => {
         let n = msg.data.length;
         this.well_poly_marker = [];
-        for(let i=0; i<n; i++)
-        {
+        for (let i = 0; i < n; i++) {
           let item = msg.data[i];
           let tmp = [];
           let dmp_polyline = item["dmp"]["polyline"];
-          for(let j=0; j<dmp_polyline.length; j++)
+          for (let j = 0; j < dmp_polyline.length; j++)
             tmp.push([dmp_polyline[j][1], dmp_polyline[j][0]]);
 
           this.well_poly_marker.push({
             data: tmp,
+            marker: item["dmp"]["marker"],
             name: item["label"]
           })
         }
@@ -750,4 +768,5 @@
 </script>
 
 <style>
+  /*@import '../components/LeafletAwesomeMarker/leaflet.awesome-markers.css';*/
 </style>
