@@ -123,7 +123,10 @@
             </ejs-button>
             <ejs-button :cssClass='markerWellPolyCssStyle()' class="mr-1"
                         v-on:click.native="markerWellPolyEventClick()"><i
-              class="fa fa-map-signs" v-b-tooltip.hover title="Show or hide well polyline"/></ejs-button>
+              class="fa fa-ils" v-b-tooltip.hover title="Show or hide well polyline"/></ejs-button>
+            <ejs-button :cssClass='markerWellPolyMarkerCssStyle()' class="mr-1"
+                        v-on:click.native="markerWellPolyMarkerEventClick()"><i
+              class="fa fa-map-signs" v-b-tooltip.hover title="Show or hide well marker"/></ejs-button>
 
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
@@ -205,7 +208,11 @@
                   <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}
                   </l-tooltip>
                 </l-polyline>
+              </template>
+            </template>
 
+            <template v-if="show_well_poly_marker_point">
+              <template v-for="wellmarker in well_poly_marker">
                 <template v-for="marker in wellmarker.marker">
                   <l-marker :lat-lng="{lat: marker.y, lng: marker.x}" :draggable="false"
                             :icon="markerWellIcon">
@@ -355,13 +362,13 @@
         // marker drag
         show_marker_drag: false,
         marker_drag_coord: {lat: 0, lng: 0},
+        markerWellIcon: L.icon({
+          iconUrl: require('../../_assets/images/marker_btomato.png'),
+          iconSize: [24, 27],
+          iconAnchor: [12, 27]
+        }),
         markerDragIcon: L.AwesomeMarkers.icon({
           icon: 'map-marker',
-          prefix: 'fa',
-          markerColor: 'red'
-        }),
-        markerWellIcon: L.AwesomeMarkers.icon({
-          icon: 'map-signs',
           prefix: 'fa',
           markerColor: 'orange'
         }),
@@ -398,6 +405,7 @@
         well_marker: [],
 
         show_well_poly_marker: false,
+        show_well_poly_marker_point: false,
         well_poly_marker: [],
 
         event_http_area_list: {success: "successAreaList", fail: "failAreaList"},
@@ -482,6 +490,15 @@
       },
       markerWellPolyEventClick() {
         this.show_well_poly_marker = !this.show_well_poly_marker;
+      },
+      markerWellPolyMarkerCssStyle() {
+        if (this.show_well_poly_marker_point)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      markerWellPolyMarkerEventClick() {
+        this.show_well_poly_marker_point = !this.show_well_poly_marker_point;
       },
 
       // ------------------------------------------------

@@ -27,6 +27,7 @@
                                                                  title="Edit group"/></ejs-button>
         </div>
         <vue-good-table
+          max-height="75vh"
           ref="table-prospect"
           compactMode
           :columns="table_prospect_headers"

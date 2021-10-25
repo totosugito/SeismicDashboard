@@ -158,12 +158,21 @@
                         v-on:click.native="markerLocationEventClick()" v-b-tooltip.hover title="Map marker position"><i
               class="fa fa-map-marker"/></ejs-button>
 
-            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedWell()">
-              <i class="fa fa-podcast" v-b-tooltip.hover title="Download well"/>
+<!--            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedWell()">-->
+<!--              <i class="fa fa-podcast" v-b-tooltip.hover title="Download well"/>-->
+<!--            </ejs-button>-->
+<!--            <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"-->
+<!--                        v-on:click.native="markerWellEventClick()"><i-->
+<!--              class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>-->
+            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadWellPoly()">
+              <i class="fa fa-cloud-download" v-b-tooltip.hover title="Download well poly"/>
             </ejs-button>
-            <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"
-                        v-on:click.native="markerWellEventClick()"><i
-              class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>
+            <ejs-button :cssClass='markerWellPolyCssStyle()' class="mr-1"
+                        v-on:click.native="markerWellPolyEventClick()"><i
+              class="fa fa-ils" v-b-tooltip.hover title="Show or hide well polyline"/></ejs-button>
+            <ejs-button :cssClass='markerWellPolyMarkerCssStyle()' class="mr-1"
+                        v-on:click.native="markerWellPolyMarkerEventClick()"><i
+              class="fa fa-map-signs" v-b-tooltip.hover title="Show or hide well marker"/></ejs-button>
 
             <template v-if="show_marker_drag">
               <span class="ml-5"><b>x</b> : {{marker_drag_coord.lat.toFixed(2)}}   ,    <b>y</b> : {{marker_drag_coord.lng.toFixed(2)}}</span>
@@ -272,6 +281,31 @@
                 </template>
               </template>
             </template>
+
+            <template v-if="show_well_poly_marker">
+              <template v-for="wellmarker in well_poly_marker">
+                <l-polyline :lat-lngs="wellmarker.data" color="orange" :weight="2">
+                  <l-tooltip :options="{permanent: 'true', opacity: 0.6, className: 'my-labels'}">{{wellmarker.name}}
+                  </l-tooltip>
+                </l-polyline>
+              </template>
+            </template>
+
+            <template v-if="show_well_poly_marker_point">
+              <template v-for="wellmarker in well_poly_marker">
+                <template v-for="marker in wellmarker.marker">
+                  <l-marker :lat-lng="{lat: marker.y, lng: marker.x}" :draggable="false"
+                            :icon="markerWellIcon">
+                    <l-popup>
+                      <div style="width: 100%">
+                        Name : <b>{{marker.PD_Reservoir}}</b><br>
+                        Z : <b>{{marker.z.toFixed(2)}}</b><br>
+                      </div>
+                    </l-popup>
+                  </l-marker>
+                </template>
+              </template>
+            </template>
           </l-map>
         </template>
       </pane>
@@ -366,6 +400,9 @@
   } from "../../libs/libVars";
   import {readProspectData, saveProspectData} from "../../_constant/active_user";
 
+  import '../components/LeafletAwesomeMarker/leaflet.awesome-markers.css'
+  import '../components/LeafletAwesomeMarker/leaflet.awesome-markers'
+
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -430,8 +467,10 @@
         currentPage: 1,
         tabIndex: 0,
         show_well_marker: false,
+        show_well_poly_marker: false,
+        show_well_poly_marker_point: false,
         well_marker: [],
-
+        well_poly_marker:[],
         heatmapScale: {
           radius: {
             min: 5,
@@ -454,15 +493,20 @@
           id: "",
         },
         objParam: {},
-        markerCenterIcon: L.icon({
-          iconUrl: getWellPinMarker(),
-          iconSize: [32, 36],
-          iconAnchor: [16, 36]
+        markerCenterIcon: L.AwesomeMarkers.icon({
+          icon: 'street-view',
+          prefix: 'fa',
+          markerColor: 'orange'
         }),
-        markerDragIcon: L.icon({
-          iconUrl: getMapPinMarker(),
-          iconSize: [32, 36],
-          iconAnchor: [16, 36]
+        markerDragIcon: L.AwesomeMarkers.icon({
+          icon: 'map-marker',
+          prefix: 'fa',
+          markerColor: 'purple'
+        }),
+        markerWellIcon: L.icon({
+          iconUrl: require('../../_assets/images/marker_btomato.png'),
+          iconSize: [24, 27],
+          iconAnchor: [12, 27]
         }),
         show_geo_json: true,
 
@@ -524,6 +568,7 @@
         event_http_layer_download: {success: "successLayerDownload", fail: "failLayerDownload"},
         event_http_wa_data: {success: "successWaData", fail: "failWaData"},
         event_http_wa_delete: {success: "successWaDelete", fail: "failWaDelete"},
+        event_http_well_poly_download: {success: "successWellPolyDownload", fail: "failWellPolyDownload"},
       }
     },
     created() {
@@ -848,6 +893,31 @@
         else
           return ("e-outline");
       },
+
+      markerWellPolyCssStyle() {
+        if (this.show_well_poly_marker)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      markerWellPolyEventClick() {
+        this.show_well_poly_marker = !this.show_well_poly_marker;
+      },
+      markerWellPolyMarkerCssStyle() {
+        if (this.show_well_poly_marker_point)
+          return ("e-warning");
+        else
+          return ("e-outline");
+      },
+      markerWellPolyMarkerEventClick() {
+        this.show_well_poly_marker_point = !this.show_well_poly_marker_point;
+      },
+      downloadWellPoly() {
+        this.showLoader = true;
+        let str_url = this.varRouter.getHttpType("well-poly-download");
+        this.$store.dispatch('http_get', [str_url, {}, this.event_http_well_poly_download]).then();
+      },
+
       downloadSelectedWell() {
         this.showLoader = true;
         let str_url = this.varRouter.getHttpType("well-list-info") + this.objParam["id_area"];
@@ -945,7 +1015,6 @@
       },
       httpGetProspectData() {
         let param = {
-          user: this.user["user"],
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"]
@@ -958,7 +1027,6 @@
       },
       httpGetListWellAnalogyData() {
         let param = {
-          user: this.user["user"],
           data: {
             id_area: this.objParam["id_area"],
             filename: this.objParam["filename"]
@@ -1168,6 +1236,34 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-----------------------------------------------------------------
+      // WELL POLY GET LIST
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_well_poly_download.success, (msg) => {
+        let n = msg.data.length;
+        this.well_poly_marker = [];
+        for (let i = 0; i < n; i++) {
+          let item = msg.data[i];
+          let tmp = [];
+          let dmp_polyline = item["dmp"]["polyline"];
+          for (let j = 0; j < dmp_polyline.length; j++)
+            tmp.push([dmp_polyline[j][1], dmp_polyline[j][0]]);
+
+          this.well_poly_marker.push({
+            data: tmp,
+            marker: item["dmp"]["marker"],
+            name: item["label"]
+          })
+        }
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_well_poly_download.fail, (msg) => {
+        this.well_poly_marker = [];
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
     beforeDestroy() {
       EventBus.$off(this.event_http_prospect_score.success);
@@ -1188,6 +1284,8 @@
       EventBus.$off(this.event_http_wa_data.fail);
       EventBus.$off(this.event_http_wa_delete.success);
       EventBus.$off(this.event_http_wa_delete.fail);
+      EventBus.$off(this.event_http_well_poly_download.success);
+      EventBus.$off(this.event_http_well_poly_download.fail);
     },
   }
 </script>
