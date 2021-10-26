@@ -15,6 +15,11 @@
       <img class="gray_image img-responsive" src="../../_assets/images/asset01@2x.png"/>
       <div class="menu_landing_page_text">Prospect Management</div>
     </button>
+
+    <button class="btn btn-light m-2" @click="openPageDataManagement">
+      <img class="img-responsive" src="../../_assets/images/asset05@2x.png"/>
+      <div class="menu_landing_page_text">Data Management</div>
+    </button>
   </div>
 </template>
 
@@ -41,6 +46,10 @@
       openPageProspectManagement()
       {
 
+      },
+      openPageDataManagement()
+      {
+        this.$router.push(this.varRouter.getRoute("start-data-management", 1));
       },
       openPageProspectFinder()
       {

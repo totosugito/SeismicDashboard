@@ -10,9 +10,83 @@
     <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
       <pane class="p-2" min-size="20" max-size="50" style="background: white">
 
-        <b-tabs v-model="tabIndex">
-          <b-tab class="scrollable" title="Data by FIELD" :title-link-class="linkClass(0)">
+        <b-tabs v-model="tabIndex" class="scrollable">
+          <b-tab title="Edit" :title-link-class="linkClass(0)">
             <div>
+              <div class="container-fluid pt-2 pb-2" style="background-color: white">
+                <table>
+                  <tr>
+                    <td style="width: 100px">User</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.userId}}</b></td>
+                  </tr>
+                  <tr>
+                    <td>Name</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.name}}</b></td>
+                  </tr>
+                  <tr>
+                    <td>Layer</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.layer}}</b></td>
+                  </tr>
+                  <tr>
+                    <td>Group</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.group}}</b></td>
+                  </tr>
+                  <tr>
+                    <td>Filename</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.filename}}</b></td>
+                  </tr>
+                  <tr>
+                    <td>Score</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.score}}</b></td>
+                  </tr>
+                  <tr>
+                    <td>Area</td>
+                    <td>:</td>
+                    <td><b>{{prospectAnalysis.area}}</b></td>
+                  </tr>
+                </table>
+              </div>
+              <b-tabs pills card vertical>
+                <b-tab title="Probability" active>
+                  <b-card-text>
+                    <ViewAnalysisInput :param="prospectAnalysis.dmp.analysis.probability"/>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="Substack">
+                  <b-card-text>
+                    <ViewAnalysisInput :param="prospectAnalysis.dmp.analysis.substack"/>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="AVA">
+                  <b-card-text>
+                    <ViewAnalysisInput :param="prospectAnalysis.dmp.analysis.AVA"/>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="Sweetness">
+                  <b-card-text>
+                    <ViewAnalysisInput :param="prospectAnalysis.dmp.analysis.sweetness"/>
+                  </b-card-text>
+                </b-tab>
+                <b-tab title="Well Analogy">
+                  <b-card-text>
+                    <ViewAnalysisInput :param="prospectAnalysis.dmp.analysis.well_analogy"/>
+                  </b-card-text>
+                </b-tab>
+              </b-tabs>
+              <div class="container-fluid p-2 text-right" style="background-color: white;">
+                <ejs-button cssClass='e-success' v-on:click.native='updateProspectAnalysisValue'>Update</ejs-button>
+              </div>
+              <ProposeProspectInfo :param="proposeProspect" class="mt-2" :showButton="false"/>
+            </div>
+          </b-tab>
+          <b-tab title="Data by FIELD" :title-link-class="linkClass(1)">
+            <div class="scrollable">
               <div>
                 <ejs-button cssClass='e-outline' class="mr-2 mb-2" v-b-tooltip.hover title="Remove all heatmap view"
                             v-on:click.native='onUncheckAll'><i class="fa fa-square-o"/>
@@ -22,6 +96,10 @@
                 </ejs-button>
                 <ejs-button cssClass='e-outline' class="mr-2 mb-2" v-b-tooltip.hover title="Open gather in the new page"
                             v-on:click.native='onClickViewGather'><i class="fa fa-image"/>
+                </ejs-button>
+                <ejs-button cssClass='e-outline' class="mr-2 mb-2" v-b-tooltip.hover
+                            title="Refresh probability data"
+                            v-on:click.native='httpGetProspectData'><i class="fa fa-refresh"/>
                 </ejs-button>
               </div>
               <div>
@@ -52,41 +130,44 @@
                   </span>
                 </template>
               </b-table>
-            </div>
-            <b-card no-body class="text-center" >
-              <b-card-header no-body><strong>Well Analogy</strong></b-card-header>
-              <div class="p-1">
-                <div>
-                  <ejs-button cssClass='e-outline' class="mr-2 mb-1" v-b-tooltip.hover title="Delete all well analogy"
-                              v-on:click.native='dialogClearWellAnalogyShow'><i class="fa fa-trash"/>
-                  </ejs-button>
-                  <ejs-button cssClass='e-outline' class="mr-2 mb-1" v-b-tooltip.hover title="Refresh well analogy data"
-                              v-on:click.native='httpGetListWellAnalogyData'><i class="fa fa-refresh"/>
-                  </ejs-button>
 
-                  <ejs-button cssClass='e-outline' class="ml-2 mr-2 mb-1" v-b-tooltip.hover title="Show well analogy chart"
-                              v-on:click.native='viewWellAnalogy'><i class="fa fa-line-chart"/>
-                  </ejs-button>
+              <b-card no-body class="text-center">
+                <b-card-header no-body><strong>Well Analogy</strong></b-card-header>
+                <div class="p-1">
+                  <div>
+                    <ejs-button cssClass='e-outline' class="mr-2 mb-1" v-b-tooltip.hover title="Delete all well analogy"
+                                v-on:click.native='dialogClearWellAnalogyShow'><i class="fa fa-trash"/>
+                    </ejs-button>
+                    <ejs-button cssClass='e-outline' class="mr-2 mb-1" v-b-tooltip.hover
+                                title="Refresh well analogy data"
+                                v-on:click.native='httpGetListWellAnalogyData'><i class="fa fa-refresh"/>
+                    </ejs-button>
+
+                    <ejs-button cssClass='e-outline' class="ml-2 mr-2 mb-1" v-b-tooltip.hover
+                                title="Show well analogy chart"
+                                v-on:click.native='viewWellAnalogy'><i class="fa fa-line-chart"/>
+                    </ejs-button>
+                  </div>
+                  <b-table
+                    responsive
+                    sticky-header="28vh"
+                    show-empty
+                    :small="true"
+                    :striped="false"
+                    :bordered="true"
+                    :outlined="true"
+                    :fields="table_wa_header"
+                    :items="table_wa">
+                    <template #cell(index)="row">
+                      {{ row.index + 1 }}
+                    </template>
+                  </b-table>
                 </div>
-                <b-table
-                  responsive
-                  sticky-header="28vh"
-                  show-empty
-                  :small="true"
-                  :striped="false"
-                  :bordered="true"
-                  :outlined="true"
-                  :fields="table_wa_header"
-                  :items="table_wa">
-                  <template #cell(index)="row">
-                    {{ row.index + 1 }}
-                  </template>
-                </b-table>
-              </div>
-            </b-card>
+              </b-card>
+            </div>
           </b-tab>
 
-          <b-tab title="Probability List" :title-link-class="linkClass(1)">
+          <b-tab title="Probability List" :title-link-class="linkClass(2)">
             <div>
               <div class="mb-1">
                 <ejs-button cssClass='e-outline' class="mr-1"
@@ -158,12 +239,12 @@
                         v-on:click.native="markerLocationEventClick()" v-b-tooltip.hover title="Map marker position"><i
               class="fa fa-map-marker"/></ejs-button>
 
-<!--            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedWell()">-->
-<!--              <i class="fa fa-podcast" v-b-tooltip.hover title="Download well"/>-->
-<!--            </ejs-button>-->
-<!--            <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"-->
-<!--                        v-on:click.native="markerWellEventClick()"><i-->
-<!--              class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>-->
+            <!--            <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadSelectedWell()">-->
+            <!--              <i class="fa fa-podcast" v-b-tooltip.hover title="Download well"/>-->
+            <!--            </ejs-button>-->
+            <!--            <ejs-button :cssClass='markerWellCssStyle()' class="mr-1"-->
+            <!--                        v-on:click.native="markerWellEventClick()"><i-->
+            <!--              class="fa fa-deviantart" v-b-tooltip.hover title="Show or hide well"/></ejs-button>-->
             <ejs-button cssClass='e-outline' class="ml-3 mr-1" v-on:click.native="downloadWellPoly()">
               <i class="fa fa-cloud-download" v-b-tooltip.hover title="Download well poly"/>
             </ejs-button>
@@ -183,16 +264,16 @@
                  @ready="onMapReady" @click="onMapClickEvent">
 
             <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
-<!--            <l-control position="topright" style="margin-top: 30px">-->
-<!--              <div class="options">-->
-<!--                <label>Radius ({{heatmapScale.radius.value}})</label><br/>-->
-<!--                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range"-->
-<!--                              :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>-->
-<!--                <label>Blur ({{heatmapScale.blur.value}})</label><br/>-->
-<!--                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range"-->
-<!--                              :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>-->
-<!--              </div>-->
-<!--            </l-control>-->
+            <!--            <l-control position="topright" style="margin-top: 30px">-->
+            <!--              <div class="options">-->
+            <!--                <label>Radius ({{heatmapScale.radius.value}})</label><br/>-->
+            <!--                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range"-->
+            <!--                              :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>-->
+            <!--                <label>Blur ({{heatmapScale.blur.value}})</label><br/>-->
+            <!--                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range"-->
+            <!--                              :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>-->
+            <!--              </div>-->
+            <!--            </l-control>-->
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 
             <template v-if="show_marker_center">
@@ -376,7 +457,7 @@
     addShowKeyToLayer,
     createAreaLeafletDemoData,
     createDemoProposeProspect,
-    createHeatmapDemoData, getSampleGeoJson
+    createHeatmapDemoData, createProspectAnalysisDemoData, getSampleGeoJson
   } from "../../libs/demo_data";
   import ProposeProspectInfo from "../myview/ProposeProspectInfo";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
@@ -402,6 +483,7 @@
 
   import '../components/LeafletAwesomeMarker/leaflet.awesome-markers.css'
   import '../components/LeafletAwesomeMarker/leaflet.awesome-markers'
+  import ViewAnalysisInput from "../myview/ViewAnalysisInput";
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -411,7 +493,7 @@
   });
 
   export default {
-    name: "ProspectEdit",
+    name: "EditProspectAnalysis",
 
     components: {
       ProposeProspectInfo,
@@ -423,7 +505,8 @@
       StarRating,
 
       Splitpanes, Pane,
-
+      ProposeProspectInfo,
+      ViewAnalysisInput,
       // VueFormDialog,
       // "vue-form-generator": VueFormGenerator.component,
 
@@ -465,12 +548,11 @@
 
         perPage: 500,
         currentPage: 1,
-        tabIndex: 0,
         show_well_marker: false,
         show_well_poly_marker: false,
         show_well_poly_marker_point: false,
         well_marker: [],
-        well_poly_marker:[],
+        well_poly_marker: [],
         heatmapScale: {
           radius: {
             min: 5,
@@ -512,7 +594,7 @@
 
         show_marker_center: true,
         show_marker_drag: false,
-        marker_drag_coord: {lat: 0, lng: 0, label:"", gather: {z: {min: 0, max: 0}}},
+        marker_drag_coord: {lat: 0, lng: 0, label: "", gather: {z: {min: 0, max: 0}}},
         refreshChart: false,
         proposeProspect: {},
         prospectMap: {ndata: 0, layers: []},
@@ -556,6 +638,11 @@
           validateAfterLoad: true,
           validateAfterChanged: true,
         },
+        prospectAnalysis: {
+          dmp: {
+            analysis: {}
+          }
+        },
 
         event_http_get_section: {success: "successGetSection", fail: "failGetSection"},
         event_http_propose_prospect: {success: "successProposeProspect", fail: "failProposeProspect"},
@@ -569,6 +656,8 @@
         event_http_wa_data: {success: "successWaData", fail: "failWaData"},
         event_http_wa_delete: {success: "successWaDelete", fail: "failWaDelete"},
         event_http_well_poly_download: {success: "successWellPolyDownload", fail: "failWellPolyDownload"},
+        event_http_prospect_analysis: {success: "successProspectAnalysis", fail: "failProspectAnalysis"},
+        event_http_prospect_update_star: {success: "successProspectUpdateStar", fail: "failProspectUpdateStar"},
       }
     },
     created() {
@@ -597,6 +686,7 @@
         layers: []
       });
       if (this.bdemo) {
+        this.prospectAnalysis = createProspectAnalysisDemoData();
         this.prospectMap = createProspectEditDemoData();
         this.table_prospect_map = addPlotDataToProspectEditMultiData(this.prospectMap);
         this.heatmap_range = this.prospectMap.v_min_max;
@@ -605,11 +695,40 @@
         this.showLoader = false;
         this.showMapProspect = true;
       } else {
-        this.httpGetProspectData();
+        // this.httpGetProspectData();
+        this.httpGetProspectAnalysisData();
       }
     },
 
     methods: {
+      updateProspectAnalysisValue()
+      {
+        let param = {
+          user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"],
+            analysis: this.prospectAnalysis["dmp"]["analysis"]
+          }
+        };
+
+        // console.log(JSON.stringify(this.prospectAnalysis))
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-update-star"), param, this.event_http_prospect_update_star]).then();
+      },
+      httpGetProspectAnalysisData() {
+        let param = {
+          // user: this.user["user"],
+          data: {
+            id_area: this.objParam["id_area"],
+            filename: this.objParam["filename"]
+          }
+        };
+
+        this.showLoader = true;
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prospect-analysis"), param, this.event_http_prospect_analysis]).then();
+      },
+
       linkClass(idx) {
         if (this.tabIndex === idx) {
           return ['bg-primary', 'text-light']
@@ -1038,16 +1157,13 @@
           this.event_http_wa_data]).then();
       },
 
-      dialogClearWellAnalogyShow()
-      {
+      dialogClearWellAnalogyShow() {
         this.$refs.dialogWellAnalogy.showModal();
       },
-      dialogClearWellAnalogyBtn1Click()
-      {
+      dialogClearWellAnalogyBtn1Click() {
         this.$refs.dialogWellAnalogy.hideModal();
       },
-      dialogClearWellAnalogyBtn2Click()
-      {
+      dialogClearWellAnalogyBtn2Click() {
         this.httpClearListWellAnalogyData();
         this.$refs.dialogWellAnalogy.hideModal();
       },
@@ -1264,6 +1380,36 @@
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
+
+      //-----------------------------------------------------------------
+      // PROSPECT ANALYSIS
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_prospect_analysis.success, (msg) => {
+        this.prospectAnalysis = msg.data;
+        this.showLoader = false;
+      });
+      EventBus.$on(this.event_http_prospect_analysis.fail, (msg) => {
+        this.prospectAnalysis = {};
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
+
+      //-----------------------------------------------------------------
+      // UPDATE STAR
+      //-----------------------------------------------------------------
+      EventBus.$on(this.event_http_prospect_update_star.success, (msg) => {
+        this.prospectAnalysis = msg.data;
+        this.showLoader = false;
+        this.retStatus["title"] = "Information";
+        this.retStatus["message"] = msg.mesg;
+        this.$refs.dialogMessage.showModal();
+      });
+      EventBus.$on(this.event_http_prospect_update_star.fail, (msg) => {
+        this.showLoader = false;
+        this.retStatus = msg;
+        this.$refs.dialogMessage.showModal();
+      });
     },
     beforeDestroy() {
       EventBus.$off(this.event_http_prospect_score.success);
@@ -1286,9 +1432,17 @@
       EventBus.$off(this.event_http_wa_delete.fail);
       EventBus.$off(this.event_http_well_poly_download.success);
       EventBus.$off(this.event_http_well_poly_download.fail);
+      EventBus.$off(this.event_http_prospect_analysis.success);
+      EventBus.$off(this.event_http_prospect_analysis.fail);
+      EventBus.$off(this.event_http_prospect_update_star.success);
+      EventBus.$off(this.event_http_prospect_update_star.fail);
     },
   }
 </script>
 
 <style scoped>
+  .scrollable {
+    overflow-y: auto;
+    max-height: 100%;
+  }
 </style>

@@ -17,6 +17,9 @@ export default class VarRouter {
     "user-profile": ["user-profile", "/user-profile", "User Profile"],
 
     "start": ["start", "/start", "Start"],
+    "start-data-management": ["start-data-management", "/start-data-management", "Data Management"],
+    'dm-probability-map': ["dm-probability-map", "/dm-probability-map", "Probability Map"],
+
     "home": ["home", "/home", "Home"],
     "well": ["well", "/well", "Well"],
     "inline-crossline": ["inline-crossline", "/well/inline-crossline", "Inline & Crossline"],
@@ -54,6 +57,8 @@ export default class VarRouter {
     'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer"],
     'prospect-edit': ["prospect-edit", "/prospect-edit", "Prospect Edit"],
     'prospect-analysis': ["prospect-analysis", "/prospect-analysis", "Prospect Analysis"],
+    'edit-prospect-analysis': ["edit-prospect-analysis", "/edit-prospect-analysis", "Prospect Analysis"],
+
     'plot-ava-gather': ["plot-ava-gather", "/plot-ava-gather", "Ava Gather"],
     'plot-ava-gather-section': ["plot-ava-gather-section", "/plot-ava-gather-section", "Ava Gather Section"],
 

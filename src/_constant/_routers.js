@@ -140,6 +140,11 @@ export default new Router({
               name: varRouter.getRoute("start", 2),
               component: () => import('../views/v1/LandingPage')
             },
+            {
+              path: varRouter.getRoute("start-data-management", 1),
+              name: varRouter.getRoute("start-data-management", 2),
+              component: () => import('../views/v1/LandingPageDataManagement')
+            },
             // ---------------------------------------------------------
             //                    Dashboard
             // ---------------------------------------------------------
@@ -218,9 +223,20 @@ export default new Router({
               component: () => import('../views/v1/ProspectAnalysis')
             },
             {
+              path: varRouter.getRoute("edit-prospect-analysis", 1),
+              name: varRouter.getRoute("edit-prospect-analysis", 2),
+              component: () => import('../views/v1/EditProspectAnalysis')
+            },
+            {
               path: varRouter.getRoute("view-well-analogy", 1),
               name: varRouter.getRoute("view-well-analogy", 2),
               component: () => import('../views/v1/ViewerWellAnalogy')
+            },
+
+            {
+              path: varRouter.getRoute("dm-probability-map", 1),
+              name: varRouter.getRoute("dm-probability-map", 2),
+              component: () => import('../views/v1/dataManagementProbabilityMap')
             },
           ]
         }

@@ -139,16 +139,16 @@
                  @ready="onMapReady" @click="onMapClickEvent">
 
             <l-control-scale position="bottomleft" :imperial="false" :metric="true"></l-control-scale>
-            <l-control position="topright" style="margin-top: 30px">
-              <div class="options">
-                <label>Radius ({{heatmapScale.radius.value}})</label><br/>
-                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range"
-                              :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>
-                <label>Blur ({{heatmapScale.blur.value}})</label><br/>
-                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range"
-                              :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>
-              </div>
-            </l-control>
+<!--            <l-control position="topright" style="margin-top: 30px">-->
+<!--              <div class="options">-->
+<!--                <label>Radius ({{heatmapScale.radius.value}})</label><br/>-->
+<!--                <b-form-input style="width: 150px" v-model="heatmapScale.radius.value" type="range"-->
+<!--                              :min="heatmapScale.radius.min" :max="heatmapScale.radius.max"></b-form-input>-->
+<!--                <label>Blur ({{heatmapScale.blur.value}})</label><br/>-->
+<!--                <b-form-input style="width: 150px" v-model="heatmapScale.blur.value" type="range"-->
+<!--                              :min="heatmapScale.blur.min" :max="heatmapScale.blur.max"></b-form-input>-->
+<!--              </div>-->
+<!--            </l-control>-->
 
             <l-tile-layer :url="map_var.url" :attribution="map_var.attribution"/>
 

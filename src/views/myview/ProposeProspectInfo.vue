@@ -25,18 +25,20 @@
 
           <div class="item_title">Box</div>
           <b-table
-                   show-empty
-                   :small="true"
-                   :striped="false"
-                   :bordered="true"
-                   :outlined="true"
-                   :fields="table_propose_box_header"
-                   :items="getTableProposeProspectBox()">
+            show-empty
+            :small="true"
+            :striped="false"
+            :bordered="true"
+            :outlined="true"
+            :fields="table_propose_box_header"
+            :items="getTableProposeProspectBox()">
           </b-table>
-          <div class="mt-3">
-            <ejs-button cssClass='e-info' class="mb-2" v-on:click.native='onClickViewProspect'>View Prospect Map
-            </ejs-button>
-          </div>
+          <template v-if="showButton">
+            <div class="mt-3">
+              <ejs-button cssClass='e-info' class="mb-2" v-on:click.native='onClickViewProspect'>View Prospect Map
+              </ejs-button>
+            </div>
+          </template>
         </b-card-body>
       </b-collapse>
     </b-card>
@@ -60,6 +62,11 @@
   export default {
     name: "ProposeProspectInfo",
     props: {
+      showButton: {
+        type: Boolean,
+        required: false,
+        default: true
+      },
       param: {
         type: Object,
         required: false,
@@ -126,25 +133,23 @@
         this.$emit('onClickViewProspect', this.param);
       },
 
-      getTableExcaBox()
-      {
-        if("exca" in this.param === false) {
+      getTableExcaBox() {
+        if ("exca" in this.param === false) {
           console.log("exca NOT EXIST")
-          return ;
+          return;
         }
 
         this.table_exca = convertProposeExcaBoxObjectToArray(this.param);
-        return(this.table_exca);
+        return (this.table_exca);
       },
-      getTableProposeProspectBox()
-      {
-        if("boxa" in this.param === false) {
+      getTableProposeProspectBox() {
+        if ("boxa" in this.param === false) {
           console.log("boxa NOT EXIST")
-          return ;
+          return;
         }
 
         this.table_propose_box = convertProposeProspectBoxObjectToArray(this.param);
-        return(this.table_propose_box);
+        return (this.table_propose_box);
       }
     },
   }
