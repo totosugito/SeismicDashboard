@@ -7,7 +7,7 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-    <splitpanes class="default-theme" style="height: 88vh" vertical>
+    <splitpanes class="default-theme" style="height: 80vh" vertical>
       <pane class="scrollable p-2" min-size="20" max-size="70" style="background: white">
         <div class="group-header">
           <ejs-button cssClass='e-outline' class="mr-1"
@@ -27,7 +27,7 @@
                                                                  title="Edit group"/></ejs-button>
         </div>
         <vue-good-table
-          max-height="75vh"
+          max-height="67vh"
           ref="table-prospect"
           compactMode
           :columns="table_prospect_headers"

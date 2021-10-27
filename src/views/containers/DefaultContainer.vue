@@ -37,6 +37,7 @@
 
         </template>
         <main class="main">
+          <Breadcrumb :list="list" style="margin-bottom:0px; "/>
           <router-view></router-view>
         </main>
       </div>

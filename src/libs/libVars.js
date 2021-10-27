@@ -1638,3 +1638,314 @@ export function createWellAnalogySaveSchema() {
   };
   return(schema_);
 }
+
+export function createTableProbMapListHeader()
+{
+  let table_headers = [
+    {
+      field: 'id_area',
+      label: 'Area',
+      width: '70px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'label',
+      label: 'Label',
+      width: '200px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'filename',
+      label: 'Filename',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'layer',
+      label: 'Layer',
+      width: '80px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'loc',
+      label: 'Loc',
+      width: '170px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'action',
+      label: 'Action',
+      width: '80px',
+      sortable: false,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+  ];
+  return (table_headers);
+}
+export function createNewProbMapModel() {
+  let model = {
+    id_area: -1,
+    layer: -1,
+    filename: "",
+    loc: "",
+    label: "",
+    isDefault: false
+  };
+  return(model);
+}
+export function createNewProbMapSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'ID Area',
+        model: 'id_area',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Layer',
+        model: 'layer',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Filename',
+        model: 'filename',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Loc',
+        model: 'loc',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Label',
+        model: 'label',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: "checkbox",
+        label: "Default",
+        model: "isDefault",
+        featured: false,
+        default: false,
+      }
+    ]
+  };
+  return(schema_);
+}
+
+export function createTableAreaListHeader_V2()
+{
+  let table_headers = [
+    {
+      field: 'id_area',
+      label: 'Area',
+      width: '70px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'name',
+      label: 'Name',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'layer_show',
+      label: 'Draw',
+      width: '80px',
+      sortable: false,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'action',
+      label: 'Action',
+      width: '80px',
+      sortable: false,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+  ];
+  return (table_headers);
+}
+
+export function createNewAreaModel() {
+  let model = {
+    id_area: -1,
+    name: "",
+    x1: 0,
+    y1: 0,
+    x2: 0,
+    y2: 0,
+    x3: 0,
+    y3: 0,
+    x4: 0,
+    y4: 0
+  };
+  return(model);
+}
+
+export function createNewAreaSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'ID Area',
+        model: 'id_area',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Name',
+        model: 'name',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'X1',
+        model: 'x1',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Y1',
+        model: 'y1',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'X2',
+        model: 'x2',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Y2',
+        model: 'y2',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'X3',
+        model: 'x3',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Y3',
+        model: 'y3',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'X4',
+        model: 'x4',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Y4',
+        model: 'y4',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_);
+}

@@ -8,7 +8,7 @@ export default class VarRouter {
     "auto-loc": ["auto-loc", "/auto-loc", "Auto GPS Location"],
 
     "dashboard-login": ["dashboard-login", "/dashboard-login", "Login"],
-    "dashboard": ["", "/", "Dashboard"],
+    "dashboard": ["", "/", ""],
 
     "page-qr": ["page-qr", "/page-qr", "QR Page"],
     "forgot-password": ["forgot-password", "/forgot-password", "Forgot Password"],
@@ -16,9 +16,10 @@ export default class VarRouter {
     "logout": ["logout", "/logout", "Logout"],
     "user-profile": ["user-profile", "/user-profile", "User Profile"],
 
-    "start": ["start", "/start", "Start"],
+    "start": ["start", "/start", "Dashboard"],
     "start-data-management": ["start-data-management", "/start-data-management", "Data Management"],
     'dm-probability-map': ["dm-probability-map", "/dm-probability-map", "Probability Map"],
+    'dm-area': ["dm-area", "/dm-area", "Area"],
 
     "home": ["home", "/home", "Home"],
     "well": ["well", "/well", "Well"],
@@ -54,7 +55,7 @@ export default class VarRouter {
     "processwizard5": ["process-wizard5", "/process-wizard5", "Process Wizard Step 5"],
     "processwizard6": ["process-wizard6", "/process-wizard6", "Process Wizard Step 6"],
 
-    'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer"],
+    'seismic-viewer-by-xy': ["seismic-viewer-by-xy", "/seismic-viewer-by-xy", "Seismic Viewer by XY"],
     'prospect-edit': ["prospect-edit", "/prospect-edit", "Prospect Edit"],
     'prospect-analysis': ["prospect-analysis", "/prospect-analysis", "Prospect Analysis"],
     'edit-prospect-analysis': ["edit-prospect-analysis", "/edit-prospect-analysis", "Prospect Analysis"],
@@ -135,6 +136,10 @@ export default class VarRouter {
     "wa-data": "/api/prospect/wa-data",
     "wa-delete": "/api/prospect/wa-delete",
     "wa-add-el": "/api/prospect/wa-add-el",
+
+    "prob-map-list-all": "/api/probmap/list-all",
+    "prob-map-register": "/api/probmap/register",
+    "prob-map-delete": "/api/probmap/delete",
   };
 
   schematype = {

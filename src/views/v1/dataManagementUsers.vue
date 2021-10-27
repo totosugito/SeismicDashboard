@@ -108,7 +108,7 @@
   import {appDemoMode} from "../../_constant/http_api";
 
   export default {
-    name: "dataManagementProbabilityMap",
+    name: "dataManagementUsers",
     components: {
       VueSimpleDialog,
 

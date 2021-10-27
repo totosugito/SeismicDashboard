@@ -7,7 +7,7 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-    <splitpanes class="default-theme" style="height: 88vh" vertical>
+    <splitpanes class="default-theme" style="height: 82vh" vertical>
       <pane class="p-2" min-size="20" max-size="30" style="background: white">
         <b-table responsive style="height: 90vh"
                  show-empty

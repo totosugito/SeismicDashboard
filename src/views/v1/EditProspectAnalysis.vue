@@ -7,7 +7,7 @@
       :size="spinLoader.size"
       :active="showLoader"/>
 
-    <splitpanes class="default-theme" vertical style="height: 87vh" vertical>
+    <splitpanes class="default-theme" vertical style="height: 82vh" vertical>
       <pane class="p-2" min-size="20" max-size="50" style="background: white">
 
         <b-tabs v-model="tabIndex" class="scrollable">

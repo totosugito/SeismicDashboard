@@ -1,25 +1,22 @@
 <template>
   <div class="flex-row align-items-center container-fluid" style="background-color:lightblue; height: 100%">
 
+    <button class="btn btn-light m-2" @click="openPageDataManagementArea">
+      <img class="img-responsive" src="../../_assets/images/asset06@2x.png"/>
+      <div class="menu_landing_page_text">Area</div>
+    </button>
     <button class="btn btn-light m-2" @click="openPageDataManagementProbilityMap">
       <img class="img-responsive" src="../../_assets/images/asset04@2x.png"/>
       <div class="menu_landing_page_text">Probability Map</div>
     </button>
-
-<!--    <button class="btn btn-light m-2" @click="openPageProspectAnalysis">-->
-<!--      <img class="img-responsive" src="../../_assets/images/asset02@2x.png"/>-->
-<!--      <div class="menu_landing_page_text">Prospect Analysis</div>-->
-<!--    </button>-->
-
-<!--    <button class="btn btn-light m-2" @click="openPageProspectManagement">-->
-<!--      <img class="gray_image img-responsive" src="../../_assets/images/asset01@2x.png"/>-->
-<!--      <div class="menu_landing_page_text">Prospect Management</div>-->
-<!--    </button>-->
-
-<!--    <button class="btn btn-light m-2" @click="openPageDataManagement">-->
-<!--      <img class="img-responsive" src="../../_assets/images/asset05@2x.png"/>-->
-<!--      <div class="menu_landing_page_text">Data Management</div>-->
-<!--    </button>-->
+    <button class="btn btn-light m-2" @click="openPageDataManagementWell">
+      <img class="img-responsive" src="../../_assets/images/asset07@2x.png"/>
+      <div class="menu_landing_page_text">Well</div>
+    </button>
+    <button class="btn btn-light m-2" @click="openPageDataManagementUser">
+      <img class="img-responsive" src="../../_assets/images/asset08@2x.png"/>
+      <div class="menu_landing_page_text">Users</div>
+    </button>
   </div>
 </template>
 
@@ -43,28 +40,22 @@
       return {}
     },
     methods: {
+      openPageDataManagementArea()
+      {
+        this.$router.push(this.varRouter.getRoute("dm-area", 1));
+      },
       openPageDataManagementProbilityMap()
       {
         this.$router.push(this.varRouter.getRoute("dm-probability-map", 1));
       },
-      // openPageDataManagement()
-      // {
-      //
-      // },
-      // openPageProspectFinder()
-      // {
-      //   let routeData = this.$router.resolve({
-      //     path: this.varRouter.getRoute("new-prospect-wizard", 1),
-      //   });
-      //   window.open(routeData.href, '_blank');
-      // },
-      // openPageProspectAnalysis()
-      // {
-      //   let routeData = this.$router.resolve({
-      //     path: this.varRouter.getRoute("prospect-management", 1),
-      //   });
-      //   window.open(routeData.href, '_blank');
-      // },
+      openPageDataManagementWell()
+      {
+
+      },
+      openPageDataManagementUser()
+      {
+
+      }
     }
   }
 </script>

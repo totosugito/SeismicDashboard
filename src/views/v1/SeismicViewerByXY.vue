@@ -10,7 +10,7 @@
 
     <b-tabs v-model="tabIndex">
       <b-tab title="Propose Prospect" :title-link-class="linkClass(0)">
-        <splitpanes class="default-theme" vertical style="height: 76vh" vertical>
+        <splitpanes class="default-theme" vertical style="height: 74vh" vertical>
           <pane class="scrollable p-2" min-size="20" max-size="40" style="background: white">
             <DynamicInputForMap :param="paramInput"
                                 @onClickResetSection="dynamicInputOnClickResetSection"
