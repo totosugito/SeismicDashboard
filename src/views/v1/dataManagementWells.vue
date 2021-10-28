@@ -9,32 +9,26 @@
 
         <div class="group-header ml-2">
           <ejs-button cssClass='e-outline' class="mr-1"
-                      v-on:click.native="openNewProbMapDialog"><i class="fa fa-plus" v-b-tooltip.hover
-                                                                 title="New probability map data"/></ejs-button>
+                      v-on:click.native="openNewWellsDialog"><i class="fa fa-plus" v-b-tooltip.hover
+                                                                 title="New Well"/></ejs-button>
           <ejs-button cssClass='e-outline' class="mr-1"
-                      v-on:click.native="httpProbMapList" v-b-tooltip.hover title="Refresh data"><i
+                      v-on:click.native="httpWellsList" v-b-tooltip.hover title="Refresh data"><i
             class="fa fa-refresh"/></ejs-button>
         </div>
         <vue-good-table
           max-height="71vh"
           ref="table-prospect"
           compactMode
-          :columns="table_prob_map_headers"
-          :rows="table_prob_map"
+          :columns="table_wells_headers"
+          :rows="table_wells"
           styleClass="vgt-table bordered striped condensed"
           :line-numbers="true"
           :pagination-options="paginationOptions"
           :select-options="tableSelectAllOptions">
-          <template slot="table-column" slot-scope="props">
-           <span v-if="props.column.label =='Marker'">
-              <i class="fa fa-map-marker"/>
-           </span>
-          </template>
-
           <template slot="table-row" slot-scope="props">
             <span v-if="props.column.field === 'action'">
               <ejs-button cssClass='e-danger'
-                          v-on:click.native="eventProbMapDeleteDialog(props.row)"><i class="fa fa-trash"/></ejs-button>
+                          v-on:click.native="eventWellsDeleteDialog(props.row)"><i class="fa fa-trash"/></ejs-button>
             </span>
           </template>
         </vue-good-table>
@@ -54,30 +48,30 @@
 
     <!-- save prospect dialog -->
     <vue-form-dialog
-      ref="newProbMapDialog"
+      ref="newWellsDialog"
       type="default"
-      header="New Probability Map" body="Body"
+      header="New User" body="Body"
       btn1_text="Close" btn2_text="Create"
       btn1_style="danger" btn2_style="primary"
-      @btn1Click="newProbMapDialogBtn1Click()" @btn2Click="newProbMapDialogBtn2Click()">
+      @btn1Click="newWellsDialogBtn1Click()" @btn2Click="newWellsDialogBtn2Click()">
 
       <!-- body slot -->
       <span slot="slot-body" style="padding-left: 20px; padding-right: 20px; width: 100%">
-              <vue-form-generator :schema="new_prob_map_schema" :model="new_prob_map_model" :options="formOptions" @validated="onValidated"/>
+              <vue-form-generator :schema="new_wells_schema" :model="new_wells_model" :options="formOptions" @validated="onValidated"/>
             </span>
     </vue-form-dialog>
 
     <!-- delete dialog -->
     <vue-simple-dialog
-      ref="dialogProbMapDelete"
+      ref="dialogWellsDelete"
       type="default"
       header="Delete data" body="Body"
       btn1_text="Cancel" btn2_text="Delete"
       btn1_style="danger" btn2_style="primary"
-      @btn1Click="eventProbMapDeleteBtn1Click()" @btn2Click="eventProbMapDeleteBtn2Click()">
+      @btn1Click="eventWellsDeleteBtn1Click()" @btn2Click="eventWellsDeleteBtn2Click()">
               <span slot="slot-body">
-                <h5>Delete label <span
-                  style="color: blue">'{{selected_prob_map.label}}'</span> ?</h5>
+                <h5>Delete well label <span
+                  style="color: blue">'{{selected_well.label}}'</span> ?</h5>
               </span>
     </vue-simple-dialog>
   </div>
@@ -97,18 +91,12 @@
 
   import {EventBus} from 'MyLibVue/src/libs/eventbus';
   import {mapState} from "vuex";
-  import {createNewProbMapModel, createNewProbMapSchema, createTableProbMapListHeader} from "../../libs/libVars";
+  import {createNewWellModel, createNewWellSchema, createTableWellsLiteListHeader} from "../../libs/libVars";
   import VueSimpleDialog from 'MyLibVue/src/components/vue-simple-dialog'
-  import {
-    addShowKeyToLayer,
-    createAreaDemoData,
-    createAreaLeafletDemoData, createDemoProspectProjectList,
-    createHeatmapDemoData
-  } from "../../libs/demo_data";
   import {appDemoMode} from "../../_constant/http_api";
 
   export default {
-    name: "dataManagementProbabilityMap",
+    name: "dataManagementWells",
     components: {
       VueSimpleDialog,
 
@@ -133,7 +121,7 @@
         showLoader: true,
         retStatus: {status: 0, title: "", message: "", data: []},
 
-        selected_prob_map: {},
+        selected_well: {},
         paginationOptions: {
           enabled: true,
           mode: 'record',
@@ -147,49 +135,50 @@
           disableSelectInfo: false
         },
 
-        new_prob_map_model: createNewProbMapModel(),
-        new_prob_map_schema: createNewProbMapSchema(),
-        table_prob_map_headers: createTableProbMapListHeader(),
-        table_prob_map: [],
+        new_wells_model: createNewWellModel(),
+        new_wells_schema: createNewWellSchema(),
+        table_wells_headers: createTableWellsLiteListHeader(),
+        table_wells: [],
 
         formOptions: {
           validateAfterLoad: true,
           validateAfterChanged: true,
         },
 
-        event_http_prob_map_list: {success: "successProbMapList", fail: "failProbMapList"},
-        event_http_prob_map_add: {success: "successProbMapAdd", fail: "failProbMapAdd"},
-        event_http_prob_map_del: {success: "successProbMapDel", fail: "failProbMapDel"},
+        event_http_wells_list: {success: "successWellsList", fail: "failWellsList"},
+        event_http_wells_add: {success: "successWellsAdd", fail: "failWellsAdd"},
+        event_http_wells_del: {success: "successWellsDel", fail: "failWellsDel"},
       }
     },
 
     beforeMount: function () {
       if (this.bdemo) {
         this.showLoader = false;
-      } else
-        this.httpProbMapList();
+      } else {
+        this.httpWellsList();
+      }
     },
 
     watch:
       {},
 
     methods: {
-      openNewProbMapDialog()
+      openNewWellsDialog()
       {
-        this.$refs.newProbMapDialog.showModal();
+        this.$refs.newWellsDialog.showModal();
       },
-      newProbMapDialogBtn1Click() {
-        this.$refs.newProbMapDialog.hideModal();
+      newWellsDialogBtn1Click() {
+        this.$refs.newWellsDialog.hideModal();
       },
-      newProbMapDialogBtn2Click() {
+      newWellsDialogBtn2Click() {
         if (!this.bvalidate) return;
 
         this.showLoader = true;
         let param = {
-          data: this.new_prob_map_model
+          data: this.new_wells_model
         };
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prob-map-register"), param, this.event_http_prob_map_add]).then();
-        this.$refs.newProbMapDialog.hideModal();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("well-register"), param, this.event_http_wells_add]).then();
+        this.$refs.newWellsDialog.hideModal();
       },
 
 
@@ -210,50 +199,43 @@
       //-----------------------------------------------------
       //TABLE VIEWER
       //-----------------------------------------------------
-      httpProbMapList() {
+      httpWellsList() {
         this.showLoader = true;
         let param = {
           data: {}
         };
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("prob-map-list-all"), param, this.event_http_prob_map_list]).then();
+        this.$store.dispatch('http_get', [this.varRouter.getHttpType("well-list-lite"), param, this.event_http_wells_list]).then();
       },
 
-      eventProbMapDeleteDialog(item) {
-        this.selected_prob_map = item;
-        this.$refs.dialogProbMapDelete.showModal();
+      eventWellsDeleteDialog(item) {
+        this.selected_well = item;
+        this.$refs.dialogWellsDelete.showModal();
       },
-      eventProbMapDeleteBtn1Click()
+      eventWellsDeleteBtn1Click()
       {
-        this.$refs.dialogProbMapDelete.hideModal();
+        this.$refs.dialogWellsDelete.hideModal();
       },
-      eventProbMapDeleteBtn2Click()
+      eventWellsDeleteBtn2Click()
       {
         this.showLoader = true;
         let param = {
-          data: this.selected_prob_map
+          data: this.selected_well
         };
-        this.$store.dispatch('http_post', [this.varRouter.getHttpType("prob-map-delete"), param, this.event_http_prob_map_del]).then();
-        this.$refs.dialogProbMapDelete.hideModal();
-      },
-
-      getHttpRefreshProspectProject() {
-        let param = {
-          data: {}
-        };
-        this.$store.dispatch('http_get', [this.varRouter.getHttpType("prospect-list"), param, this.event_http_prospect_list]).then();
+        this.$store.dispatch('http_post', [this.varRouter.getHttpType("well-delete"), param, this.event_http_wells_del]).then();
+        this.$refs.dialogWellsDelete.hideModal();
       },
     },
     mounted() {
       //-----------------------------------------------------------------
       // LIST PROB MAP
       //-----------------------------------------------------------------
-      EventBus.$on(this.event_http_prob_map_list.success, (msg) => {
-        this.table_prob_map = msg.data; //fill table contents
+      EventBus.$on(this.event_http_wells_list.success, (msg) => {
+        this.table_wells = msg.data; //fill table contents
         this.showLoader = false;
       });
-      EventBus.$on(this.event_http_prob_map_list.fail, (msg) => {
+      EventBus.$on(this.event_http_wells_list.fail, (msg) => {
         this.showLoader = false;
-        this.table_prob_map = [];
+        this.table_wells = [];
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
       });
@@ -261,14 +243,14 @@
       //-----------------------------------------------------------------
       // PROB MAP REGISTER
       //-----------------------------------------------------------------
-      EventBus.$on(this.event_http_prob_map_add.success, (msg) => {
+      EventBus.$on(this.event_http_wells_add.success, (msg) => {
         this.retStatus["title"] = "Information";
         this.retStatus["message"] = msg["mesg"];
         this.$refs.dialogMessage.showModal();
 
-        this.httpProbMapList();
+        this.httpWellsList();
       });
-      EventBus.$on(this.event_http_prob_map_add.fail, (msg) => {
+      EventBus.$on(this.event_http_wells_add.fail, (msg) => {
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
@@ -277,14 +259,14 @@
       //-----------------------------------------------------------------
       // PROB MAP DELETE
       //-----------------------------------------------------------------
-      EventBus.$on(this.event_http_prob_map_del.success, (msg) => {
+      EventBus.$on(this.event_http_wells_del.success, (msg) => {
         this.retStatus["title"] = "Information";
         this.retStatus["message"] = msg["mesg"];
         this.$refs.dialogMessage.showModal();
 
-        this.httpProbMapList();
+        this.httpWellsList();
       });
-      EventBus.$on(this.event_http_prob_map_del.fail, (msg) => {
+      EventBus.$on(this.event_http_wells_del.fail, (msg) => {
         this.showLoader = false;
         this.retStatus = msg;
         this.$refs.dialogMessage.showModal();
@@ -292,12 +274,12 @@
     },
 
     beforeDestroy() {
-      EventBus.$off(this.event_http_prob_map_list.success);
-      EventBus.$off(this.event_http_prob_map_list.fail);
-      EventBus.$off(this.event_http_prob_map_add.success);
-      EventBus.$off(this.event_http_prob_map_add.fail);
-      EventBus.$off(this.event_http_prob_map_del.success);
-      EventBus.$off(this.event_http_prob_map_del.fail);
+      EventBus.$off(this.event_http_wells_list.success);
+      EventBus.$off(this.event_http_wells_list.fail);
+      EventBus.$off(this.event_http_wells_add.success);
+      EventBus.$off(this.event_http_wells_add.fail);
+      EventBus.$off(this.event_http_wells_del.success);
+      EventBus.$off(this.event_http_wells_del.fail);
 
       this.showLoader = false;
     },

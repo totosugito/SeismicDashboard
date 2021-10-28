@@ -74,7 +74,7 @@
       ref="dialogMessage"
       type="warning"
       :header="retStatus.title" body="Body"
-      btn1_text="Tutup"
+      btn1_text="Close"
       btn1_style="success"
       @btn1Click="dialogMessageBtn1Click()">
               <span slot="slot-body">

@@ -11,7 +11,7 @@
     </button>
     <button class="btn btn-light m-2" @click="openPageDataManagementWell">
       <img class="img-responsive" src="../../_assets/images/asset07@2x.png"/>
-      <div class="menu_landing_page_text">Well</div>
+      <div class="menu_landing_page_text">Wells</div>
     </button>
     <button class="btn btn-light m-2" @click="openPageDataManagementUser">
       <img class="img-responsive" src="../../_assets/images/asset08@2x.png"/>
@@ -50,11 +50,11 @@
       },
       openPageDataManagementWell()
       {
-
+        this.$router.push(this.varRouter.getRoute("dm-wells", 1));
       },
       openPageDataManagementUser()
       {
-
+        this.$router.push(this.varRouter.getRoute("dm-users", 1));
       }
     }
   }

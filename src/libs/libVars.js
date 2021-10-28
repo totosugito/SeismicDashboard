@@ -1949,3 +1949,234 @@ export function createNewAreaSchema() {
   };
   return(schema_);
 }
+export function createTableUsersListHeader()
+{
+  let table_headers = [
+    {
+      field: 'email',
+      label: 'Email',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'username',
+      label: 'User Name',
+      // width: '150px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'label',
+      label: 'Label',
+      // width: '150px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'level',
+      label: 'Level',
+      width: '100px',
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'isLogin',
+      label: 'Status',
+      width: '120px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'action',
+      label: 'Action',
+      width: '80px',
+      sortable: false,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+  ];
+  return (table_headers);
+}
+export function createNewUserModel() {
+  let model = {
+    username: "",
+    email: "",
+    password: "",
+    level: 1,
+    label: "",
+    isLogin: false
+  };
+  return(model);
+}
+export function createNewUserSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Username',
+        model: 'username',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'email',
+        label: 'Email',
+        model: 'email',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'password',
+        label: 'Password',
+        model: 'password',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'number',
+        label: 'Level',
+        model: 'level',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Label',
+        model: 'label',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_);
+}
+export function createTableWellsLiteListHeader()
+{
+  let table_headers = [
+    {
+      field: 'filename',
+      label: 'Filename',
+      // width: '150px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'label',
+      label: 'Label',
+      // width: '150px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'vue-good-table-td-style',
+    },
+    {
+      field: 'GTS',
+      label: 'GTS',
+      width: '120px',
+      filterOptions: {
+        enabled: true,
+        placeholder: '',
+        trigger: 'enter',
+      },
+      sortable: true,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+    {
+      field: 'action',
+      label: 'Action',
+      width: '80px',
+      sortable: false,
+      thClass: 'text-center vue-good-table-header-style',
+      tdClass: 'text-center vue-good-table-td-style',
+    },
+  ];
+  return (table_headers);
+}
+export function createNewWellModel() {
+  let model = {
+    filename: "",
+    label: "",
+    GTS: "",
+  };
+  return(model);
+}
+export function createNewWellSchema() {
+  let schema_ = {
+    fields: [
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Filename',
+        model: 'filename',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'Label',
+        model: 'label',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+      {
+        type: 'input',
+        inputType: 'text',
+        label: 'GTS',
+        model: 'GTS',
+        placeholder: '',
+        featured: true,
+        required: true
+      },
+    ]
+  };
+  return(schema_);
+}

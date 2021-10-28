@@ -174,6 +174,16 @@ export default new Router({
                       name: varRouter.getRoute("dm-area", 2),
                       component: () => import('../views/v1/dataManagementArea')
                     },
+                    {
+                      path: varRouter.getRoute("dm-wells", 1),
+                      name: varRouter.getRoute("dm-wells", 2),
+                      component: () => import('../views/v1/dataManagementWells')
+                    },
+                    {
+                      path: varRouter.getRoute("dm-users", 1),
+                      name: varRouter.getRoute("dm-users", 2),
+                      component: () => import('../views/v1/dataManagementUsers')
+                    },
                   ]
                 },
 

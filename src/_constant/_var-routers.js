@@ -20,6 +20,8 @@ export default class VarRouter {
     "start-data-management": ["start-data-management", "/start-data-management", "Data Management"],
     'dm-probability-map': ["dm-probability-map", "/dm-probability-map", "Probability Map"],
     'dm-area': ["dm-area", "/dm-area", "Area"],
+    'dm-wells': ["dm-wells", "/dm-wells", "Wells"],
+    'dm-users': ["dm-users", "/dm-users", "Users"],
 
     "home": ["home", "/home", "Home"],
     "well": ["well", "/well", "Well"],
@@ -74,6 +76,7 @@ export default class VarRouter {
     "user-logout": "/api/user/logout",
     "user-list": "/api/user/list",
     "user-register": "/api/user/register",
+    "user-delete": "/api/user/delete",
 
     "area-list": "/api/area/list",
     "area-register": "/api/area/register",
@@ -130,6 +133,10 @@ export default class VarRouter {
     "prospect-analysis": "/api/prospect/analysis",
     "prospect-update-star": "/api/prospect/update-star",
 
+    "well-list": "/api/well/list",
+    "well-list-lite": "/api/well/list-lite",
+    "well-register": "/api/well/register",
+    "well-delete": "/api/well/delete",
     "well-list-info": "/api/well/list-info/",
     "well-poly-download": "/api/well/list",
 
